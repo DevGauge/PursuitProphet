@@ -86,20 +86,39 @@ class Bot:
     assistant_color = color_map["assistant"]
     system_color = color_map["system"]
 
+    def __init__(self, model="gpt-3.5-turbo"):
+        self.gpt = model
+        self.initialize()
+
     def formatted_text_output(self, message_type, text):
         """Format the text output based on the type of message"""
         color = self.color_map[message_type]
         print(f"{color}{text}{Style.RESET_ALL}\n")
 
+    def append_message(self, role, message):
+        """Append a message to the message list"""
+        self.messages.append({"role": role, "content": message})
+
     def assistant_message(self, message, to_user=True):
         """Send a message from the assistant to the user"""
         if to_user:
             self.formatted_text_output("assistant", message)
-        self.messages.append({"role": "assistant", "content": message})
+        self.append_message("assistant", message)
 
     def system_message(self, message):
         """Send a message from the system to the user"""
         self.formatted_text_output("system", message)
+        self.append_message("system", message)
+
+    def user_message(self, message):
+        """Record a message from the user"""
+        self.append_message("user", message)
+    
+    def get_user_input(self, prompt):
+        """Get input from the user and append it to the messages list"""
+        user_response = input(prompt)
+        self.messages.append({"role": "user", "content": user_response})
+        return user_response
 
     def get_open_ai_key(self):
         """Get the OpenAI API key from the environment or crash"""
@@ -116,23 +135,30 @@ class Bot:
         """Instantiate Gpt-3.5"""
         self.system_message("Initializing Custom Bot")
         openai.api_key = self.get_open_ai_key()
-        self.gpt = "gpt-3.5-turbo"
-    
-    def welcome(self):
-        """Define the role"""
-        self.assistant_message("Welcome to the Todo List ChatGPTBot. What role would you like me to fill today?")
-        self.role = input()
-        self.messages.append({"role": "system", "content": f"for the remainder of the conversation, I want you to act and respond as {self.role}"})
+
+    def send_message_to_gpt(self, messages):
+        """Send a list of messages to the ChatGPT API"""
         openai.ChatCompletion.create(
             model=self.gpt,
-            messages=self.messages
+            messages=messages
         )
 
-    def suggest_goals(self):
+    def display_welcome_message(self):
+        """Display the welcome message"""
+        welcome_message = "Welcome to the Todo List ChatGPTBot. What role would you like me to fill today?"
+        self.assistant_message(welcome_message)
+
+    def set_assistant_role(self):
+        """Set the assistant role based on user input"""
+        self.role = self.get_user_input("Please enter the role for the assistant: ")
+        self.messages.append({"role": "system", "content": f"For the remainder of the conversation, I want you to act and respond as {self.role}"})
+        self.send_message_to_gpt(self.messages)
+    
+    def suggest_goals(self, num_goals=5):
         """Define the objective"""
-        message = f"Define 5 goals that fulfill the role of {self.role}. Return goals in a numbered list. Do not provide additional context or output as I will provide it to the user."
+        message = f"Define {num_goals} goals that fulfill the role of {self.role}. Return goals in a numbered list."
         #send message to ChatGPT
-        self.messages.append({"role": "system", "content": message})
+        self.append_message("system", message)
         response = openai.ChatCompletion.create(
             model=self.gpt,
             messages=self.messages
@@ -156,43 +182,64 @@ class Bot:
     def ask_user_to_review_goals(self, goals):
         """Ask the user to review the goals"""
         #send user message asking them to review the goals
-        message = f"I've generated the following goals for you: \n\n{goals}\n\nWould you like to keep (keep) them, modify (modify) them, ask me to generate new goals (new), or provide your own goals? (list 5 goals, separated by a new line)"
-        self.messages.append({"role": "assistant", "content": message})
-        self.formatted_text_output("assistant", message)
-        user_response = input()
-        self.messages.append({"role": "user", "content": user_response})
+        formatted_goals = "\n".join([f"{i+1}. {goal}" for i, goal in enumerate(goals)])
+        message = f"I've generated the following goals for you: \n\n{formatted_goals}\n\nWould you like to keep (keep) them, modify (modify) them, ask me to generate new goals (new), or provide your own goals? (list 5 goals, separated by a new line)"
+        self.assistant_message(message)
+
+    def get_user_choice(self, choices):
+        """Get user input and ensure it's one of the provided choices."""
+        while True:
+            user_input = input().strip().lower()  # Get user input, remove leading/trailing whitespace and convert to lowercase
+            self.user_message(user_input)
+            if user_input in choices:
+                return user_input
+            else:
+                self.assistant_message("Invalid choice. Please choose from the following options: " + ", ".join(choices))
+
+    def confirm_completion(self, item):
+        """Ask the user to confirm whether a goal or subtask is complete."""
+        self.assistant_message(f"Have you completed {item}? Please respond with 'yes' or 'no'.")
+        user_input = self.get_user_choice(["yes", "no"])
+        if user_input == 'yes':
+            # Mark the item as complete and remove it from the list
+            self.assistant_message(f"Great job! {item} has been marked as complete.")
+        else:
+            self.assistant_message(f"Okay, we'll keep working on {item}.")
 
     def request_goals_from_user(self):
         """Request goals from the user"""
         #send user message asking what goals would help fulfill the role
         message = f"What goals would help fulfill the role of {self.role}? Please provide 5 goals, separated by a new line"
-        self.formatted_text_output("assistant", message)
+        self.assistant_message(message)
         user_response = input()
-        self.messages.append({"role": "user", "content": user_response})
+        self.user_message(user_response)
 
     def assist_user_with_goal(self, n):
-        """Assist the user with a goal"""        
-        sys_message = f"Given your role as {self.role}, do you suggest breaking this task into substasks? If yes, please respond with \"I think it's a good idea to break this task into subtasks.\": numbered list of subtasks separated by new lines. If no, please suggest how the user can start working on the goal. Do not provide any additional context, instrucitons, advice, etc. I will provide it to the user."
-        self.messages.append({"role": "system", "content": sys_message})
+        """Assist the user with a goal"""
+        task = self.goals[n]
+        sys_message = f"Given your role as {self.role}, do you suggest breaking {task} into substasks? If yes, please respond with \"I think it's a good idea to break {task} into subtasks.\": numbered list of subtasks separated by new lines. If no, please suggest how the user can start working on the goal. Do not provide any additional context, instrucitons, advice, etc. I will provide it to the user."
+        self.append_message("system", sys_message)
         response = openai.ChatCompletion.create(
             model=self.gpt,
             messages=self.messages
         )
         text = response['choices'][0]['message']['content']
-        self.formatted_text_output("assistant", text)
+        self.assistant_message(text)
 
-    def handle_user_input(self):
-        user_response = input()
-        self.messages.append({"role": "user", "content": user_response})
+    def run(self):
+        """Main function"""
+        self.display_welcome_message()
+        self.set_assistant_role()
+        goals = self.suggest_goals()
+        goals = self.strip_goals_and_save(goals)
+        self.ask_user_to_review_goals(goals)
+        user_choice = self.get_user_choice(['keep', 'modify', 'new'])
+        if user_choice == 'modify' or user_choice == 'new':
+            self.request_goals_from_user()
+        for n in range(len(self.goals)):
+            self.assist_user_with_goal(n)
 
-def main():
-    """Main function"""
-    bot = Bot()
-    bot.initialize()
-    bot.welcome()
-    goals = bot.suggest_goals()
-    bot.ask_user_to_review_goals(goals)
-    bot.request_goals_from_user()
 
 if __name__ == "__main__":
-    main()
+    bot = Bot()
+    bot.run()
