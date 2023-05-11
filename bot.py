@@ -104,10 +104,12 @@ class Bot:
             self.formatted_text_output("assistant", message)
         self.append_message("assistant", message)
 
-    def system_message(self, message):
+    def system_message(self, message, to_user=True, to_gpt=False):
         """Send a message from the system to the user"""
-        self.formatted_text_output("system", message)
-        self.append_message("system", message)
+        if to_user:
+            self.formatted_text_output("system", message)
+        if to_gpt:
+            self.append_message("system", message)
 
     def user_message(self, message):
         """Record a message from the user"""
