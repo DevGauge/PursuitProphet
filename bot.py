@@ -76,17 +76,13 @@ class Bot:
     gpt = None
     role = None
     messages = []
-    goals = []
-    
+    completed_goals = []
+
     color_map = {
         "user": Fore.GREEN,
         "assistant": Fore.BLUE,
         "system": Fore.RED,
     }
-
-    user_color = color_map["user"]
-    assistant_color = color_map["assistant"]
-    system_color = color_map["system"]
 
     def __init__(self, model="gpt-3.5-turbo"):
         self.gpt = model
@@ -152,9 +148,9 @@ class Bot:
             spinner.stop()
 
     def display_welcome_message(self):
-        """Display the welcome message"""
-        welcome_message = "Welcome to the Todo List ChatGPTBot. What role would you like me to fill today?"
-        self.assistant_message(welcome_message)
+        """Display the welcome message"""        
+        welcome_message = "Welcome to the Todo List ChatGPTBot. What goal would you like help accomplishing?"
+        self.assistant_message(welcome_message)        
 
     def set_assistant_role(self):
         """Set the assistant role based on user input"""
@@ -167,10 +163,7 @@ class Bot:
         message = f"Define {num_goals} goals that fulfill the role of {self.role}. Return goals in a numbered list."
         #send message to ChatGPT
         self.append_message("system", message)
-        response = openai.ChatCompletion.create(
-            model=self.gpt,
-            messages=self.messages
-        )
+        response = self.send_message_to_gpt(self.messages)
         text = response['choices'][0]['message']['content']
         return text
     
