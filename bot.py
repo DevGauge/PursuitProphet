@@ -58,8 +58,6 @@ If the user exceeds the token limit for a request, the ChatGPTBot divides the re
 # Determine tokens being sent when providing "training" data.
 # Handle errors and unexpected situations and inform the user.
 # Confirm with the user that the goal should be removed.
-# Implement user input handling.
-# Write the main function to run the bot.
 # Test the bot extensively to ensure all functionality works as expected.
 
 import os
@@ -71,7 +69,6 @@ import halo
 
 class Bot:
     """Create a bot using GPT-3.5 to act as an assistant, helping the user complete a to-do list"""
-    gpt = None
     role = None
     messages = []
     completed_goals = []
