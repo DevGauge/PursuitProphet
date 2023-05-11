@@ -68,6 +68,8 @@ Test the bot extensively to ensure all functionality works as expected.
 import os
 import openai
 from colorama import Fore, Style
+import halo
+import json
 
 class Bot:
     """Create a bot using GPT-3.5 to act as an assistant, helping the user complete a to-do list"""
@@ -136,12 +138,17 @@ class Bot:
         self.system_message("Use this bot at your own risk. Nothing shared is confidential, but no data is tied to you personally. ")
         openai.api_key = self.get_open_ai_key()
 
-    def send_message_to_gpt(self, messages):
+    def send_message_to_gpt(self, messages, loading_text='Thinking'):
         """Send a list of messages to the ChatGPT API"""
-        openai.ChatCompletion.create(
-            model=self.gpt,
-            messages=messages
-        )
+        spinner = halo.Halo(text=loading_text, spinner='dots')
+        spinner.start()
+        try:
+            return openai.ChatCompletion.create(
+                model=self.gpt,
+                messages=messages
+            )
+        finally:
+            spinner.stop()
 
     def display_welcome_message(self):
         """Display the welcome message"""
