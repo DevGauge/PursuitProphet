@@ -49,21 +49,18 @@ If the ChatGPTBot encounters an error or unexpected situation, it informs the us
 
 If the user exceeds the token limit for a request, the ChatGPTBot divides the request into smaller parts and sends them one by one within the token limit.
 """
+# TO DO
 
-"""
-TO DO
-
-Implement message history tracking.
-Assist the user with a goal.
-Handle ambiguous or unclear affirmative responses regarding goal completion using RNG.
-Determine if there are additional responses required and ask ChatGPT to provide those responses for long-term goals.
-Determine tokens being sent when providing "training" data.
-Handle errors and unexpected situations and inform the user.
-Confirm with the user that the goal should be removed.
-Implement user input handling.
-Write the main function to run the bot.
-Test the bot extensively to ensure all functionality works as expected.
-"""
+# Implement message history tracking.
+# Assist the user with a goal.
+# Handle ambiguous or unclear affirmative responses regarding goal completion using RNG.
+# Determine if there are additional responses required and ask ChatGPT to provide those responses for long-term goals.
+# Determine tokens being sent when providing "training" data.
+# Handle errors and unexpected situations and inform the user.
+# Confirm with the user that the goal should be removed.
+# Implement user input handling.
+# Write the main function to run the bot.
+# Test the bot extensively to ensure all functionality works as expected.
 
 import os
 import openai
