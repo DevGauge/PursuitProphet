@@ -133,7 +133,7 @@ class Bot:
     
     def initialize(self):
         """Instantiate Gpt-3.5"""
-        self.system_message("Initializing Custom Bot")
+        self.system_message("Use this bot at your own risk. Nothing shared is confidential, but no data is tied to you personally. ")
         openai.api_key = self.get_open_ai_key()
 
     def send_message_to_gpt(self, messages):
