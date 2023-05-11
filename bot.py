@@ -63,10 +63,11 @@ If the user exceeds the token limit for a request, the ChatGPTBot divides the re
 # Test the bot extensively to ensure all functionality works as expected.
 
 import os
+import json
 import openai
 from colorama import Fore, Style
 import halo
-import json
+
 
 class Bot:
     """Create a bot using GPT-3.5 to act as an assistant, helping the user complete a to-do list"""
@@ -224,7 +225,68 @@ class Bot:
             messages=self.messages
         )
         text = response['choices'][0]['message']['content']
+        subtasks = text.split('\n')  # Split the response into subtasks
+        self.goals[task] = subtasks  # Assign the subtasks to the corresponding goal
         self.assistant_message(text)
+
+    def handle_user_task_interaction(self):
+        """Iterate through the user's tasks, asking if they want to work on it, breaking it down if needed, and providing assistance."""
+        for task in self.goals:
+            # Ask the user if they want to work on the task
+            user_wants_to_work_on_task = self.ask_if_user_wants_to_work_on_task(task)
+            if not user_wants_to_work_on_task:
+                continue
+
+            # Ask user what subtask they want to work on and provide assistance
+            self.provide_assistance_with_task(task)
+
+    def ask_if_user_wants_to_work_on_task(self, task):
+        """Ask the user if they want to work on a task."""
+        message = f"Do you want to work on {task}?"
+        self.assistant_message(message)
+        user_input = self.get_user_choice(["yes", "no"])
+        if user_input == 'yes':
+            return True
+        return False
+
+    def provide_assistance_with_task(self, task):
+        """Ask the user what subtask they want to work on and provide assistance."""
+        # Ask the user what task they want to work on
+        # If the bot can provide assistance with the task, do so
+        # Otherwise, let the user know that the bot can't provide the specific assistance requested but can provide other types of assistance
+        message = f"Acting with the goal of {self.role}, what assistance can you provide with {task}? Keep your answer concise and to the point, providing practical advice whenever possible. If unable to complete a task, let the user know and ask if they'd like to move on to the next task or want you to wait for them, using \"/goal complete\" to mark the task as complete."
+        self.system_message(message, to_user=False, to_gpt=True)
+        response = self.send_message_to_gpt(self.messages)
+        text = response['choices'][0]['message']['content']
+        self.assistant_message(text)
+
+    def mark_task_as_complete(self, task):
+        """Mark a task as complete."""
+        self.goals.remove(task)
+        self.completed_goals.append(task)
+
+    def save_goals_to_disk_in_json(self):
+        """Save the goals to disk in JSON format."""
+        sys_message = "Saving goals to disk."
+        self.system_message(sys_message, to_user=True, to_gpt=False)
+
+        sys_filename_message = f"Please give me a filename to save {self.role} using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems."
+        self.system_message(sys_filename_message, to_user=False, to_gpt=True)
+        response = self.send_message_to_gpt(self.messages, loading_text="Generating...")
+        filename = response['choices'][0]['message']['content']
+        
+        json_dict = {
+            "role": self.role,
+            "goals": self.goals,
+            "completed_goals": self.completed_goals,
+        }        
+        json_object = json.dumps(json_dict, indent=4)
+
+        with open(filename, "w") as f:
+            f.write(json_object)
+        
+        sys_save_complete_message = f"Saved session to disk as {filename}."
+        self.system_message(sys_save_complete_message, to_user=True, to_gpt=False)        
 
     def run(self):
         """Main function"""
@@ -238,7 +300,7 @@ class Bot:
             self.request_goals_from_user()
         for n in range(len(self.goals)):
             self.assist_user_with_goal(n)
-
+        bot.save_goals_to_disk_in_json()
 
 if __name__ == "__main__":
     bot = Bot()
