@@ -90,6 +90,7 @@ class Bot:
 
     def __init__(self, model="gpt-3.5-turbo"):
         self.gpt = model
+        self.goals = {}  # Initialize goals as an empty dictionary
         self.initialize()
 
     def formatted_text_output(self, message_type, text):
@@ -183,8 +184,8 @@ class Bot:
         goals = [goal[1:] if goal[0] == "." else goal for goal in goals]
         # strip leading and trailing whitespace
         goals = [goal.strip() for goal in goals]
-        self.goals = goals
-        return goals
+        self.goals = {goal: [] for goal in goals}  # Store each goal as a key with an empty list as its value
+        return self.goals
 
     def ask_user_to_review_goals(self, goals):
         """Ask the user to review the goals"""
@@ -223,7 +224,7 @@ class Bot:
 
     def assist_user_with_goal(self, n):
         """Assist the user with a goal"""
-        task = self.goals[n]
+        task = list(self.goals.keys())[n]
         sys_message = f"Given your role as {self.role}, do you suggest breaking {task} into substasks? If yes, please respond with \"I think it's a good idea to break {task} into subtasks.\": numbered list of subtasks separated by new lines. If no, please suggest how the user can start working on the goal. Do not provide any additional context, instrucitons, advice, etc. I will provide it to the user."
         self.append_message("system", sys_message)
         response = openai.ChatCompletion.create(
