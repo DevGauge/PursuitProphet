@@ -337,7 +337,8 @@ class Bot:
         if user_choice == 'modify' or user_choice == 'new':
             self.request_goals_from_user()
         for n in range(len(self.goals)):
-            self.assist_user_with_goal(n)
+            self.generate_subtasks(n)
+        bot.handle_user_task_interaction()
         bot.save_goals_to_disk_in_json()
 
 if __name__ == "__main__":
