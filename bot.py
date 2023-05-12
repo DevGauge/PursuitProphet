@@ -194,9 +194,9 @@ class Bot:
         #strip the goals from the response
         goals = goals.split("\n")
         # if goal starts with number or number and period, strip it
-        goals = [goal.split(" ", 1)[1] if goal[0].isdigit() else goal for goal in goals]
+        goals = [goal.split(" ", 1)[1] if goal != "" and goal[0].isdigit() else goal for goal in goals]
         # if goal starts with period, strip it
-        goals = [goal[1:] if goal[0] == "." else goal for goal in goals]
+        goals = [goal[1:] if goal != "" and goal[0] == "." else goal for goal in goals]
         # strip leading and trailing whitespace
         goals = [goal.strip() for goal in goals]
         self.goals = {goal: [] for goal in goals}  # Store each goal as a key with an empty list as its value
@@ -206,7 +206,7 @@ class Bot:
         """Ask the user to review the goals"""
         #send user message asking them to review the goals
         formatted_goals = "\n".join([f"{i+1}. {goal}" for i, goal in enumerate(goals)])
-        message = f"I've generated the following goals for you: \n\n{formatted_goals}\n\nWould you like to keep (keep) them, modify (modify) them, ask me to generate new goals (new), or provide your own goals? (list 5 goals, separated by a new line)"
+        message = f"I've generated the following goals for you: \n\n{formatted_goals}\n\nWould you like to keep (keep) them, modify (modify) them, ask me to generate new goals (new), or provide your own goals? (list goals, separated by a new line)"
         self.assistant_message(message)
 
     def get_user_choice(self, choices):
