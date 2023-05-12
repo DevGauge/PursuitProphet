@@ -84,6 +84,30 @@ class Bot:
         self.goals = {}  # Initialize goals as an empty dictionary
         self.initialize()
 
+    def handle_slash_command(self, text):
+        """Handle slash commands"""
+        commands = {
+            "/goal": ['create', 'complete']
+            #"/subtask": ['create', 'complete'],
+        }
+        
+        # if text includes a valid command
+        if text.split(" ")[0] in commands:
+            command, action = text.split(" ")[:2]
+            if command == "/goal":
+                if action == "create":
+                    goal = text.split(" ", 2)[2]
+                    self.goals[goal] = []
+                    self.system_message(f"Created new goal: {goal}", to_user=True, to_gpt=True)
+                    return True
+                elif action == "complete":
+                    goal_number = int(text.split(" ")[2])
+                    self.mark_goal_as_complete(goal_number)
+                    return True
+            else:
+                self.system_message(f"Invalid command. Valid commands are {json.dumps(commands, indent=4)}")
+                return False
+
     def formatted_text_output(self, message_type, text):
         """Format the text output based on the type of message"""
         color = self.color_map[message_type]
@@ -113,7 +137,8 @@ class Bot:
     def get_user_input(self, prompt):
         """Get input from the user and append it to the messages list"""
         user_response = input(prompt)
-        self.messages.append({"role": "user", "content": user_response})
+        if self.handle_slash_command(user_response) is False:
+            self.messages.append({"role": "user", "content": user_response})
         return user_response
 
     def get_open_ai_key(self):
