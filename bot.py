@@ -71,22 +71,63 @@ from colorama import Fore, Style
 import halo
 import openai
 
-class Bot:
-    """Create a bot using GPT-3.5 to act as an assistant, helping the user complete a to-do list"""
-    role = None
-    messages = []
-    completed_goals = []
+class ChatBot:
+    def __init__(self):
+        self.io_manager = IOManager(role='')
+        self.gpt3_interface = GPT3Interface(io_manager=self.io_manager)
+        self.goal_manager = GoalManager(io_manager=self.io_manager, gpt3_interface=self.gpt3_interface)
+    
+    def run(self):
+        """Main function"""
+        self.display_welcome_message()
+        self.set_assistant_role()
+        self.goal_manager.goals = self.gpt3_interface.suggest_goals()
+        self.goal_manager.goals = self.goal_manager.strip_goals_and_save(self.goal_manager.goals)
+        self.io_manager.ask_user_to_review_goals(self.goal_manager.goals)
+        user_choice = self.io_manager.get_user_choice(['keep', 'modify', 'new'])
+        if user_choice == 'modify' or user_choice == 'new':
+            self.request_goals_from_user()
+        for n in range(len(self.goal_manager.goals)):
+            self.goal_manager.generate_subtasks(n)
+        self.goal_manager.handle_user_task_interaction()
+        self.goal_manager.save_goals_to_disk_in_json()
 
-    color_map = {
-        "user": Fore.GREEN,
-        "assistant": Fore.BLUE,
-        "system": Fore.RED,
-    }
+    def set_role(self, role):
+        self.io_manager.role = role
 
-    def __init__(self, model="gpt-3.5-turbo"):
-        self.gpt = model
-        self.goals = {}  # Initialize goals as an empty dictionary
-        self.initialize()
+    def display_welcome_message(self):
+        """Display the welcome message"""        
+        welcome_message = "Welcome to Devgauge's Todo List ChatGPTBot. What goal would you like help accomplishing?"
+        self.io_manager.assistant_message(welcome_message)
+        
+    def request_goals_from_user(self):
+        """Request goals from the user"""
+        #send user message asking what goals would help fulfill the role
+        message = f"What goals would help fulfill the role of {self.io_manager.role}? Please provide goals separated by a new line"
+        self.io_manager.assistant_message(message)
+        user_response = input()
+        self.io_manager.user_message(user_response)
+        self.goal_manager.strip_goals_and_save(user_response)
+
+    def set_assistant_role(self):
+        """Set the assistant role based on user input"""
+        self.set_role(self.io_manager.get_user_input("Please enter the role for the assistant: "))
+        self.io_manager.system_message(f"For the remainder of the conversation, I want you to act and respond as {self.io_manager.role}", to_user=False, to_gpt=True)
+        self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
+
+class GoalManager:
+    def __init__(self, io_manager, gpt3_interface):
+        self.io_manager = io_manager
+        self.gpt3_interface = gpt3_interface
+        self.goals = {}
+        self.completed_goals = []
+
+    def create_file_json(self):
+        return {
+            "role": self.io_manager.role,
+            "goals": self.goals,
+            "completed_goals": self.completed_goals,
+        }
 
     def handle_slash_command(self, text):
         """Handle slash commands"""
@@ -102,15 +143,163 @@ class Bot:
                 if action == "create":
                     goal = text.split(" ", 2)[2]
                     self.goals[goal] = []
-                    self.system_message(f"Created new goal: {goal}", to_user=True, to_gpt=True)
+                    self.io_manager.system_message(f"Created new goal: {goal}", to_user=True, to_gpt=True)
                     return True
                 elif action == "complete":
                     goal_number = int(text.split(" ")[2])
                     self.mark_goal_as_complete(goal_number)
                     return True
             else:
-                self.system_message(f"Invalid command. Valid commands are {json.dumps(commands, indent=4)}")
+                self.io_manager.system_message(f"Invalid command. Valid commands are {json.dumps(commands, indent=4)}")
                 return False
+        return False
+
+    def confirm_completion(self, item):
+        """Ask the user to confirm whether a goal or subtask is complete."""
+        self.io_manager.assistant_message(f"Have you completed {item}? Please respond with 'yes' or 'no'.")
+        user_input = self.io_manager.get_user_choice(["yes", "no"])
+        if user_input == 'yes':
+            # Mark the item as complete and remove it from the list
+            self.io_manager.assistant_message(f"Great job! {item} has been marked as complete.")
+        else:
+            self.io_manager.assistant_message(f"Okay, we'll keep working on {item}.")
+
+    def generate_subtasks(self, n):
+        """Assist the user with a goal"""
+        task = list(self.goals.keys())[n]
+        sys_message = f"Given your role as {self.io_manager.role}, do you suggest breaking {task} into substasks? If yes, please respond with \"I think it's a good idea to break {task} into subtasks.\": numbered list of subtasks separated by new lines. If no, please suggest how the user can start working on the goal. It's important that you only provide a numbered list with no additional context."
+        self.io_manager.system_message(sys_message, to_user=False, to_gpt=True)
+        response = self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
+        text = response['choices'][0]['message']['content']
+        subtasks = text.split('\n')  # Split the response into subtasks
+        self.goals[task] = subtasks  # Assign the subtasks to the corresponding goal
+        self.io_manager.assistant_message(text)
+    
+    def ask_if_user_wants_to_work_on_task(self, task):
+        """Ask the user if they want to work on a task."""
+        message = f"Do you want to work on {task}?"
+        self.io_manager.assistant_message(message)
+        user_input = self.io_manager.get_user_choice(["yes", "no"])
+        if user_input == 'yes':
+            return True
+        return False
+
+    def handle_user_task_interaction(self):
+        """Iterate through the user's tasks, asking if they want to work on it, breaking it down if needed, and providing assistance."""
+        for task in self.goals:
+            # Ask the user if they want to work on the task
+            user_wants_to_work_on_task = self.ask_if_user_wants_to_work_on_task(task)
+            if not user_wants_to_work_on_task:
+                continue
+
+            # Ask user what subtask they want to work on and provide assistance
+            self.gpt3_interface.provide_assistance_with_task(task)
+
+    def mark_goal_as_complete(self, n):
+        """Mark the nth goal as complete."""
+        goal = list(self.goals.keys())[n]
+        self.completed_goals.append({goal: self.goals[goal]})
+        del self.goals[goal]
+        self.io_manager.system_message(f"Goal {n+1} '{goal}' marked as complete.")
+
+    def strip_goals_and_save(self, goals):
+        """Strip the goals from the response and save them"""
+        #strip the goals from the response
+        goals = goals.split("\n")
+        # if goal starts with number or number and period, strip it
+        goals = [goal.split(" ", 1)[1] if goal != "" and goal[0].isdigit() else goal for goal in goals]
+        # if goal starts with period, strip it
+        goals = [goal[1:] if goal != "" and goal[0] == "." else goal for goal in goals]
+        # strip leading and trailing whitespace
+        goals = [goal.strip() for goal in goals]
+        self.goals = {goal: [] for goal in goals}  # Store each goal as a key with an empty list as its value
+        return self.goals
+
+    def save_goals_to_disk_in_json(self):
+        """Save the goals to disk in JSON format."""
+        sys_message = "Saving goals to disk."
+        self.io_manager.system_message(sys_message, to_user=True, to_gpt=False)
+        # eclude existing files
+        excluded_filenames = [filename for filename in os.listdir() if filename.endswith(".json")]
+
+        sys_filename_message = f"Please give me a filename to save {self.io_manager.role} using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems. Exclude the following filenames from any you generate: {excluded_filenames}"
+        # check if sys_filename_message exists
+        if os.path.exists(sys_filename_message):
+            # append timestamp to filename
+            sys_filename_message = sys_filename_message + str(datetime.datetime.now())
+        
+        self.io_manager.system_message(sys_filename_message, to_user=False, to_gpt=True)
+        response = self.gpt3_interface.send_message_to_gpt(self.io_manager.messages, loading_text="Generating...")
+        filename = response['choices'][0]['message']['content']
+        
+        json_dict = {
+            "role": self.io_manager.role,
+            "goals": self.goals,
+            "completed_goals": self.completed_goals,
+        }        
+        json_object = json.dumps(json_dict, indent=4)
+
+        with open(self.strip_invalid_file_chars(filename), "w", encoding="utf-8") as f:
+            f.write(json_object)
+        
+        sys_save_complete_message = f"Saved session to disk as {filename}."
+        self.io_manager.system_message(sys_save_complete_message, to_user=True, to_gpt=False)
+
+    def strip_invalid_file_chars(self, filename):
+        """Strip invalid characters from a filename."""
+        invalid_chars = ["/", "\\", ":", "*", "?", "\"", "<", ">", "|"]
+        for char in invalid_chars:
+            filename = filename.replace(char, "")
+        return filename
+
+class GPT3Interface:
+    def __init__(self, io_manager, model="gpt-3.5-turbo"):        
+        self.io_manager = io_manager
+        self.gpt = model
+        openai.api_key = self.io_manager.get_open_ai_key()
+
+    def send_message_to_gpt(self, messages, loading_text='Thinking'):
+        """Send a list of messages to the ChatGPT API"""
+        spinner = halo.Halo(text=loading_text, spinner='dots')
+        spinner.start()
+        try:
+            return openai.ChatCompletion.create(
+                model=self.gpt,
+                messages=messages
+            )
+        finally:
+            spinner.stop()
+
+    def suggest_goals(self, num_goals=10):
+        """Define the objective"""
+        message = f"Define as many goals as possible up to {num_goals} goals that fulfill the role of {self.io_manager.role}."
+        #send message to ChatGPT
+        self.io_manager.append_message("system", message)
+        response = self.send_message_to_gpt(self.io_manager.messages)
+        text = response['choices'][0]['message']['content']
+        return text
+
+    def provide_assistance_with_task(self, task):
+        """Ask the user what subtask they want to work on and provide assistance."""
+        # Ask the user what task they want to work on
+        # If the bot can provide assistance with the task, do so
+        # Otherwise, let the user know that the bot can't provide the specific assistance requested but can provide other types of assistance
+        message = f"Acting with the goal of {self.io_manager.role}, what assistance can you provide with {task}? Keep your answer concise and to the point, providing practical advice whenever possible. If unable to complete a task, let the user know and ask if they'd like to move on to the next task or want you to wait for them, using \"/goal complete\" to mark the task as complete."
+        self.io_manager.system_message(message, to_user=False, to_gpt=True)
+        response = self.send_message_to_gpt(self.io_manager.messages)
+        text = response['choices'][0]['message']['content']
+        self.io_manager.assistant_message(text)
+
+class IOManager:
+    color_map = {
+        "user": Fore.GREEN,
+        "assistant": Fore.BLUE,
+        "system": Fore.RED,
+    }
+
+    def __init__(self, role):
+        self.role = role
+        self.messages = []
 
     def formatted_text_output(self, message_type, text):
         """Format the text output based on the type of message"""
@@ -137,81 +326,13 @@ class Bot:
     def user_message(self, message):
         """Record a message from the user"""
         self.append_message("user", message)
-    
+
     def get_user_input(self, prompt):
         """Get input from the user and append it to the messages list"""
         user_response = input(prompt)
-        if self.handle_slash_command(user_response) is False:
-            self.messages.append({"role": "user", "content": user_response})
+        # if self.handle_slash_command(user_response) is False:
+        #     self.messages.append({"role": "user", "content": user_response})
         return user_response
-
-    def get_open_ai_key(self):
-        """Get the OpenAI API key from the environment or crash"""
-        key = os.getenv("OPENAI_API_KEY")
-        if key is not None:
-            return key
-
-        to_user_message="Please set your OpenAI API key in the environment variables using the key OPENAI_API_KEY"
-        sys_message="OPENAI_API_KEY not found in environment variables"
-        self.system_message(to_user_message)
-        raise UnboundLocalError(sys_message)
-    
-    def initialize(self):
-        """Instantiate Gpt-3.5"""
-        self.system_message("Use this bot at your own risk. Nothing shared is confidential, but no data is tied to you personally. ")
-        openai.api_key = self.get_open_ai_key()
-
-    def send_message_to_gpt(self, messages, loading_text='Thinking'):
-        """Send a list of messages to the ChatGPT API"""
-        spinner = halo.Halo(text=loading_text, spinner='dots')
-        spinner.start()
-        try:
-            return openai.ChatCompletion.create(
-                model=self.gpt,
-                messages=messages
-            )
-        finally:
-            spinner.stop()
-
-    def display_welcome_message(self):
-        """Display the welcome message"""        
-        welcome_message = "Welcome to the Todo List ChatGPTBot. What goal would you like help accomplishing?"
-        self.assistant_message(welcome_message)        
-
-    def set_assistant_role(self):
-        """Set the assistant role based on user input"""
-        self.role = self.get_user_input("Please enter the role for the assistant: ")
-        self.messages.append({"role": "system", "content": f"For the remainder of the conversation, I want you to act and respond as {self.role}"})
-        self.send_message_to_gpt(self.messages)
-    
-    def suggest_goals(self, num_goals=10):
-        """Define the objective"""
-        message = f"Define as many goals as possible up to {num_goals} goals that fulfill the role of {self.role}. I want you to first generate 10 goals, then ask yourself what rank the goals should be in, ranked by importance toward fulfilling the role. Return goals in a numbered list. Exclude any commentary, only providing the numbered list. I will provide instructions to the  user and additional text will interfere with this process."
-        #send message to ChatGPT
-        self.append_message("system", message)
-        response = self.send_message_to_gpt(self.messages)
-        text = response['choices'][0]['message']['content']
-        return text
-    
-    def strip_goals_and_save(self, goals):
-        """Strip the goals from the response and save them"""
-        #strip the goals from the response
-        goals = goals.split("\n")
-        # if goal starts with number or number and period, strip it
-        goals = [goal.split(" ", 1)[1] if goal != "" and goal[0].isdigit() else goal for goal in goals]
-        # if goal starts with period, strip it
-        goals = [goal[1:] if goal != "" and goal[0] == "." else goal for goal in goals]
-        # strip leading and trailing whitespace
-        goals = [goal.strip() for goal in goals]
-        self.goals = {goal: [] for goal in goals}  # Store each goal as a key with an empty list as its value
-        return self.goals
-
-    def ask_user_to_review_goals(self, goals):
-        """Ask the user to review the goals"""
-        #send user message asking them to review the goals
-        formatted_goals = "\n".join([f"{i+1}. {goal}" for i, goal in enumerate(goals)])
-        message = f"I've generated the following goals for you: \n\n{formatted_goals}\n\nWould you like to keep (keep) them, modify (modify) them, ask me to generate new goals (new), or provide your own goals? (list goals, separated by a new line)"
-        self.assistant_message(message)
 
     def get_user_choice(self, choices):
         """Get user input and ensure it's one of the provided choices."""
@@ -223,128 +344,28 @@ class Bot:
             else:
                 self.assistant_message("Invalid choice. Please choose from the following options: " + ", ".join(choices))
 
-    def confirm_completion(self, item):
-        """Ask the user to confirm whether a goal or subtask is complete."""
-        self.assistant_message(f"Have you completed {item}? Please respond with 'yes' or 'no'.")
-        user_input = self.get_user_choice(["yes", "no"])
-        if user_input == 'yes':
-            # Mark the item as complete and remove it from the list
-            self.assistant_message(f"Great job! {item} has been marked as complete.")
-        else:
-            self.assistant_message(f"Okay, we'll keep working on {item}.")
-
-    def request_goals_from_user(self):
-        """Request goals from the user"""
-        #send user message asking what goals would help fulfill the role
-        message = f"What goals would help fulfill the role of {self.role}? Please provide 5 goals, separated by a new line"
+    def ask_user_to_review_goals(self, goals):
+        """Ask the user to review the goals"""
+        #send user message asking them to review the goals
+        formatted_goals = "\n".join([f"{i+1}. {goal}" for i, goal in enumerate(goals)])
+        message = f"I've generated the following goals for you: \n\n{formatted_goals}\n\nWould you like to keep (keep) them, modify (modify) them, ask me to generate new goals (new), or provide your own goals? (list goals, separated by a new line)"
         self.assistant_message(message)
-        user_response = input()
-        self.user_message(user_response)
 
-    def generate_subtasks(self, n):
-        """Assist the user with a goal"""
-        task = list(self.goals.keys())[n]
-        sys_message = f"Given your role as {self.role}, do you suggest breaking {task} into substasks? If yes, please respond with \"I think it's a good idea to break {task} into subtasks.\": numbered list of subtasks separated by new lines. If no, please suggest how the user can start working on the goal. Do not provide any additional context, instrucitons, advice, etc. I will provide it to the user."
-        self.append_message("system", sys_message)
-        response = openai.ChatCompletion.create(
-            model=self.gpt,
-            messages=self.messages
-        )
-        text = response['choices'][0]['message']['content']
-        subtasks = text.split('\n')  # Split the response into subtasks
-        self.goals[task] = subtasks  # Assign the subtasks to the corresponding goal
-        self.assistant_message(text)
+    def get_open_ai_key(self):
+        """Get the OpenAI API key from the environment or crash"""
+        key = os.getenv("OPENAI_API_KEY")
+        if key is not None:
+            return key
 
-    def handle_user_task_interaction(self):
-        """Iterate through the user's tasks, asking if they want to work on it, breaking it down if needed, and providing assistance."""
-        for task in self.goals:
-            # Ask the user if they want to work on the task
-            user_wants_to_work_on_task = self.ask_if_user_wants_to_work_on_task(task)
-            if not user_wants_to_work_on_task:
-                continue
+        to_user_message="Please set your OpenAI API key in the environment variables using the key OPENAI_API_KEY"
+        sys_message="OPENAI_API_KEY not found in environment variables"
+        self.system_message(to_user_message)
+        raise UnboundLocalError(sys_message)
 
-            # Ask user what subtask they want to work on and provide assistance
-            self.provide_assistance_with_task(task)
-
-    def ask_if_user_wants_to_work_on_task(self, task):
-        """Ask the user if they want to work on a task."""
-        message = f"Do you want to work on {task}?"
-        self.assistant_message(message)
-        user_input = self.get_user_choice(["yes", "no"])
-        if user_input == 'yes':
-            return True
-        return False
-
-    def provide_assistance_with_task(self, task):
-        """Ask the user what subtask they want to work on and provide assistance."""
-        # Ask the user what task they want to work on
-        # If the bot can provide assistance with the task, do so
-        # Otherwise, let the user know that the bot can't provide the specific assistance requested but can provide other types of assistance
-        message = f"Acting with the goal of {self.role}, what assistance can you provide with {task}? Keep your answer concise and to the point, providing practical advice whenever possible. If unable to complete a task, let the user know and ask if they'd like to move on to the next task or want you to wait for them, using \"/goal complete\" to mark the task as complete."
-        self.system_message(message, to_user=False, to_gpt=True)
-        response = self.send_message_to_gpt(self.messages)
-        text = response['choices'][0]['message']['content']
-        self.assistant_message(text)
-
-    def mark_goal_as_complete(self, n):
-        """Mark the nth goal as complete."""
-        goal = list(self.goals.keys())[n]
-        self.completed_goals.append({goal: self.goals[goal]})
-        del self.goals[goal]
-        self.system_message(f"Goal {n+1} '{goal}' marked as complete.")
-
-    def save_goals_to_disk_in_json(self):
-        """Save the goals to disk in JSON format."""
-        sys_message = "Saving goals to disk."
-        self.system_message(sys_message, to_user=True, to_gpt=False)
-        # eclude existing files
-        excluded_filenames = [filename for filename in os.listdir() if filename.endswith(".json")]
-
-        sys_filename_message = f"Please give me a filename to save {self.role} using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems. Exclude the following filenames from any you generate: {excluded_filenames}"
-        # check if sys_filename_message exists
-        if os.path.exists(sys_filename_message):
-            # append timestamp to filename
-            sys_filename_message = sys_filename_message + str(datetime.datetime.now())
-        
-        self.system_message(sys_filename_message, to_user=False, to_gpt=True)
-        response = self.send_message_to_gpt(self.messages, loading_text="Generating...")
-        filename = response['choices'][0]['message']['content']
-        
-        json_dict = {
-            "role": self.role,
-            "goals": self.goals,
-            "completed_goals": self.completed_goals,
-        }        
-        json_object = json.dumps(json_dict, indent=4)
-
-        with open(self.strip_invalid_file_chars(filename), "w", encoding="utf-8") as f:
-            f.write(json_object)
-        
-        sys_save_complete_message = f"Saved session to disk as {filename}."
-        self.system_message(sys_save_complete_message, to_user=True, to_gpt=False)
-
-    def strip_invalid_file_chars(self, filename):
-        """Strip invalid characters from a filename."""
-        invalid_chars = ["/", "\\", ":", "*", "?", "\"", "<", ">", "|"]
-        for char in invalid_chars:
-            filename = filename.replace(char, "")
-        return filename
-
-    def run(self):
-        """Main function"""
-        self.display_welcome_message()
-        self.set_assistant_role()
-        goals = self.suggest_goals()
-        goals = self.strip_goals_and_save(goals)
-        self.ask_user_to_review_goals(goals)
-        user_choice = self.get_user_choice(['keep', 'modify', 'new'])
-        if user_choice == 'modify' or user_choice == 'new':
-            self.request_goals_from_user()
-        for n in range(len(self.goals)):
-            self.generate_subtasks(n)
-        bot.handle_user_task_interaction()
-        bot.save_goals_to_disk_in_json()
+def main():
+    """Main function"""
+    bot = ChatBot()
+    bot.run()
 
 if __name__ == "__main__":
-    bot = Bot()
-    bot.run()
+    main()
