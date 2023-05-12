@@ -237,7 +237,7 @@ class Bot:
         user_response = input()
         self.user_message(user_response)
 
-    def assist_user_with_goal(self, n):
+    def generate_subtasks(self, n):
         """Assist the user with a goal"""
         task = list(self.goals.keys())[n]
         sys_message = f"Given your role as {self.role}, do you suggest breaking {task} into substasks? If yes, please respond with \"I think it's a good idea to break {task} into subtasks.\": numbered list of subtasks separated by new lines. If no, please suggest how the user can start working on the goal. Do not provide any additional context, instrucitons, advice, etc. I will provide it to the user."
