@@ -293,8 +293,15 @@ class Bot:
         """Save the goals to disk in JSON format."""
         sys_message = "Saving goals to disk."
         self.system_message(sys_message, to_user=True, to_gpt=False)
+        # eclude existing files
+        excluded_filenames = [filename for filename in os.listdir() if filename.endswith(".json")]
 
-        sys_filename_message = f"Please give me a filename to save {self.role} using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems."
+        sys_filename_message = f"Please give me a filename to save {self.role} using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems. Exclude the following filenames from any you generate: {excluded_filenames}"
+        # check if sys_filename_message exists
+        if os.path.exists(sys_filename_message):
+            # append timestamp to filename
+            sys_filename_message = sys_filename_message + str(datetime.datetime.now())
+        
         self.system_message(sys_filename_message, to_user=False, to_gpt=True)
         response = self.send_message_to_gpt(self.messages, loading_text="Generating...")
         filename = response['choices'][0]['message']['content']
@@ -306,11 +313,18 @@ class Bot:
         }        
         json_object = json.dumps(json_dict, indent=4)
 
-        with open(filename, "w") as f:
+        with open(self.strip_invalid_file_chars(filename), "w", encoding="utf-8") as f:
             f.write(json_object)
         
         sys_save_complete_message = f"Saved session to disk as {filename}."
-        self.system_message(sys_save_complete_message, to_user=True, to_gpt=False)        
+        self.system_message(sys_save_complete_message, to_user=True, to_gpt=False)
+
+    def strip_invalid_file_chars(self, filename):
+        """Strip invalid characters from a filename."""
+        invalid_chars = ["/", "\\", ":", "*", "?", "\"", "<", ">", "|"]
+        for char in invalid_chars:
+            filename = filename.replace(char, "")
+        return filename
 
     def run(self):
         """Main function"""
