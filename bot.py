@@ -186,14 +186,16 @@ class GoalManager:
 
     def handle_user_task_interaction(self):
         """Iterate through the user's tasks, asking if they want to work on it, breaking it down if needed, and providing assistance."""
-        for task in self.goals:
-            # Ask the user if they want to work on the task
-            user_wants_to_work_on_task = self.ask_if_user_wants_to_work_on_task(task)
-            if not user_wants_to_work_on_task:
-                continue
+        for goal, tasks in self.goals.items():
+            print(f"Goal: {goal}")
+            for task in tasks:
+                # Ask the user if they want to work on the subtask
+                user_wants_to_work_on_subtask = self.ask_if_user_wants_to_work_on_task(task)
+                if not user_wants_to_work_on_subtask:
+                    continue
 
-            # Ask user what subtask they want to work on and provide assistance
-            self.gpt3_interface.provide_assistance_with_task(task)
+                # Provide assistance with the subtask
+                self.gpt3_interface.provide_assistance_with_task(task)
 
     def mark_goal_as_complete(self, n):
         """Mark the nth goal as complete."""
