@@ -59,13 +59,17 @@ If the user exceeds the token limit for a request, the ChatGPTBot divides the re
 # Handle errors and unexpected situations and inform the user.
 # Confirm with the user that the goal should be removed.
 # Test the bot extensively to ensure all functionality works as expected.
+# When user creates a goal, ask if they want to generate subtasks for it, then work on the goal/subtasks
+# Work on subtasks in addition to goal
 
-import os
+# Standard imports
+import datetime
 import json
-import openai
+import os
+# 3rd party imports
 from colorama import Fore, Style
 import halo
-import datetime
+import openai
 
 class Bot:
     """Create a bot using GPT-3.5 to act as an assistant, helping the user complete a to-do list"""
