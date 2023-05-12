@@ -155,9 +155,9 @@ class Bot:
         self.messages.append({"role": "system", "content": f"For the remainder of the conversation, I want you to act and respond as {self.role}"})
         self.send_message_to_gpt(self.messages)
     
-    def suggest_goals(self, num_goals=5):
+    def suggest_goals(self, num_goals=10):
         """Define the objective"""
-        message = f"Define {num_goals} goals that fulfill the role of {self.role}. Return goals in a numbered list."
+        message = f"Define as many goals as possible up to {num_goals} goals that fulfill the role of {self.role}. I want you to first generate 10 goals, then ask yourself what rank the goals should be in, ranked by importance toward fulfilling the role. Return goals in a numbered list. Exclude any commentary, only providing the numbered list. I will provide instructions to the  user and additional text will interfere with this process."
         #send message to ChatGPT
         self.append_message("system", message)
         response = self.send_message_to_gpt(self.messages)
