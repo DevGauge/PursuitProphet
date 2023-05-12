@@ -282,10 +282,12 @@ class Bot:
         text = response['choices'][0]['message']['content']
         self.assistant_message(text)
 
-    def mark_task_as_complete(self, task):
-        """Mark a task as complete."""
-        self.goals.remove(task)
-        self.completed_goals.append(task)
+    def mark_goal_as_complete(self, n):
+        """Mark the nth goal as complete."""
+        goal = list(self.goals.keys())[n]
+        self.completed_goals.append({goal: self.goals[goal]})
+        del self.goals[goal]
+        self.system_message(f"Goal {n+1} '{goal}' marked as complete.")
 
     def save_goals_to_disk_in_json(self):
         """Save the goals to disk in JSON format."""
