@@ -65,7 +65,7 @@ import json
 import openai
 from colorama import Fore, Style
 import halo
-
+import datetime
 
 class Bot:
     """Create a bot using GPT-3.5 to act as an assistant, helping the user complete a to-do list"""
