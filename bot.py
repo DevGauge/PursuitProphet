@@ -72,9 +72,11 @@ import halo
 import openai
 
 class ChatBot:
-    def __init__(self):
+    def __init__(self, api_key=None):
         self.io_manager = IOManager(role='')
-        self.gpt3_interface = GPT3Interface(io_manager=self.io_manager)
+        if api_key is None:
+            api_key = self.io_manager.get_open_ai_key()
+        self.gpt3_interface = GPT3Interface(io_manager=self.io_manager, openapi_key=api_key)
         self.goal_manager = GoalManager(io_manager=self.io_manager, gpt3_interface=self.gpt3_interface)
     
     def run(self):
@@ -254,10 +256,10 @@ class GoalManager:
         return filename
 
 class GPT3Interface:
-    def __init__(self, io_manager, model="gpt-3.5-turbo"):        
+    def __init__(self, io_manager, openapi_key, model="gpt-3.5-turbo"):        
         self.io_manager = io_manager
         self.gpt = model
-        openai.api_key = self.io_manager.get_open_ai_key()
+        openai.api_key = openapi_key
 
     def send_message_to_gpt(self, messages, loading_text='Thinking'):
         """Send a list of messages to the ChatGPT API"""
@@ -368,10 +370,17 @@ class IOManager:
         self.system_message(to_user_message)
         raise UnboundLocalError(sys_message)
 
-def main():
+def main(argv):
     """Main function"""
-    bot = ChatBot()
+    # check if user provided an OpenAI API key with the -k flag
+    if len(argv) > 1 and argv[1] == "-k":
+        api_key = argv[2]
+        bot = ChatBot(api_key=api_key)
+    else:
+        bot = ChatBot()
     bot.run()
 
 if __name__ == "__main__":
-    main()
+    import sys
+    # pass commandline arguments to main function
+    main(sys.argv[1:])
