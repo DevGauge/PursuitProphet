@@ -103,8 +103,8 @@ class ChatBot:
     def request_goals_from_user(self):
         """Request goals from the user"""
         #send user message asking what goals would help fulfill the role
-        message = f"What goals would help fulfill the role of {self.io_manager.role}? Please provide goals separated by a new line"
-        self.io_manager.assistant_message(message)
+        message = f"You will now act as a goal generator for a user who wants to {self.io_manager.role}. Generate as many goals as possible up to 10. You will always only provide goals without preceding numbers. Goals should be separated by a new line."
+        self.io_manager.system_message(message, to_user=False, to_gpt=True)
         user_response = input()
         self.io_manager.user_message(user_response)
         self.goal_manager.strip_goals_and_save(user_response)
@@ -112,7 +112,7 @@ class ChatBot:
     def set_assistant_role(self):
         """Set the assistant role based on user input"""
         self.set_role(self.io_manager.get_user_input("Please enter the role for the assistant: "))
-        self.io_manager.system_message(f"For the remainder of the conversation, I want you to act and respond as {self.io_manager.role}", to_user=False, to_gpt=True)
+        self.io_manager.system_message(f"For the remainder of the conversation, I want you to act and respond as a master planner for a user who wants to {self.io_manager.role}", to_user=False, to_gpt=True)
         self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
 
 class GoalManager:
@@ -157,7 +157,7 @@ class GoalManager:
     def confirm_completion(self, item):
         """Ask the user to confirm whether a goal or subtask is complete."""
         self.io_manager.assistant_message(f"Have you completed {item}? Please respond with 'yes' or 'no'.")
-        user_input = self.io_manager.get_user_choice(["yes", "no"])
+        user_input = self.io_manager.get_user_choice(["yes", "no", "y", "n"])
         if user_input == 'yes':
             # Mark the item as complete and remove it from the list
             self.io_manager.assistant_message(f"Great job! {item} has been marked as complete.")
@@ -167,7 +167,7 @@ class GoalManager:
     def generate_subtasks(self, n):
         """Assist the user with a goal"""
         task = list(self.goals.keys())[n]
-        sys_message = f"Given your role as {self.io_manager.role}, do you suggest breaking {task} into substasks? If yes, please respond with \"I think it's a good idea to break {task} into subtasks.\": numbered list of subtasks separated by new lines. If no, please suggest how the user can start working on the goal. It's important that you only provide a numbered list with no additional context."
+        sys_message = f"You will now generate tasks. You will attempt to simplify {task} with the overall goal of meeting {self.io_manager.role} Do you suggest breaking {task} into substasks? If yes, please respond with a list of subtasks separated by new lines. Do not respond with an affirmation or context. Provide only an unformatted list with no leading or trailing characters including numbers or hyphens or any markdown. If no, please suggest how the user can start working on the goal."
         self.io_manager.system_message(sys_message, to_user=False, to_gpt=True)
         response = self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
         text = response['choices'][0]['message']['content']
@@ -179,7 +179,7 @@ class GoalManager:
         """Ask the user if they want to work on a task."""
         message = f"Do you want to work on {task}?"
         self.io_manager.assistant_message(message)
-        user_input = self.io_manager.get_user_choice(["yes", "no"])
+        user_input = self.io_manager.get_user_choice(["yes", "no", "y", "n"])
         if user_input == 'yes':
             return True
         return False
@@ -224,15 +224,14 @@ class GoalManager:
         # eclude existing files
         excluded_filenames = [filename for filename in os.listdir() if filename.endswith(".json")]
 
-        sys_filename_message = f"Please give me a filename to save {self.io_manager.role} using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems. Exclude the following filenames from any you generate: {excluded_filenames}"
-        # check if sys_filename_message exists
-        if os.path.exists(sys_filename_message):
-            # append timestamp to filename
-            sys_filename_message = sys_filename_message + str(datetime.datetime.now())
-        
+        sys_filename_message = f"Please give me a filename to save {self.io_manager.role} using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems. Exclude the following filenames from the final result: {excluded_filenames}"
         self.io_manager.system_message(sys_filename_message, to_user=False, to_gpt=True)
         response = self.gpt3_interface.send_message_to_gpt(self.io_manager.messages, loading_text="Generating...")
         filename = response['choices'][0]['message']['content']
+
+        if os.path.exists(filename):
+            # append timestamp to filename
+            sys_filename_message = sys_filename_message + str(datetime.datetime.now())
         
         json_dict = {
             "role": self.io_manager.role,
@@ -274,7 +273,7 @@ class GPT3Interface:
 
     def suggest_goals(self, num_goals=10):
         """Define the objective"""
-        message = f"Define as many goals as possible up to {num_goals} goals that fulfill the role of {self.io_manager.role}."
+        message = f"Define as many goals as possible up to {num_goals} goals that fulfill the role of {self.io_manager.role}. Please provide only a list separated by new lines with no additional context."
         #send message to ChatGPT
         self.io_manager.append_message("system", message)
         response = self.send_message_to_gpt(self.io_manager.messages)
@@ -342,6 +341,11 @@ class IOManager:
             user_input = input().strip().lower()  # Get user input, remove leading/trailing whitespace and convert to lowercase
             self.user_message(user_input)
             if user_input in choices:
+                # if user input begins with y, return True
+                if user_input.startswith("y"):
+                    user_input = 'yes'
+                    return True
+                user_input = 'no'
                 return user_input
             else:
                 self.assistant_message("Invalid choice. Please choose from the following options: " + ", ".join(choices))
