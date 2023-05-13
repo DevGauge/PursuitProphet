@@ -8,17 +8,17 @@ Given a role, comes up with goals and subtasks for each goal. Plans for full use
 3. From this repository's directory, run pip install -r requirements.txt
 4. Export your Open AI API key as an environment variable :arrow_down:
 #### MacOS
-       ```bash
-       OPENAI_API_KEY='YOUR API KEY HERE'
-       ```
+```bash
+OPENAI_API_KEY=YOUR-API-KEY-HERE
+```
 #### Windows Command Line
-       ```shell
-       set OPENAI_API_KEY='YOUR API KEY HERE'
-       ```
+```shell
+set OPENAI_API_KEY=YOUR-API-KEY-HERE
+```
 #### Windows Powershell
-       ```powershell
-       $Env:OPENAI_API_KEY = 'YOUR API KEY HERE'
-       ```
+```powershell
+$Env:OPENAI_API_KEY = 'YOUR-API-KEY-HERE'
+```
 
 # Run it from the repository's directory
 `python bot.py`
