@@ -367,8 +367,9 @@ class IOManager:
 
         to_user_message="Please set your OpenAI API key in the environment variables using the key OPENAI_API_KEY"
         sys_message="OPENAI_API_KEY not found in environment variables"
-        self.system_message(to_user_message)
-        raise UnboundLocalError(sys_message)
+        self.system_message(sys_message, to_gpt=False)
+        self.user_instruction(to_user_message)        
+        sys.exit(1)
 
 def main(argv):
     """Main function"""
@@ -377,7 +378,10 @@ def main(argv):
         api_key = argv[2]
         bot = ChatBot(api_key=api_key)
     else:
-        bot = ChatBot()
+        # will exit if not set
+        api_key = IOManager(None).get_open_ai_key()
+        if api_key is not None:
+            bot = ChatBot(api_key=api_key)
     bot.run()
 
 if __name__ == "__main__":
