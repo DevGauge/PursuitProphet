@@ -185,6 +185,43 @@ class GoalManager:
         if user_input == 'yes':
             return True
         return False
+    
+    def sanitize_bot_goal_response(self, response_text, char_limit=8000):
+        """Sanitize the bot's response to a goal."""
+        
+        if not isinstance(response_text, str):
+            raise ValueError("Input should be a string.")
+        
+        if len(response_text) > char_limit:  # Arbitrary limit based on 2k token limit (4k/2 allowing for 2k response)            
+            raise ValueError("Input is too long.")
+        
+        # If there's no text, there's nothing to sanitize.
+        if response_text == "":
+            return response_text
+        
+        # If the response contains multiple goals, split them into a list
+        if "\n\n" in response_text:
+            goals = response_text.split("\n\n")
+            
+            sanitized_goals = []
+            for goal in goals:
+                # If goal starts with a number or a number followed by a period, strip it
+                if goal and goal[0].isdigit():
+                    goal = goal.split(" ", 1)[1] if len(goal.split(" ", 1)) > 1 else ''
+                
+                # If goal starts with a period, strip it
+                if goal and goal[0] == ".":
+                    goal = goal[1:]
+                
+                # Strip leading and trailing whitespace
+                sanitized_goal = goal.strip()
+                sanitized_goals.append(sanitized_goal)
+            
+            # Join the sanitized goals with "\n\n" and return the resulting string
+            return "\n\n".join(sanitized_goals)
+
+        # If none of the above conditions are met, return the original string.
+        return response_text
 
     def handle_user_task_interaction(self):
         """Iterate through the user's tasks, asking if they want to work on it, breaking it down if needed, and providing assistance."""
