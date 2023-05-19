@@ -1,4 +1,4 @@
-# GPT_TODO_Bot
+# Pursuit Prophet
 Given a role, comes up with goals and subtasks for each goal. Plans for full user interaction including tracking goals, completing tasks, asking for help with tasks
 
 # Installation
