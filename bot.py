@@ -81,6 +81,7 @@ class ChatBot:
     
     def run(self):
         """Main function"""
+        print()
         self.display_welcome_message()
         self.set_assistant_role()
         self.goal_manager.goals = self.gpt3_interface.suggest_goals()
@@ -145,7 +146,7 @@ class GoalManager:
                 if action == "create":
                     goal = text.split(" ", 2)[2]
                     self.goals[goal] = []
-                    self.io_manager.system_message(f"Created new goal: {goal}", to_user=True, to_gpt=True)
+                    self.io_manager.user_instruction(f"Created new goal: {goal}")
                     return True
                 elif action == "complete":
                     goal_number = int(text.split(" ")[2])
@@ -171,6 +172,7 @@ class GoalManager:
         task = list(self.goals.keys())[n]
         sys_message = f"You will now generate tasks. You will attempt to simplify {task} with the overall goal of meeting {self.io_manager.role} Do you suggest breaking {task} into substasks? If yes, please respond with a list of subtasks separated by new lines. Do not respond with an affirmation or context. Provide only an unformatted list with no leading or trailing characters including numbers or hyphens or any markdown. If no, please suggest how the user can start working on the goal."
         self.io_manager.system_message(sys_message, to_user=False, to_gpt=True)
+        
         response = self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
         text = response['choices'][0]['message']['content']
         subtasks = text.split('\n')  # Split the response into subtasks
@@ -179,8 +181,8 @@ class GoalManager:
     
     def ask_if_user_wants_to_work_on_task(self, task):
         """Ask the user if they want to work on a task."""
-        message = f"Do you want to work on {task}?"
-        self.io_manager.assistant_message(message)
+        message = "Do you want to work on this right now? Please respond with 'yes' or 'no'"
+        self.io_manager.user_instruction(message)
         user_input = self.io_manager.get_user_choice(["yes", "no", "y", "n"])
         if user_input == 'yes':
             return True
@@ -226,8 +228,9 @@ class GoalManager:
     def handle_user_task_interaction(self):
         """Iterate through the user's tasks, asking if they want to work on it, breaking it down if needed, and providing assistance."""
         for goal, tasks in self.goals.items():
-            print(f"Goal: {goal}")
             for task in tasks:
+                print(f"Goal: {goal}")
+                print(f"Task: {task}")
                 # Ask the user if they want to work on the subtask
                 user_wants_to_work_on_subtask = self.ask_if_user_wants_to_work_on_task(task)
                 if not user_wants_to_work_on_subtask:
@@ -387,14 +390,15 @@ class IOManager:
                 user_input = 'no'
                 return user_input
             else:
-                self.assistant_message("Invalid choice. Please choose from the following options: " + ", ".join(choices))
+                self.user_instruction("Invalid choice. Please choose from the following options: " + ", ".join(choices))
 
     def ask_user_to_review_goals(self, goals):
         """Ask the user to review the goals"""
         #send user message asking them to review the goals
         formatted_goals = "\n".join([f"{i+1}. {goal}" for i, goal in enumerate(goals)])
-        message = f"I've generated the following goals for you: \n\n{formatted_goals}\n\nWould you like to keep (keep) them, modify (modify) them, ask me to generate new goals (new), or provide your own goals? (list goals, separated by a new line)"
-        self.assistant_message(message)
+        goal_message = f"I've generated the following goals for you: \n\n{formatted_goals}"
+        self.assistant_message(goal_message)
+        self.user_instruction("Would you like to keep them (keep), modify them (modify), or ask me to generate new goals (new)?")
 
     def get_open_ai_key(self):
         """Get the OpenAI API key from the environment or crash"""
