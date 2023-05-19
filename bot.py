@@ -108,6 +108,23 @@ class ChatBot:
         #send user message asking what goals would help fulfill the role
         message = f"You will now act as a goal generator for a user who wants to {self.io_manager.role}. Generate as many goals as possible up to 10. You will always only provide goals without preceding numbers. Goals should be separated by a new line."
         self.io_manager.system_message(message, to_user=False, to_gpt=True)
+        example_goal_response = """
+        Following the line after "===" is an example 
+        response for the goal "I want to go potty". 
+        Notice there is no formatting or numbering:
+        ===
+        Get to the bathroom
+        Find an available toilet
+        Remove pants or clothing blocking access
+        Sit on the toilet seat
+        Wait for urine or bowel movement to empty
+        Wipe properly after using the restroom
+        Flush the toilet
+        Wash hands with soap and water
+        Dry hands with a clean towel or air dryer
+        Return to the original location or activity
+        """
+        self.io_manager.system_message(example_goal_response, to_user=False, to_gpt=True)
         user_response = input()
         self.io_manager.user_message(user_response)
         self.goal_manager.strip_goals_and_save(user_response)
@@ -170,11 +187,60 @@ class GoalManager:
     def generate_subtasks(self, n):
         """Assist the user with a goal"""
         task = list(self.goals.keys())[n]
-        sys_message = f"You will now generate tasks. You will attempt to simplify {task} with the overall goal of meeting {self.io_manager.role} Do you suggest breaking {task} into substasks? If yes, please respond with a list of subtasks separated by new lines. Do not respond with an affirmation or context. Provide only an unformatted list with no leading or trailing characters including numbers or hyphens or any markdown. If no, please suggest how the user can start working on the goal."
+        example_subtask_yes_response="""
+        Following the line after "===" is an example response for the task 
+        "Make a playlist of your mom's favorite songs or songs that remind you of her". 
+        The role for this task is "Help me wish my mom a Happy Mother's Day"
+        This is a response where you have determined there are subtasks.
+		Notice there is no formatting or numbering:
+        ===
+        Consider your mom's musical tastes and preferences
+        Research songs that your mom loves or that are meaningful to her
+        Choose a platform to use for your playlist, such as Spotify or iTunes
+        Compile a list of songs that you want to include in the playlist
+        Organize the songs in a way that makes sense for the occasion or your mom's preferences
+        Test the playlist to make sure it flows well and includes all the songs you want to include
+        Personalize the playlist by adding a special message or note to your mom
+        Share the playlist with your mom to make her day special
+
+        To start working on this goal, you can begin by considering your mom's musical tastes and 
+        preferences. Research songs that your mom loves or that are meaningful to her and choose a 
+        platform to use for your playlist, such as Spotify or iTunes. Once you've gathered your 
+        list of songs, you can organize them in a way that makes sense for the occasion or your 
+        mom's preferences, and test the playlist to ensure it flows well. Personalize the playlist 
+        by adding a special message or note to your mom and share it with her on Mother's Day to 
+        make her day extra special.
+        """
+        example_subtask_no_response="""
+        Following the line after "===" is an example response for the task
+        "Remove any clothing that is blocking access to the toilet" The role 
+        for this task is "Go potty". This is a response where you have 
+        determined there are no subtasks. Notice there is no formatting or 
+        numbering.
+        ===
+        Remove any clothing that is blocking access to the toilet such as pants, underwear, or skirts
+        """
+        sys_message = f"""
+        You will now generate tasks. You will attempt to simplify "{task}" with 
+        the overall goal of meeting "{self.io_manager.role}" Do you suggest 
+        breaking "{task}" into substasks? If yes, please respond with a list 
+        of subtasks separated by new lines. Do not respond with an affirmation 
+        or context. Using the examples provided, provide an unformatted list with 
+        no leading or trailing characters. Then summarize the tasks and suggest 
+        how the user can begin working on the goal. If no, please only suggest 
+        how the user can start working on the goal. Do not include "===" or any 
+        context in your response. "===" is only used to deliniate the example 
+        response from the example instructions/context:
+        """.strip()
+        
+        self.io_manager.system_message(example_subtask_yes_response, to_user=False, to_gpt=True)
+        self.io_manager.system_message(example_subtask_no_response, to_user=False, to_gpt=True)
         self.io_manager.system_message(sys_message, to_user=False, to_gpt=True)
         
         response = self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
-        text = response['choices'][0]['message']['content']
+        response_text = response['choices'][0]['message']['content']
+        text = self.sanitize_bot_goal_response(response_text)
+        
         subtasks = text.split('\n')  # Split the response into subtasks
         self.goals[task] = subtasks  # Assign the subtasks to the corresponding goal
         self.io_manager.assistant_message(text)
@@ -188,7 +254,7 @@ class GoalManager:
             return True
         return False
     
-    def sanitize_bot_goal_response(self, response_text, char_limit=8000):
+    def sanitize_bot_goal_response(self, response_text):
         """Sanitize the bot's response to a goal."""
         
         if not isinstance(response_text, str):
@@ -201,9 +267,24 @@ class GoalManager:
         if response_text == "":
             return response_text
         
-        # If the response contains multiple goals, split them into a list
+        # If the response contains 2 newlines, split it into text and goals.
+        # GPT likes to provide pretext, content, and posttext.
+        # We're interested in the content and posttext.
         if "\n\n" in response_text:
-            goals = response_text.split("\n\n")
+            print("Response Text: " + response_text)
+            text = response_text.split("\n\n")
+            print("Text Array: " + str(text))
+            if len(text) > 2:
+                goals = text[2:]
+                print("Goals: " + str(goals))
+            elif len(text) > 1:
+                goals = text[:1]
+            else:
+                goals = text
+
+            if len(text) > 3:
+                commentary = text[3]
+                print("Commentary: " + commentary)
             
             sanitized_goals = []
             for goal in goals:
@@ -212,12 +293,13 @@ class GoalManager:
                     goal = goal.split(" ", 1)[1] if len(goal.split(" ", 1)) > 1 else ''
                 
                 # If goal starts with a period, strip it
-                if goal and goal[0] == ".":
+                if goal and goal[0] == "." or goal and goal[0] == "-":
                     goal = goal[1:]
                 
                 # Strip leading and trailing whitespace
-                sanitized_goal = goal.strip()
-                sanitized_goals.append(sanitized_goal)
+                if goal != "":
+                    goal.strip()
+                    sanitized_goals.append(goal)
             
             # Join the sanitized goals with "\n\n" and return the resulting string
             return "\n\n".join(sanitized_goals)
@@ -353,10 +435,15 @@ class IOManager:
         """Append a message to the message list"""
         self.messages.append({"role": role, "content": message})
 
-    def assistant_message(self, message, to_user=True):
+    def assistant_message(self, message):
         """Send a message from the assistant to the user"""
         if to_user:
-            self.formatted_text_output("assistant", message)
+        self.formatted_text_output("assistant", message)
+        self.append_message("assistant", message)
+
+    def user_instruction(self, message):
+        """Send a message from the assistant to the user"""
+        self.formatted_text_output("user", message)
         self.append_message("assistant", message)
 
     def system_message(self, message, to_user=True, to_gpt=False):
