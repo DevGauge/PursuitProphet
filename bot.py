@@ -137,6 +137,8 @@ class ChatBot:
         self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
 
 class GoalManager:
+    goals = { }
+
     def __init__(self, io_manager, gpt3_interface):
         self.io_manager = io_manager
         self.gpt3_interface = gpt3_interface
@@ -379,7 +381,7 @@ class GoalManager:
         return filename
 
 class GPT3Interface:
-    def __init__(self, io_manager, openapi_key, model="gpt-3.5-turbo"):        
+    def __init__(self, io_manager, openapi_key, model="gpt-3.5-turbo"):
         self.io_manager = io_manager
         self.gpt = model
         openai.api_key = openapi_key
@@ -422,6 +424,13 @@ class IOManager:
         "assistant": Fore.BLUE,
         "system": Fore.RED,
     }
+
+    role = ""
+
+    default_messages = [
+        {"role": "system", "content": f"You will act as a goal generator for a user who wants to {role}"},
+        {"role": "system", "content": f"You have already generated the following goals: {GoalManager.goals.items()}"}
+    ]
 
     def __init__(self, role):
         self.role = role
@@ -497,8 +506,17 @@ class IOManager:
         to_user_message="Please set your OpenAI API key in the environment variables using the key OPENAI_API_KEY"
         sys_message="OPENAI_API_KEY not found in environment variables"
         self.system_message(sys_message, to_gpt=False)
-        self.user_instruction(to_user_message)        
+        self.user_instruction(to_user_message)
         sys.exit(1)
+    
+    def clear_messages(self):
+        """Clear the messages list"""
+        self.messages = []
+
+    def reset_with_default_messages(self):
+        """Reset the messages list with the default messages"""
+        self.clear_messages()
+        self.messages = self.default_messages
 
 def main(argv):
     """Main function"""
