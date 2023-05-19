@@ -89,7 +89,7 @@ class ChatBot:
         self.io_manager.ask_user_to_review_goals(self.goal_manager.goals)
         user_choice = self.io_manager.get_user_choice(['keep', 'modify', 'new'])
         if user_choice == 'modify' or user_choice == 'new':
-            self.request_goals_from_user()
+            self.request_goal_from_user()
         for n in range(len(self.goal_manager.goals)):
             self.goal_manager.generate_subtasks(n)
         self.goal_manager.handle_user_task_interaction()
@@ -103,7 +103,7 @@ class ChatBot:
         welcome_message = "Welcome to Devgauge's Todo List ChatGPTBot. What goal would you like help accomplishing?"
         self.io_manager.assistant_message(welcome_message)
         
-    def request_goals_from_user(self):
+    def request_goal_from_user(self):
         """Request goals from the user"""
         #send user message asking what goals would help fulfill the role
         message = f"You will now act as a goal generator for a user who wants to {self.io_manager.role}. Generate as many goals as possible up to 10. You will always only provide goals without preceding numbers. Goals should be separated by a new line."
