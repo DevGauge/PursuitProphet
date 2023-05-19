@@ -59,21 +59,26 @@ h2.sub-heading {
 }
 
 .submit-button {
-    background-color: #4A90E2;
-    border: none;
-    color: white;
-    padding: 10px 20px;
+    background-color: #f90; /* Amazon orange */
+    background-image: linear-gradient(to bottom,#f7dfa5,#f0c14b);
+    border-color: #a88734 #9c7e31 #846a29;
+    color: #111; /* Amazon text color */
+    border: 1px solid;
+    padding: 3px 11px; /* Adjust the padding as needed */
     text-align: center;
     text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
+    font-size: 15px;
+    border-radius: 3px; /* Rounded corners */
+    box-shadow: 0 1px 0 rgba(255,255,255,.4) inset;
     cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
-
-    &:hover {
-        opacity: 1;
+    transition: border-color 0.3s ease-in-out;
+    line-height: 20px; /* adjust as needed */
+    padding: 6px 12px; /* adjust as needed */
+    width: 100%;
+    
+    &:hover,
+    &:focus {
+        border-color: purple;
     }
 }
 
@@ -124,17 +129,42 @@ h2.sub-heading {
 }
 
 .text-container {
-    margin-bottom: 20px;
-    width: 200px;
-    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
-.input {
+form {
+    width: 20%;
+}
+
+.text-center {
+    text-align: center;
+}
+
+input {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    background-color: darkgray;
+    border: 1px solid #000;
+    border-radius: 4px; /* Rounded corners */
+    box-sizing: border-box;
     font-size: 16px;
-    border: 0;
-    padding: 10px 0;
-    border-bottom: 1px solid #ccc;
+    font-weight: bold;
     transition: all 0.3s ease-in-out;
+    width: 100%;
+    flex-grow: 1;
+    /* This will make the text box take up the remaining space in the container */
+    margin-right: 10px;
+    /* This will put a small margin between the text box and the button */
+    line-height: 20px; /* adjust as needed */
+    padding: 6px 12px; /* adjust as needed */
+    &:hover {
+        border-color: #800080;
+    }
 
     &:focus {
         border-color: #800080;
@@ -150,10 +180,12 @@ h2.sub-heading {
         left: 0;
         width: 0;
         height: 2px;
-        background-color: #27ad8a;
+        background-color: #4eb398;
 
         .input:focus & {
             width: 100%;
             transition: 0.5s;
+            background-color: #000;
         }
-    }}
+    }
+}

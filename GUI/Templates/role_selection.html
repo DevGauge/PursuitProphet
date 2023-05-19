@@ -2,7 +2,16 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-center">Choose your role to get started</h1>
+    <h1 class="text-center main-heading">What do you want to do today?</h1>
+    <div class="text-container">
+        <input class="input" type="text" placeholder="Role">
+        <span class="border"></span>
+        <form action="{{ url_for('role_selection') }}" method="POST">
+            <input type="hidden" name="role" id="selectedRole">
+            <button type="submit" class="btn submit-button">Submit</button>
+        </form>
+    </div>
+    <h2 class="text-center sub-heading">Examples</h2>
     <div class="row">
         <div class="card-container">
             {% for role in roles %}
@@ -15,24 +24,32 @@
             </div>
             {% endfor %}
         </div>
-        <form action="{{ url_for('role_selection') }}" method="POST">
-            <input type="hidden" name="role" id="selectedRole">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
-    <div class="text-container">
-        <input class="input" type="text" placeholder="Role">
-        <span class="border"></span>
     </div>
 </div>
 <script>
+    function typeText(element, text, delay) {
+        var i = 0;
+        var intervalId = setInterval(function () {
+            if (i < text.length) {
+                element.value += text[i];
+                i++;
+            } else {
+                clearInterval(intervalId);
+            }
+        }, delay);
+    }
     window.onload = function () {
         var cards = document.getElementsByClassName('role-card');
+        var inputBox = document.getElementsByClassName('input')[0];
         for (var i = 0; i < cards.length; i++) {
             cards[i].addEventListener('click', function (e) {
                 var activeCard = document.getElementsByClassName('active')[0];
                 if (activeCard) activeCard.classList.remove('active');
                 this.classList.add('active');
+                // Set the value of the input box to the role name
+                var roleName = this.getElementsByClassName('card-title')[0].textContent;
+                inputBox.value = '';
+                typeText(inputBox, roleName, 80); // Adjust the delay to speed up or slow down the typing
             });
         }
     }
