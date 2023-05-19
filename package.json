@@ -4,9 +4,16 @@
     "description": "",
     "main": "index.js",
     "scripts": {
+<<<<<<< HEAD
       "compile-scss": "sass GUI/Static:GUI/Static/style.css"
     },
     "devDependencies": {
       "sass": "^1.62.1"
+=======
+      "compile-scss": "node-sass src/scss -o static/css"
+    },
+    "devDependencies": {
+      "node-sass": "^6.0.1"
+>>>>>>> 9bff9af (added package.json)
     }
   }
