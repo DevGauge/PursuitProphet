@@ -129,19 +129,17 @@ class ChatBot:
         self.io_manager.user_message(user_response)
         self.goal_manager.strip_goals_and_save(user_response)
 
-    def set_assistant_role(self, role=None):
+    def set_assistant_role(self):
         """Set the assistant role based on user input"""
-        if role is None:
-            self.set_role(self.io_manager.get_user_input("Please enter the role for the assistant: "))
+        self.set_role(self.io_manager.get_user_input("Please enter the role for the assistant: "))
         self.io_manager.system_message(f"For the remainder of the conversation, I want you to act and respond as a master planner for a user who wants to {self.io_manager.role}", to_user=False, to_gpt=True)
         self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
 
 class GoalManager:
-    goals = { }
-
     def __init__(self, io_manager, gpt3_interface):
         self.io_manager = io_manager
         self.gpt3_interface = gpt3_interface
+        self.goals = {}
         self.completed_goals = []
 
     def create_file_json(self):
@@ -262,6 +260,9 @@ class GoalManager:
         if not isinstance(response_text, str):
             raise ValueError("Input should be a string.")
         
+        if len(response_text) > char_limit:  # Arbitrary limit based on 2k token limit (4k/2 allowing for 2k response)            
+            raise ValueError("Input is too long.")
+        
         # If there's no text, there's nothing to sanitize.
         if response_text == "":
             return response_text
@@ -377,7 +378,7 @@ class GoalManager:
         return filename
 
 class GPT3Interface:
-    def __init__(self, io_manager, openapi_key, model="gpt-3.5-turbo"):
+    def __init__(self, io_manager, openapi_key, model="gpt-3.5-turbo"):        
         self.io_manager = io_manager
         self.gpt = model
         openai.api_key = openapi_key
@@ -421,13 +422,6 @@ class IOManager:
         "system": Fore.RED,
     }
 
-    role = ""
-
-    default_messages = [
-        {"role": "system", "content": f"You will act as a goal generator for a user who wants to {role}"},
-        {"role": "system", "content": f"You have already generated the following goals: {GoalManager.goals.items()}"}
-    ]
-
     def __init__(self, role):
         self.role = role
         self.messages = []
@@ -443,6 +437,7 @@ class IOManager:
 
     def assistant_message(self, message):
         """Send a message from the assistant to the user"""
+        if to_user:
         self.formatted_text_output("assistant", message)
         self.append_message("assistant", message)
 
@@ -501,17 +496,8 @@ class IOManager:
         to_user_message="Please set your OpenAI API key in the environment variables using the key OPENAI_API_KEY"
         sys_message="OPENAI_API_KEY not found in environment variables"
         self.system_message(sys_message, to_gpt=False)
-        self.user_instruction(to_user_message)
+        self.user_instruction(to_user_message)        
         sys.exit(1)
-    
-    def clear_messages(self):
-        """Clear the messages list"""
-        self.messages = []
-
-    def reset_with_default_messages(self):
-        """Reset the messages list with the default messages"""
-        self.clear_messages()
-        self.messages = self.default_messages
 
 def main(argv):
     """Main function"""
