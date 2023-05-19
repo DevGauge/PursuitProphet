@@ -1,0 +1,12 @@
+{
+    "name": "my-flask-app",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "compile-scss": "node-sass src/scss -o static/css"
+    },
+    "devDependencies": {
+      "node-sass": "^6.0.1"
+    }
+  }
