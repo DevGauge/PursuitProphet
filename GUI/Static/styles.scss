@@ -1,0 +1,159 @@
+body {
+    background-color: #f0f0f0;
+    color: #000000;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.welcome-screen {
+    text-align: center;
+    padding: 50px;
+}
+
+.logo,
+.inspiring-image {
+    animation: fadein 2s;
+
+    &.logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    &.inspiring-image {
+        width: 100%;
+        height: auto;
+        margin-top: 25px;
+    }
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+h1.main-heading {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+h2.sub-heading {
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.name-input {
+    border: none;
+    border-bottom: 2px solid #000;
+    outline: none;
+    transition: border 0.3s ease;
+
+    &:focus {
+        border-bottom: 2px solid #4A90E2;
+    }
+}
+
+.submit-button {
+    background-color: #4A90E2;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.card-container {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.card {
+    margin: 10px;
+}
+
+.role-card {
+    position: relative;
+    transition: transform 0.3s ease-in-out;
+    border-radius: 10px;
+    border: 4px solid #000;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    margin: 10px;
+    padding: 10px;
+    background-color: #fff;
+    width: 200px;
+    height: 200px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+    font-size: 20px;
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+
+    &:hover {
+        transform: translateY(-10px);
+        border: 4px solid purple;
+        box-shadow: 0 0 20px purple;
+    }
+
+    &:active,
+    &.active {
+        transform: translateY(-5px);
+        background-color: purple;
+        box-shadow: 0 0 20px purple;
+    }
+}
+
+.text-container {
+    margin-bottom: 20px;
+    width: 200px;
+    position: relative;
+}
+
+.input {
+    font-size: 16px;
+    border: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc;
+    transition: all 0.3s ease-in-out;
+
+    &:focus {
+        border-color: #800080;
+    }
+
+    &:valid {
+        background-color: #F5F5F5;
+    }
+
+    &~.border {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #27ad8a;
+
+        .input:focus & {
+            width: 100%;
+            transition: 0.5s;
+        }
+    }}
