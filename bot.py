@@ -129,9 +129,10 @@ class ChatBot:
         self.io_manager.user_message(user_response)
         self.goal_manager.strip_goals_and_save(user_response)
 
-    def set_assistant_role(self):
+    def set_assistant_role(self, role=None):
         """Set the assistant role based on user input"""
-        self.set_role(self.io_manager.get_user_input("Please enter the role for the assistant: "))
+        if role is None:
+            self.set_role(self.io_manager.get_user_input("Please enter the role for the assistant: "))
         self.io_manager.system_message(f"For the remainder of the conversation, I want you to act and respond as a master planner for a user who wants to {self.io_manager.role}", to_user=False, to_gpt=True)
         self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
 
