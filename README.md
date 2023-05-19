@@ -25,4 +25,4 @@ $Env:OPENAI_API_KEY = 'YOUR-API-KEY-HERE'
 ##### If you've set your API Key as environment variable:
 `python bot.py`
 ##### If you want to pass it in at the command line:
-`python bot.py -k YOUR-API-KEY-HERE
+`python bot.py -k YOUR-API-KEY-HERE`
