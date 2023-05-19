@@ -1,0 +1,63 @@
+body {
+  background-color: #f0f0f0;
+}
+
+.welcome-screen {
+  text-align: center;
+  padding: 50px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  animation: fadein 2s;
+}
+
+.inspiring-image {
+  width: 100%;
+  height: auto;
+  margin-top: 25px;
+  animation: fadein 2s;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.name-input {
+  border: none;
+  border-bottom: 2px solid #000;
+  outline: none;
+  transition: border 0.3s ease;
+}
+
+.name-input:focus {
+  border-bottom: 2px solid #4A90E2;
+}
+
+.submit-button {
+  background-color: #4A90E2;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.submit-button:hover {
+  opacity: 1;
+}
+
+/*# sourceMappingURL=styles.css.map */
