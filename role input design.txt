@@ -1,0 +1,36 @@
+Design Document
+Purpose
+This document provides a detailed specification for the design and layout of the Role Selection page. It includes color schemes, typography, and interactive elements. This design aims to provide a visually appealing, user-friendly, and intuitive interface for the users.
+
+Color Scheme
+The primary colors used in the design are as follows:
+
+Purple (#800080): This color is used to indicate interactive elements and user actions such as hover and selection.
+White (#FFFFFF): This is the primary background color, which helps keep the interface clean and simple.
+Black (#000000): This is the primary text color, providing a high contrast against the white background for readability.
+Typography
+Heading ("What do you want to do today?"): Open Sans, 36px, Bold, Black
+Sub-heading ("Choose your role to get started"): Open Sans, 28px, Semi-Bold, Black
+Role Cards: Open Sans, 20px, Regular, Black
+Input Field: Open Sans, 16px, Regular, Black
+Note: Open Sans is a humanist sans serif typeface designed for readability and a friendly, open appearance. It works well for both headings and body text.
+
+Layout
+The main heading "What do you want to do today?" is centered at the top of the page.
+
+Underneath the main is a stylized input selection box. This box has similar effects to the role cards, including a purple border on focus and a subtle color change in the background. It's large enough for comfortable interaction and is clearly visible against the background. The input box should take the majority of the screen width and have significant height. It should be obvious that this is the preferred method and the cards are more for examples.
+
+Below the main heading is the sub-heading "Choose your role to get started", also centered.
+
+The role cards are arranged in a centered horizontal row below the sub-heading. Each card is equally spaced and easily clickable. On hover, the card moves slightly upwards (translates along the y-axis), and the border color changes to purple. On selection, the card's background color changes to purple.
+
+The input field starts with a light-grey background and white placeholder text
+
+On the input field, an animation is added to make the interface feel more responsive. The border color changes to purple when the field is hovered over, and the background color changes slightly when the user starts typing. The text color changes to purple
+
+Interactions
+When a user hovers over a role card, the card animates upwards and its border color changes to purple.
+When a user selects a role card, the card's background color changes to purple.
+When a user hovers the input box, its border color changes to purple.
+When a user clicks on the input box, the background color changes to white and the text color changes to purple
+This design aims to provide a visually engaging, interactive, and user-friendly interface that encourages users to select a role and interact with the application. It balances aesthetics with usability, ensuring a pleasing experience that doesn't sacrifice functionality.
