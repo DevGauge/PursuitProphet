@@ -178,8 +178,4 @@ input ~ .border {
   background-color: #000;
 }
 
-input[type=text]:focus {
-  border-color: #800080;
-}
-
 /*# sourceMappingURL=styles.css.map */
