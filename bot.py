@@ -395,11 +395,26 @@ class GPT3Interface:
             spinner.stop()
 
     def suggest_goals(self, num_goals=10):
-        """Define the objective"""
-        message = f"Define as many goals as possible up to {num_goals} goals that fulfill the role of {self.io_manager.role}. Please provide only a list separated by new lines with no additional context."
-        #send message to ChatGPT
-        self.io_manager.append_message("system", message)
-        response = self.send_message_to_gpt(self.io_manager.messages)
+        """Define the objective"""                
+        example_goal_response = """
+        Following is an example 
+        response for the goal "I want to go potty". 
+        Notice there is no formatting or numbering:
+        
+        Get to the bathroom
+        Find an available toilet
+        Remove pants or clothing blocking access
+        Sit on the toilet seat
+        Wait for urine or bowel movement to empty
+        Wipe properly after using the restroom
+        Flush the toilet
+        Wash hands with soap and water
+        Dry hands with a clean towel or air dryer
+        Return to the original location or activity
+        """
+        message = f"You will now act as a goal generator for a user who wants to {self.io_manager.role}. Generate as many goals as possible up to 10. Goals should be separated by a new line. Do not add any context or formatting. An example follows: {example_goal_response}"
+        self.io_manager.system_message(message, to_user=False, to_gpt=True)
+        response = self.send_message_to_gpt(self.io_manager.messages, loading_text=f"Generating Goals for {self.io_manager.role}...")
         text = response['choices'][0]['message']['content']
         return text
 
