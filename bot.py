@@ -389,7 +389,9 @@ class GPT3Interface:
         try:
             return openai.ChatCompletion.create(
                 model=self.gpt,
-                messages=messages
+                messages=messages,
+                temperature=1.0,
+                top_p=1
             )
         finally:
             spinner.stop()
