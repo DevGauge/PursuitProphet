@@ -106,8 +106,6 @@ class ChatBot:
     def request_goal_from_user(self):
         """Request goals from the user"""
         #send user message asking what goals would help fulfill the role
-        message = f"You will now act as a goal generator for a user who wants to {self.io_manager.role}. Generate as many goals as possible up to 10. You will always only provide goals without preceding numbers. Goals should be separated by a new line."
-        self.io_manager.system_message(message, to_user=False, to_gpt=True)
         example_goal_response = """
         Following is an example 
         response for the goal "I want to go potty". 
