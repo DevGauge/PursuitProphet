@@ -109,10 +109,10 @@ class ChatBot:
         message = f"You will now act as a goal generator for a user who wants to {self.io_manager.role}. Generate as many goals as possible up to 10. You will always only provide goals without preceding numbers. Goals should be separated by a new line."
         self.io_manager.system_message(message, to_user=False, to_gpt=True)
         example_goal_response = """
-        Following the line after "===" is an example 
+        Following is an example 
         response for the goal "I want to go potty". 
         Notice there is no formatting or numbering:
-        ===
+
         Get to the bathroom
         Find an available toilet
         Remove pants or clothing blocking access
