@@ -1,3 +1,5 @@
-openai
-colorama
-halo
+colorama==0.4.6
+Flask==2.3.2
+halo==0.0.31
+langchain==0.0.178
+openai==0.27.2
