@@ -124,7 +124,9 @@ class ChatBot:
         Dry hands with a clean towel or air dryer
         Return to the original location or activity
         """
-        self.io_manager.system_message(example_goal_response, to_user=False, to_gpt=True)
+        message = f"You will now act as a goal generator for a user who wants to {self.io_manager.role}. Generate as many goals as possible up to 10. Goals should be separated by a new line. Do not add any context or formatting. An example follows: {example_goal_response}"
+
+        self.io_manager.system_message(message, to_user=True, to_gpt=True)
         user_response = input()
         self.io_manager.user_message(user_response)
         self.goal_manager.strip_goals_and_save(user_response)
