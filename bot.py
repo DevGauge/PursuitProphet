@@ -66,10 +66,238 @@ If the user exceeds the token limit for a request, the ChatGPTBot divides the re
 import datetime
 import json
 import os
+# Local imports
+from langchain_manager import ConversationSummarizer, ExampleFactory, FewShotPromptHandler, FewShotPromptTemplate, ModelFactory, PromptLengthLimiter, PromptTemplate
 # 3rd party imports
 from colorama import Fore, Style
+from termcolor import colored
 import halo
 import openai
+
+class GoalPromptHandler(FewShotPromptHandler):
+    """Prompt Factory for Goals"""
+
+    def __init__(
+        self,
+        example_template: PromptTemplate,
+        examples: list[str],
+        prefix: str,
+        suffix: str,
+        example_prompt: PromptTemplate = None,
+        limiter: PromptLengthLimiter = None,
+    ):
+        super().__init__(example_template, examples, prefix, suffix, limiter)
+        self.example_factory = GoalExampleFactory()
+        self.example_prompt = (
+            example_prompt
+            if example_prompt is not None
+            else self.example_factory.example_prompt
+        )
+
+    def _example_prompt(self, variables_list: list[str]) -> PromptTemplate:
+        return PromptTemplate(
+            input_variables=variables_list, template=self.example_template
+        )
+
+    def few_shot_prompt_template(
+        self,
+        input_variables=["query"],
+        example_separator="\n",
+        limiter: PromptLengthLimiter = None,
+    ) -> PromptTemplate:
+        self.prompt_template = FewShotPromptTemplate(
+            examples=self.examples,
+            example_prompt=limiter.length_based_selector()
+            if limiter is not None
+            else self.example_prompt,
+            prefix=self.prefix,
+            suffix=self.suffix,
+            input_variables=input_variables,
+            example_separator=example_separator,
+        )
+        return self.prompt_template
+
+class GoalExampleFactory(ExampleFactory):
+    """Factory for goal prompt examples"""
+    example_template = """
+    User: {query}
+    AI: {answer}
+    """
+
+    example_prompt = PromptTemplate(
+        input_variables=["query", "answer"], template=example_template
+    )
+
+    def examples(self) -> list[dict[str, str]]:
+        return [
+            {
+                "query": f"{ self.goal_instructions('learn how to code', 3)}",
+                "answer": """Develop a solid understanding of programming languages, syntax, and concepts.
+                Gain practical experience in writing code and solving programming problems.
+                Acquire the ability to design and develop software applications independently."""
+            },
+            {
+                "query": f"{ self.goal_instructions('clean my house', 10)}",
+                "answer": """Declutter and organize rooms.
+                Dust and clean surfaces.
+                Vacuum and mop floors.
+                Clean and sanitize kitchen and bathrooms.
+                Wash, fold, and put away laundry.
+                Clean windows, mirrors, and glass.
+                Tidy outdoor areas.
+                Organize closets, drawers, and cabinets.
+                Empty and clean trash bins.
+                Wipe down frequently touched surfaces."""
+            },
+            {
+                "query": f"{ self.goal_instructions('wash my dog', 5)}",
+                "answer": """Prepare bathing area and supplies.
+                Wet dog's fur with warm water.
+                Apply and lather dog shampoo.
+                Thoroughly rinse off shampoo.
+                Dry dog's fur with a towel.
+                """
+            }
+        ]
+
+    def goal_instructions(self, role: str, num_goals: int):
+        return f"""Define up to {num_goals} goals that fulfill the role of {role}"""
+    
+class TaskPromptHandler(FewShotPromptHandler):
+    """Prompt Factory for Goals"""
+    def __init__(
+        self,
+        example_template: PromptTemplate,
+        examples: list[str],
+        prefix: str,
+        suffix: str,
+        example_prompt: PromptTemplate = None,
+        limiter: PromptLengthLimiter = None,
+    ):
+        super().__init__(example_template, examples, prefix, suffix, limiter)
+        self.example_factory = TaskExampleFactory()
+        self.example_prompt = (
+            example_prompt
+            if example_prompt is not None
+            else self.example_factory.example_prompt
+        )
+
+    def _example_prompt(self, variables_list: list[str]) -> PromptTemplate:
+        return PromptTemplate(
+            input_variables=variables_list, template=self.example_template
+        )
+
+    def few_shot_prompt_template(
+        self,
+        input_variables=["query"],
+        example_separator="\n",
+        limiter: PromptLengthLimiter = None,
+    ) -> PromptTemplate:
+        self.prompt_template = FewShotPromptTemplate(
+            examples=self.examples,
+            example_prompt=limiter.length_based_selector()
+            if limiter is not None
+            else self.example_prompt,
+            prefix=self.prefix,
+            suffix=self.suffix,
+            input_variables=input_variables,
+            example_separator=example_separator,
+        )
+        return self.prompt_template
+    
+class TaskExampleFactory(ExampleFactory):
+    """Factory for task prompt examples"""
+    example_template = """
+    User: {query}
+    AI: {answer}
+    """
+
+    example_prompt = PromptTemplate(
+        input_variables=["query", "answer"], template=example_template
+    )
+
+    def examples(self) -> list[dict[str, str]]:
+        print("queried")
+        return [
+            {
+                "query": f"{ self.task_instructions('learn how to code', 3)}",
+                "answer": """Develop a solid understanding of programming languages, syntax, and concepts.
+                Gain practical experience in writing code and solving programming problems.
+                Acquire the ability to design and develop software applications independently."""
+            },
+            {
+                "query": f"{ self.task_instructions('clean my house', 10)}",
+                "answer": """Declutter and organize rooms.
+                Dust and clean surfaces.
+                Vacuum and mop floors.
+                Clean and sanitize kitchen and bathrooms.
+                Wash, fold, and put away laundry.
+                Clean windows, mirrors, and glass.
+                Tidy outdoor areas.
+                Organize closets, drawers, and cabinets.
+                Empty and clean trash bins.
+                Wipe down frequently touched surfaces."""
+            },
+            {
+                "query": f"{ self.task_instructions('wash my dog', 5)}",
+                "answer": """Prepare bathing area and supplies.
+                Wet dog's fur with warm water.
+                Apply and lather dog shampoo.
+                Thoroughly rinse off shampoo.
+                Dry dog's fur with a towel.
+                """
+            }
+        ]
+
+    def task_instructions(self, goal: str, num_tasks: int):
+        return f"""Define up to {num_tasks} for the goal of {goal}"""
+
+
+class TaskGeneratorBot:
+    """Responsible for generating tasks based on a goal"""
+    def __init__(self, goal: str, num_goals: int = 10):
+        self.goal = goal
+        self.num_goals = num_goals
+
+    factory = TaskExampleFactory()
+
+    promptHandler = None
+
+    def create_prompt_template(self):
+        return TaskPromptHandler(
+        example_template=self.factory.example_template,
+        examples=self.factory.examples(),
+        prefix=f"You are a task generator. Generate up to n goals for the user's current goal of {self.goal}.",
+        suffix="""
+        User: {query}
+        AI: """,
+    )
+
+    def generate_tasks(self):
+        query = self.factory.task_instructions(f"{self.goal}", self.num_goals)
+        summarizer = ConversationSummarizer()
+        return summarizer.summarize(self.create_prompt_template().few_shot_prompt_template().format(query=query))
+    
+class GoalGeneratorBot:
+    def __init__(self, goal: str, num_goals: int = 10):
+        self.goal = goal
+        self.num_goals = num_goals
+        self.io_manager = IOManager(role=f"{goal}")
+
+    factory = GoalExampleFactory()
+
+    promptHandler = GoalPromptHandler(
+        example_template=factory.example_template,
+        examples=factory.examples(),
+        prefix="You are a goal generator. Generate up to n goals for the user's prompt",
+        suffix="""
+        User: {query}
+        AI: """,
+    )
+    def generate_goals(self):
+        query = self.factory.goal_instructions(f"{self.goal}", self.num_goals)
+        summarizer = ConversationSummarizer()
+        return summarizer.summarize(self.promptHandler.few_shot_prompt_template().format(query=query))
 
 class ChatBot:
     def __init__(self, api_key=None):
@@ -78,21 +306,23 @@ class ChatBot:
             api_key = self.io_manager.get_open_ai_key()
         self.gpt3_interface = GPT3Interface(io_manager=self.io_manager, openapi_key=api_key)
         self.goal_manager = GoalManager(io_manager=self.io_manager, gpt3_interface=self.gpt3_interface)
+        self.goal_gen_bot = GoalGeneratorBot(goal='', num_goals=10)        
     
     def run(self):
         """Main function"""
         print()
         self.display_welcome_message()
         self.set_assistant_role()
-        self.goal_manager.goals = self.gpt3_interface.suggest_goals()
-        self.goal_manager.goals = self.goal_manager.strip_goals_and_save(self.goal_manager.goals)
+        self.goal_gen_bot.goal = self.io_manager.role
+        suggested_goals = self.goal_gen_bot.generate_goals()        
+        self.goal_manager.goals = self.goal_manager.strip_goals_and_save(suggested_goals)
         self.io_manager.ask_user_to_review_goals(self.goal_manager.goals)
         user_choice = self.io_manager.get_user_choice(['keep', 'modify', 'new'])
         if user_choice == 'modify' or user_choice == 'new':
-            self.request_goal_from_user()
+            pass #TODO: implement modify and new using langchain
         for n in range(len(self.goal_manager.goals)):
             self.goal_manager.generate_subtasks(n)
-        self.goal_manager.handle_user_task_interaction()
+            # self.goal_manager.handle_user_task_interaction()
         self.goal_manager.save_goals_to_disk_in_json()
 
     def set_role(self, role):
@@ -100,7 +330,7 @@ class ChatBot:
 
     def display_welcome_message(self):
         """Display the welcome message"""        
-        welcome_message = "Welcome to Devgauge's Todo List ChatGPTBot. What goal would you like help accomplishing?"
+        welcome_message = "Hello, I am Pursuit Prophet, brought to you by DevGauge. What dream would you like to pursue today?"
         self.io_manager.assistant_message(welcome_message)
         
     def request_goal_from_user(self):
@@ -189,65 +419,16 @@ class GoalManager:
     def generate_subtasks(self, n):
         """Assist the user with a goal"""
         task = list(self.goals.keys())[n]
-        example_subtask_yes_response="""
-        Following the line after "===" is an example response for the task 
-        "Make a playlist of your mom's favorite songs or songs that remind you of her". 
-        The role for this task is "Help me wish my mom a Happy Mother's Day"
-        This is a response where you have determined there are subtasks.
-		Notice there is no formatting or numbering:
-        ===
-        Consider your mom's musical tastes and preferences
-        Research songs that your mom loves or that are meaningful to her
-        Choose a platform to use for your playlist, such as Spotify or iTunes
-        Compile a list of songs that you want to include in the playlist
-        Organize the songs in a way that makes sense for the occasion or your mom's preferences
-        Test the playlist to make sure it flows well and includes all the songs you want to include
-        Personalize the playlist by adding a special message or note to your mom
-        Share the playlist with your mom to make her day special
-
-        To start working on this goal, you can begin by considering your mom's musical tastes and 
-        preferences. Research songs that your mom loves or that are meaningful to her and choose a 
-        platform to use for your playlist, such as Spotify or iTunes. Once you've gathered your 
-        list of songs, you can organize them in a way that makes sense for the occasion or your 
-        mom's preferences, and test the playlist to ensure it flows well. Personalize the playlist 
-        by adding a special message or note to your mom and share it with her on Mother's Day to 
-        make her day extra special.
-        """
-        example_subtask_no_response="""
-        Following the line after "===" is an example response for the task
-        "Remove any clothing that is blocking access to the toilet" The role 
-        for this task is "Go potty". This is a response where you have 
-        determined there are no subtasks. Notice there is no formatting or 
-        numbering.
-        ===
-        Remove any clothing that is blocking access to the toilet such as pants, underwear, or skirts
-        """
-        sys_message = f"""
-        You will now generate tasks. You will attempt to simplify "{task}" with 
-        the overall goal of meeting "{self.io_manager.role}" Do you suggest 
-        breaking "{task}" into substasks? If yes, please respond with a list 
-        of subtasks separated by new lines. Do not respond with an affirmation 
-        or context. Using the examples provided, provide an unformatted list with 
-        no leading or trailing characters. Then summarize the tasks and suggest 
-        how the user can begin working on the goal. If no, please only suggest 
-        how the user can start working on the goal. Do not include "===" or any 
-        context in your response. "===" is only used to deliniate the example 
-        response from the example instructions/context:
-        """.strip()
+        bot = TaskGeneratorBot(goal=task)
+        response_text = bot.generate_tasks()
         
-        self.io_manager.system_message(example_subtask_yes_response, to_user=False, to_gpt=True)
-        self.io_manager.system_message(example_subtask_no_response, to_user=False, to_gpt=True)
-        self.io_manager.system_message(sys_message, to_user=False, to_gpt=True)
-        
-        response = self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
-        response_text = response['choices'][0]['message']['content']
         text = self.sanitize_bot_goal_response(response_text)
         
         subtasks = text.split('\n')  # Split the response into subtasks
         self.goals[task] = subtasks  # Assign the subtasks to the corresponding goal
         self.io_manager.assistant_message(text)
     
-    def ask_if_user_wants_to_work_on_task(self, task):
+    def  ask_if_user_wants_to_work_on_task(self):
         """Ask the user if they want to work on a task."""
         message = "Do you want to work on this right now? Please respond with 'yes' or 'no'"
         self.io_manager.user_instruction(message)
@@ -436,6 +617,7 @@ class IOManager:
         "user": Fore.GREEN,
         "assistant": Fore.BLUE,
         "system": Fore.RED,
+        "input": "green"
     }
 
     role = ""
@@ -480,8 +662,8 @@ class IOManager:
         self.append_message("user", message)
 
     def get_user_input(self, prompt):
-        """Get input from the user and append it to the messages list"""
-        user_response = input(prompt)
+        """Get input from the user and append it to the messages list"""        
+        user_response = input(colored(prompt, self.color_map["input"]))
         # if self.handle_slash_command(user_response) is False:
         #     self.messages.append({"role": "user", "content": user_response})
         return user_response
@@ -489,7 +671,7 @@ class IOManager:
     def get_user_choice(self, choices):
         """Get user input and ensure it's one of the provided choices."""
         while True:
-            user_input = input().strip().lower()  # Get user input, remove leading/trailing whitespace and convert to lowercase
+            user_input = self.get_user_input("").strip().lower()  # Get user input, remove leading/trailing whitespace and convert to lowercase
             self.user_message(user_input)
             if user_input in choices:
                 # if user input begins with y, return True
