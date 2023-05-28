@@ -6,6 +6,7 @@ from langchain.chains.conversation.memory import ConversationSummaryBufferMemory
 from langchain.callbacks import get_openai_callback
 from abc import ABC, abstractmethod, abstractproperty, abstractstaticmethod
 
+parameters_list = ["query", "answer"]
 
 class TokenHandler:
     """Handles token reporting"""
@@ -116,7 +117,7 @@ class FewShotPromptHandler(ABC):
         self.limiter = limiter
 
     @abstractmethod
-    def _example_prompt(self, variables_list=["query", "answer"]) -> PromptTemplate:
+    def _example_prompt(self, variables_list: list[str]) -> PromptTemplate:
         return PromptTemplate(
             input_variables=variables_list, template=self.example_template
         )
