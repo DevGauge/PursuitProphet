@@ -131,7 +131,7 @@ class FewShotPromptHandler(ABC):
         example_separator="\n",
         limiter: PromptLengthLimiter = None,
     ) -> PromptTemplate:
-        self.prompt_template = PromptTemplate(
+        self.prompt_template = FewShotPromptTemplate(
             examples=self.examples,
             example_prompt=limiter.length_based_selector()
             if limiter is not None
