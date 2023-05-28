@@ -16,7 +16,7 @@ Postconditions:
 The user receives personalized advice and support.
 The user can track their progress through completed goals and subtasks.
 
-Fitness Coach Use Case Example:
+Fitness Coach Goal Example:
 The user initializes the ChatGPTBot with their OpenAI API token.
 The ChatGPTBot authenticates the user and welcomes them to the Personal Fitness Coach session.
 The user defines their role as "Personal Fitness Coach."
@@ -427,7 +427,7 @@ class GoalManager:
         subtasks = text.split('\n')  # Split the response into subtasks
         self.goals[task] = subtasks  # Assign the subtasks to the corresponding goal
     
-    def  ask_if_user_wants_to_work_on_task(self, task):
+    def  ask_if_user_wants_to_work_on_task(self):
         """Ask the user if they want to work on a task."""
         message = "Do you want to work on this right now? Please respond with 'yes' or 'no'"
         self.io_manager.user_instruction(message)
