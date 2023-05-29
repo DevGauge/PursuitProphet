@@ -23,7 +23,7 @@ def welcome():
 def role_selection():
     if request.method == 'POST':
         role = request.form.get('role')
-        bot.set_assistant_role(role)
+        bot.set_assistant_primary_goal(role)
         return redirect(url_for('next_function'))  # replace 'next_function' with the name of your next route
     else:
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
