@@ -279,7 +279,9 @@ class TaskGeneratorBot:
         spinner = halo.Halo(text=f"Generating Tasks for {self.goal}", spinner='dots')
         spinner.start()
         try:
-            return summarizer.summarize(self.create_prompt_template().few_shot_prompt_template().format(query=query))
+            return summarizer.summarize(self.create_prompt_template()
+                                        .few_shot_prompt_template()
+                                        .format(query=query))
         finally:
             spinner.stop()
 
@@ -368,8 +370,8 @@ class ChatBot:
         """Set the assistant role based on user input"""
         if role is None:
             self.set_role(self.io_manager.get_user_input("Please enter the role for the assistant: "))
-        self.io_manager.system_message(f"For the remainder of the conversation, I want you to act and respond as a master planner for a user who wants to {self.io_manager.role}", to_user=False, to_gpt=True)
-        self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
+        # self.io_manager.system_message(f"For the remainder of the conversation, I want you to act and respond as a master planner for a user who wants to {self.io_manager.role}", to_user=False, to_gpt=True)
+        # self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
 
 class GoalManager:
     goals = { }
