@@ -341,7 +341,7 @@ class GoalGeneratorBot:
     def generate_goals(self):
         query = self.factory.goal_instructions(f"{self.goal}", self.num_goals)
         summarizer = ConversationSummarizer()
-        return summarizer.summarize(self.promptHandler.few_shot_prompt_template().format(query=query))
+        return summarizer.summarize(self.create_prompt_template().few_shot_prompt_template().format(query=query))
 
 class ChatBot:
     def __init__(self, api_key=None):
