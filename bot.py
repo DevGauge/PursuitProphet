@@ -144,37 +144,45 @@ class GoalExampleFactory(ExampleFactory):
         return [
             {
                 "query": f"{ self.goal_instructions('learn how to code', 3)}",
-                "answer": """Develop a solid understanding of programming languages, syntax, and concepts.
-                Gain practical experience in writing code and solving programming problems.
-                Acquire the ability to design and develop software applications independently."""
+                "answer": 
+"""
+Develop a solid understanding of programming languages, syntax, and concepts.
+Gain practical experience in writing code and solving programming problems.
+Acquire the ability to design and develop software applications independently.
+"""
             },
             {
                 "query": f"{ self.goal_instructions('clean my house', 10)}",
-                "answer": """Declutter and organize rooms.
-                Dust and clean surfaces.
-                Vacuum and mop floors.
-                Clean and sanitize kitchen and bathrooms.
-                Wash, fold, and put away laundry.
-                Clean windows, mirrors, and glass.
-                Tidy outdoor areas.
-                Organize closets, drawers, and cabinets.
-                Empty and clean trash bins.
-                Wipe down frequently touched surfaces."""
+                "answer": 
+"""
+Declutter and organize rooms.
+Dust and clean surfaces.
+Vacuum and mop floors.
+Clean and sanitize kitchen and bathrooms.
+Wash, fold, and put away laundry.
+Clean windows, mirrors, and glass.
+Tidy outdoor areas.
+Organize closets, drawers, and cabinets.
+Empty and clean trash bins.
+Wipe down frequently touched surfaces.
+"""
             },
             {
                 "query": f"{ self.goal_instructions('wash my dog', 5)}",
-                "answer": """Prepare bathing area and supplies.
-                Wet dog's fur with warm water.
-                Apply and lather dog shampoo.
-                Thoroughly rinse off shampoo.
-                Dry dog's fur with a towel.
-                """
+                "answer": 
+"""
+Prepare bathing area and supplies.
+Wet dog's fur with warm water.
+Apply and lather dog shampoo.
+Thoroughly rinse off shampoo.
+Dry dog's fur with a towel.
+"""
             }
         ]
 
     def goal_instructions(self, primary_goal: str, num_goals: int):
         return f"""Define up to {num_goals} goals that fulfill the primary goal of '{primary_goal}'"""
-    
+
 class TaskPromptHandler(FewShotPromptHandler):
     """Prompt Factory for Goals"""
     def __init__(
@@ -232,31 +240,39 @@ class TaskExampleFactory(ExampleFactory):
         return [
             {
                 "query": f"{ self.task_instructions('learn how to code', 3)}",
-                "answer": """Develop a solid understanding of programming languages, syntax, and concepts.
-                Gain practical experience in writing code and solving programming problems.
-                Acquire the ability to design and develop software applications independently."""
+                "answer": 
+"""
+Develop a solid understanding of programming languages, syntax, and concepts.
+Gain practical experience in writing code and solving programming problems.
+Acquire the ability to design and develop software applications independently.
+"""
             },
             {
                 "query": f"{ self.task_instructions('clean my house', 10)}",
-                "answer": """Declutter and organize rooms.
-                Dust and clean surfaces.
-                Vacuum and mop floors.
-                Clean and sanitize kitchen and bathrooms.
-                Wash, fold, and put away laundry.
-                Clean windows, mirrors, and glass.
-                Tidy outdoor areas.
-                Organize closets, drawers, and cabinets.
-                Empty and clean trash bins.
-                Wipe down frequently touched surfaces."""
+                "answer": 
+"""
+Declutter and organize rooms.
+Dust and clean surfaces.
+Vacuum and mop floors.
+Clean and sanitize kitchen and bathrooms.
+Wash, fold, and put away laundry.
+Clean windows, mirrors, and glass.
+Tidy outdoor areas.
+Organize closets, drawers, and cabinets.
+Empty and clean trash bins.
+Wipe down frequently touched surfaces.
+"""
             },
             {
                 "query": f"{ self.task_instructions('wash my dog', 5)}",
-                "answer": """Prepare bathing area and supplies.
-                Wet dog's fur with warm water.
-                Apply and lather dog shampoo.
-                Thoroughly rinse off shampoo.
-                Dry dog's fur with a towel.
-                """
+                "answer": 
+"""
+Prepare bathing area and supplies.
+Wet dog's fur with warm water.
+Apply and lather dog shampoo.
+Thoroughly rinse off shampoo.
+Dry dog's fur with a towel.
+"""
             }
         ]
 
@@ -348,7 +364,7 @@ class ChatBot:
 
     def display_welcome_message(self):
         """Display the welcome message"""        
-        welcome_message = "Hello, I am Pursuit Prophet, brought to you by DevGauge. What dream would you like to pursue today?"
+        welcome_message = "Hi! I'm Pursuit Prophet, brought to you by DevGauge."
         self.io_manager.assistant_message(welcome_message)
 
     def set_assistant_primary_goal(self, primary_goal=None):
@@ -607,13 +623,14 @@ class IOManager(metaclass=SingletonMeta):
 
     def get_user_input(self, prompt):
         """Get input from the user and append it to the messages list"""        
-        user_response = input(colored(prompt, self.color_map["input"]))
+        user_response = input(colored(prompt + ' ', self.color_map["input"]))
         return user_response
 
     def get_user_choice(self, choices):
         """Get user input and ensure it's one of the provided choices."""
         while True:
-            user_input = self.get_user_input("").strip().lower()  # Get user input, remove leading/trailing whitespace and convert to lowercase            
+            string_choices = ','.join(choices)
+            user_input = self.get_user_input(f'[{string_choices}]: ').strip().lower()  # Get user input, remove leading/trailing whitespace and convert to lowercase            
             if user_input in choices:
                 # if user input begins with y, return True
                 if user_input.startswith("y"):
