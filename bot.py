@@ -113,10 +113,12 @@ class GoalPromptHandler(FewShotPromptHandler):
 
     def few_shot_prompt_template(
         self,
-        input_variables=["query"],
+        input_variables=None,
         example_separator="\n",
         limiter: PromptLengthLimiter = None,
     ) -> PromptTemplate:
+        if input_variables is None:
+            input_variables = ["query"]
         self.prompt_template = FewShotPromptTemplate(
             examples=self.examples,
             example_prompt=limiter.length_based_selector()
