@@ -296,7 +296,7 @@ class TaskGeneratorBot:
         return TaskPromptHandler(
         example_template=self.factory.example_template,
         examples=self.factory.examples(),
-        prefix=f"You are a task generator. Generate up to n goals for the user's current goal of {self.goal}.",
+        prefix=f"You are a task generator. Generate up to {self.num_goals} goals for the user's current goal of {self.goal}.",
         suffix="""
         User: {query}
         AI: """,
