@@ -322,14 +322,22 @@ class GoalGeneratorBot:
 
     factory = GoalExampleFactory()
 
-    promptHandler = GoalPromptHandler(
-        example_template=factory.example_template,
-        examples=factory.examples(),
-        prefix="You are a goal generator. Generate up to n goals for the user's prompt",
+    def create_prompt_template(self):
+        # remove all newlines from prefix
+        prefix=f"""You are a goal generator. Generate up to {self.num_goals} goals for the user's prompt. 
+        Goals should be ordered first by priority, but always respect dependency order. 
+        For instance, if a user's goal is to bake a cake, it's very important to mix the 
+        batter, but first you must have the necessary ingredients!
+        """.replace('\n', ' ')
+        return GoalPromptHandler(
+        example_template=self.factory.example_template,
+        examples=self.factory.examples(),
+        prefix=prefix,
         suffix="""
         User: {query}
         AI: """,
     )
+
     def generate_goals(self):
         query = self.factory.goal_instructions(f"{self.goal}", self.num_goals)
         summarizer = ConversationSummarizer()
