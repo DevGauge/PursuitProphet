@@ -339,32 +339,6 @@ class ChatBot:
         """Display the welcome message"""        
         welcome_message = "Hello, I am Pursuit Prophet, brought to you by DevGauge. What dream would you like to pursue today?"
         self.io_manager.assistant_message(welcome_message)
-        
-    def request_goal_from_user(self):
-        """Request goals from the user"""
-        #send user message asking what goals would help fulfill the role
-        example_goal_response = """
-        Following is an example 
-        response for the goal "I want to go potty". 
-        Notice there is no formatting or numbering:
-
-        Get to the bathroom
-        Find an available toilet
-        Remove pants or clothing blocking access
-        Sit on the toilet seat
-        Wait for urine or bowel movement to empty
-        Wipe properly after using the restroom
-        Flush the toilet
-        Wash hands with soap and water
-        Dry hands with a clean towel or air dryer
-        Return to the original location or activity
-        """
-        message = f"You will now act as a goal generator for a user who wants to {self.io_manager.role}. Generate as many goals as possible up to 10. Goals should be separated by a new line. Do not add any context or formatting. An example follows: {example_goal_response}"
-
-        self.io_manager.system_message(message, to_user=True, to_gpt=True)
-        user_response = input()
-        self.io_manager.user_message(user_response)
-        self.goal_manager.strip_goals_and_save(user_response)
 
     def set_assistant_role(self, role=None):
         """Set the assistant role based on user input"""
@@ -707,15 +681,6 @@ class IOManager:
         self.system_message(sys_message, to_gpt=False)
         self.user_instruction(to_user_message)
         sys.exit(1)
-    
-    def clear_messages(self):
-        """Clear the messages list"""
-        self.messages = []
-
-    def reset_with_default_messages(self):
-        """Reset the messages list with the default messages"""
-        self.clear_messages()
-        self.messages = self.default_messages
 
 def main(argv):
     """Main function"""
