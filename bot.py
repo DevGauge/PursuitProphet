@@ -172,8 +172,8 @@ class GoalExampleFactory(ExampleFactory):
             }
         ]
 
-    def goal_instructions(self, role: str, num_goals: int):
-        return f"""Define up to {num_goals} goals that fulfill the role of {role}"""
+    def goal_instructions(self, primary_goal: str, num_goals: int):
+        return f"""Define up to {num_goals} goals that fulfill the primary goal of '{primary_goal}'"""
     
 class TaskPromptHandler(FewShotPromptHandler):
     """Prompt Factory for Goals"""
@@ -300,7 +300,7 @@ class GoalGeneratorBot:
     def __init__(self, goal: str, num_goals: int = 10):
         self.goal = goal
         self.num_goals = num_goals
-        self.io_manager = IOManager(role=f"{goal}")
+        self.io_manager = IOManager(primary_goal=f"{goal}")
 
     factory = GoalExampleFactory()
 
@@ -319,7 +319,7 @@ class GoalGeneratorBot:
 
 class ChatBot:
     def __init__(self, api_key=None):
-        self.io_manager = IOManager(role='')
+        self.io_manager = IOManager(primary_goal='')
         if api_key is None:
             api_key = self.io_manager.get_open_ai_key()
         self.gpt3_interface = GPT3Interface(io_manager=self.io_manager, openapi_key=api_key)
@@ -330,8 +330,8 @@ class ChatBot:
         """Main function"""
         print()
         self.display_welcome_message()
-        self.set_assistant_role()
-        self.goal_gen_bot.goal = self.io_manager.role
+        self.set_assistant_primary_goal()
+        self.goal_gen_bot.goal = self.io_manager.primary_goal
         suggested_goals = self.goal_gen_bot.generate_goals()        
         self.goal_manager.goals = self.goal_manager.strip_goals_and_save(suggested_goals)
         self.io_manager.ask_user_to_review_goals(self.goal_manager.goals)
@@ -343,18 +343,18 @@ class ChatBot:
             # self.goal_manager.handle_user_task_interaction()
         self.goal_manager.save_goals_to_disk_in_json()
 
-    def set_role(self, role):
-        self.io_manager.role = role
+    def primary_goal(self, primary_goal):
+        self.io_manager.primary_goal = primary_goal
 
     def display_welcome_message(self):
         """Display the welcome message"""        
         welcome_message = "Hello, I am Pursuit Prophet, brought to you by DevGauge. What dream would you like to pursue today?"
         self.io_manager.assistant_message(welcome_message)
 
-    def set_assistant_role(self, role=None):
+    def set_assistant_primary_goal(self, primary_goal=None):
         """Set the assistant role based on user input"""
-        if role is None:
-            self.set_role(self.io_manager.get_user_input("Please enter the role for the assistant: "))
+        if primary_goal is None:
+            self.primary_goal(self.io_manager.get_user_input("What are you dreaming of today?"))
 
 class GoalManager:
     goals = { }
@@ -366,7 +366,7 @@ class GoalManager:
 
     def create_file_json(self):
         return {
-            "role": self.io_manager.role,
+            "role": self.io_manager.primary_goal,
             "goals": self.goals,
             "completed_goals": self.completed_goals,
         }
@@ -515,7 +515,7 @@ class GoalManager:
         # eclude existing files
         excluded_filenames = [filename for filename in os.listdir() if filename.endswith(".json")]
 
-        sys_filename_message = f"Please give me a filename to save '{self.io_manager.role}' using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems. Exclude the following filenames from the final result: {excluded_filenames}"
+        sys_filename_message = f"Please give me a filename to save '{self.io_manager.primary_goal}' using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems. Exclude the following filenames from the final result: {excluded_filenames}"
         self.io_manager.system_message(sys_filename_message)
         response = self.gpt3_interface.send_message_to_gpt([{'role':'system', 'content':sys_filename_message}], loading_text="Generating...")
         filename = response['choices'][0]['message']['content']
@@ -525,10 +525,10 @@ class GoalManager:
             sys_filename_message = sys_filename_message + str(datetime.datetime.now())
         
         json_dict = {
-            "role": self.io_manager.role,
+            "primary_goal": self.io_manager.primary_goal,
             "goals": self.goals,
             "completed_goals": self.completed_goals,
-        }        
+        }
         json_object = json.dumps(json_dict, indent=4)
 
         with open(self.strip_invalid_file_chars(filename), "w", encoding="utf-8") as f:
@@ -569,7 +569,7 @@ class GPT3Interface:
         # Ask the user what task they want to work on
         # If the bot can provide assistance with the task, do so
         # Otherwise, let the user know that the bot can't provide the specific assistance requested but can provide other types of assistance
-        message = f"Acting with the goal of {self.io_manager.role}, what assistance can you provide with {task}? Keep your answer concise and to the point, providing practical advice whenever possible. If unable to complete a task, let the user know and ask if they'd like to move on to the next task or want you to wait for them, using \"/goal complete\" to mark the task as complete."
+        message = f"Acting with the goal of {self.io_manager.primary_goal}, what assistance can you provide with {task}? Keep your answer concise and to the point, providing practical advice whenever possible. If unable to complete a task, let the user know and ask if they'd like to move on to the next task or want you to wait for them, using \"/goal complete\" to mark the task as complete."
         self.io_manager.system_message(message)
         response = self.send_message_to_gpt(self.io_manager.messages)
         text = response['choices'][0]['message']['content']
@@ -583,10 +583,10 @@ class IOManager(metaclass=SingletonMeta):
         "input": "green"
     }
 
-    role = ""
+    primary_goal = ""
 
-    def __init__(self, role):
-        self.role = role
+    def __init__(self, primary_goal):
+        self.primary_goal = primary_goal
 
     def formatted_text_output(self, message_type, text):
         """Format the text output based on the type of message"""
