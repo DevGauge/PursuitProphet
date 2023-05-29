@@ -73,6 +73,18 @@ from colorama import Fore, Style
 from termcolor import colored
 import halo
 import openai
+import threading
+
+class SingletonMeta(type):
+    _instances = {}
+    _lock: threading.Lock = threading.Lock()
+    
+    def __call__(cls, *args, **kwargs):
+        with cls._lock:
+            if cls not in cls._instances:
+                instance = super().__call__(*args, **kwargs)
+                cls._instances[cls] = instance
+        return cls._instances[cls]
 
 class GoalPromptHandler(FewShotPromptHandler):
     """Prompt Factory for Goals"""
@@ -217,7 +229,6 @@ class TaskExampleFactory(ExampleFactory):
     )
 
     def examples(self) -> list[dict[str, str]]:
-        print("queried")
         return [
             {
                 "query": f"{ self.task_instructions('learn how to code', 3)}",
@@ -313,7 +324,7 @@ class ChatBot:
             api_key = self.io_manager.get_open_ai_key()
         self.gpt3_interface = GPT3Interface(io_manager=self.io_manager, openapi_key=api_key)
         self.goal_manager = GoalManager(io_manager=self.io_manager, gpt3_interface=self.gpt3_interface)
-        self.goal_gen_bot = GoalGeneratorBot(goal='', num_goals=10)        
+        self.goal_gen_bot = GoalGeneratorBot(goal='', num_goals=10)
     
     def run(self):
         """Main function"""
@@ -344,8 +355,6 @@ class ChatBot:
         """Set the assistant role based on user input"""
         if role is None:
             self.set_role(self.io_manager.get_user_input("Please enter the role for the assistant: "))
-        # self.io_manager.system_message(f"For the remainder of the conversation, I want you to act and respond as a master planner for a user who wants to {self.io_manager.role}", to_user=False, to_gpt=True)
-        # self.gpt3_interface.send_message_to_gpt(self.io_manager.messages)
 
 class GoalManager:
     goals = { }
@@ -440,7 +449,6 @@ class GoalManager:
                 goals = text[:1]
             else:
                 goals = text
-
             if len(text) > 3:
                 commentary = text[3]
                 print("Commentary: " + commentary)
@@ -503,13 +511,13 @@ class GoalManager:
     def save_goals_to_disk_in_json(self):
         """Save the goals to disk in JSON format."""
         sys_message = "Saving goals to disk."
-        self.io_manager.system_message(sys_message, to_user=True, to_gpt=False)
+        self.io_manager.system_message(sys_message)
         # eclude existing files
         excluded_filenames = [filename for filename in os.listdir() if filename.endswith(".json")]
 
-        sys_filename_message = f"Please give me a filename to save {self.io_manager.role} using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems. Exclude the following filenames from the final result: {excluded_filenames}"
-        self.io_manager.system_message(sys_filename_message, to_user=False, to_gpt=True)
-        response = self.gpt3_interface.send_message_to_gpt(self.io_manager.messages, loading_text="Generating...")
+        sys_filename_message = f"Please give me a filename to save '{self.io_manager.role}' using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems. Exclude the following filenames from the final result: {excluded_filenames}"
+        self.io_manager.system_message(sys_filename_message)
+        response = self.gpt3_interface.send_message_to_gpt([{'role':'system', 'content':sys_filename_message}], loading_text="Generating...")
         filename = response['choices'][0]['message']['content']
 
         if os.path.exists(filename):
@@ -527,7 +535,7 @@ class GoalManager:
             f.write(json_object)
         
         sys_save_complete_message = f"Saved session to disk as {filename}."
-        self.io_manager.system_message(sys_save_complete_message, to_user=True, to_gpt=False)
+        self.io_manager.system_message(sys_save_complete_message)
 
     def strip_invalid_file_chars(self, filename):
         """Strip invalid characters from a filename."""
@@ -556,42 +564,18 @@ class GPT3Interface:
         finally:
             spinner.stop()
 
-    def suggest_goals(self, num_goals=10):
-        """Define the objective"""                
-        example_goal_response = """
-        Following is an example 
-        response for the goal "I want to go potty". 
-        Notice there is no formatting or numbering:
-        
-        Get to the bathroom
-        Find an available toilet
-        Remove pants or clothing blocking access
-        Sit on the toilet seat
-        Wait for urine or bowel movement to empty
-        Wipe properly after using the restroom
-        Flush the toilet
-        Wash hands with soap and water
-        Dry hands with a clean towel or air dryer
-        Return to the original location or activity
-        """
-        message = f"You will now act as a goal generator for a user who wants to {self.io_manager.role}. Generate as many goals as possible up to 10. Goals should be separated by a new line. Do not add any context or formatting. An example follows: {example_goal_response}"
-        self.io_manager.system_message(message, to_user=False, to_gpt=True)
-        response = self.send_message_to_gpt(self.io_manager.messages, loading_text=f"Generating Goals for {self.io_manager.role}...")
-        text = response['choices'][0]['message']['content']
-        return text
-
     def provide_assistance_with_task(self, task):
         """Ask the user what subtask they want to work on and provide assistance."""
         # Ask the user what task they want to work on
         # If the bot can provide assistance with the task, do so
         # Otherwise, let the user know that the bot can't provide the specific assistance requested but can provide other types of assistance
         message = f"Acting with the goal of {self.io_manager.role}, what assistance can you provide with {task}? Keep your answer concise and to the point, providing practical advice whenever possible. If unable to complete a task, let the user know and ask if they'd like to move on to the next task or want you to wait for them, using \"/goal complete\" to mark the task as complete."
-        self.io_manager.system_message(message, to_user=False, to_gpt=True)
+        self.io_manager.system_message(message)
         response = self.send_message_to_gpt(self.io_manager.messages)
         text = response['choices'][0]['message']['content']
         self.io_manager.assistant_message(text)
 
-class IOManager:
+class IOManager(metaclass=SingletonMeta):
     color_map = {
         "user": Fore.GREEN,
         "assistant": Fore.BLUE,
@@ -601,57 +585,35 @@ class IOManager:
 
     role = ""
 
-    default_messages = [
-        {"role": "system", "content": f"You will act as a goal generator for a user who wants to {role}"},
-        {"role": "system", "content": f"You have already generated the following goals: {GoalManager.goals.items()}"}
-    ]
-
     def __init__(self, role):
         self.role = role
-        self.messages = []
 
     def formatted_text_output(self, message_type, text):
         """Format the text output based on the type of message"""
         color = self.color_map[message_type]
         print(f"{color}{text}{Style.RESET_ALL}\n")
 
-    def append_message(self, role, message):
-        """Append a message to the message list"""
-        self.messages.append({"role": role, "content": message})
-
     def assistant_message(self, message):
         """Send a message from the assistant to the user"""
         self.formatted_text_output("assistant", message)
-        self.append_message("assistant", message)
 
     def user_instruction(self, message):
         """Send a message from the assistant to the user"""
         self.formatted_text_output("user", message)
-        self.append_message("assistant", message)
 
-    def system_message(self, message, to_user=True, to_gpt=False):
-        """Send a message from the system to the user"""
-        if to_user:
-            self.formatted_text_output("system", message)
-        if to_gpt:
-            self.append_message("system", message)
-
-    def user_message(self, message):
-        """Record a message from the user"""
-        self.append_message("user", message)
+    def system_message(self, message):
+        """Send a message from the system to the user"""        
+        self.formatted_text_output("system", message)
 
     def get_user_input(self, prompt):
         """Get input from the user and append it to the messages list"""        
         user_response = input(colored(prompt, self.color_map["input"]))
-        # if self.handle_slash_command(user_response) is False:
-        #     self.messages.append({"role": "user", "content": user_response})
         return user_response
 
     def get_user_choice(self, choices):
         """Get user input and ensure it's one of the provided choices."""
         while True:
-            user_input = self.get_user_input("").strip().lower()  # Get user input, remove leading/trailing whitespace and convert to lowercase
-            self.user_message(user_input)
+            user_input = self.get_user_input("").strip().lower()  # Get user input, remove leading/trailing whitespace and convert to lowercase            
             if user_input in choices:
                 # if user input begins with y, return True
                 if user_input.startswith("y"):
@@ -678,7 +640,7 @@ class IOManager:
 
         to_user_message="Please set your OpenAI API key in the environment variables using the key OPENAI_API_KEY"
         sys_message="OPENAI_API_KEY not found in environment variables"
-        self.system_message(sys_message, to_gpt=False)
+        self.system_message(sys_message)
         self.user_instruction(to_user_message)
         sys.exit(1)
 
