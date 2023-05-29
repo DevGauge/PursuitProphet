@@ -276,8 +276,13 @@ class TaskGeneratorBot:
     def generate_tasks(self):
         query = self.factory.task_instructions(f"{self.goal}", self.num_goals)
         summarizer = ConversationSummarizer()
-        return summarizer.summarize(self.create_prompt_template().few_shot_prompt_template().format(query=query))
-    
+        spinner = halo.Halo(text=f"Generating Tasks for {self.goal}", spinner='dots')
+        spinner.start()
+        try:
+            return summarizer.summarize(self.create_prompt_template().few_shot_prompt_template().format(query=query))
+        finally:
+            spinner.stop()
+
 class GoalGeneratorBot:
     def __init__(self, goal: str, num_goals: int = 10):
         self.goal = goal
