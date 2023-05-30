@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="welcome-screen">
+        <img class=logo src="{{ url_for('static', filename='paper_bot_40x40.png') }}" alt="App Logo" class="logo">
+        <h1>Welcome To {{ app_name }}!</h1>
+        <img src="{{ url_for('static', filename='baby_bot.png') }}" alt="Inspiring Image" class="inspiring-image">
+        <form action="{{ url_for('welcome') }}" method="POST">
+            <label for="user_name">Enter your name:</label>
+            <input type="text" id="user_name" name="user_name">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+</html>
