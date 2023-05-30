@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-      "compile-scss": "node-sass src/scss -o static/css"
+      "compile-scss": "sass GUI/Static/styles.scss:GUI/Static/styles.css"
     },
     "devDependencies": {
      "sass": "1.62.1"

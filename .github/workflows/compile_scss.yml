@@ -32,3 +32,4 @@ jobs:
         git add -A
         git commit -m "Compile SCSS" || echo "No changes to commit"
         git push
+
