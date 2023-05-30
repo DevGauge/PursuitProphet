@@ -1,10 +1,11 @@
+from abc import ABC, abstractmethod, abstractproperty, abstractstaticmethod
+
 from langchain import PromptTemplate, FewShotPromptTemplate, LLMChain
 from langchain.prompts.example_selector import LengthBasedExampleSelector
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationChain
 from langchain.chains.conversation.memory import ConversationSummaryBufferMemory
 from langchain.callbacks import get_openai_callback
-from abc import ABC, abstractmethod, abstractproperty, abstractstaticmethod
 
 parameters_list = ["query", "answer"]
 
