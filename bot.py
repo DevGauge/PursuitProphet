@@ -201,6 +201,9 @@ class GoalManager:
         if not isinstance(response_text, str):
             raise ValueError("Input should be a string.")
         
+        if len(response_text) > char_limit:  # Arbitrary limit based on 2k token limit (4k/2 allowing for 2k response)            
+            raise ValueError("Input is too long.")
+        
         # If there's no text, there's nothing to sanitize.
         if response_text == "":
             return response_text
@@ -329,6 +332,7 @@ class IOManager(metaclass=SingletonMeta):
 
     def assistant_message(self, message):
         """Send a message from the assistant to the user"""
+        if to_user:
         self.formatted_text_output("assistant", message)
 
     def user_instruction(self, message):
