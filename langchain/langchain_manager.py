@@ -59,6 +59,9 @@ class ModelFactory:
     
     def chatbot(self):
         return self._creative_gpt3()
+    
+    def filename_bot(self):
+        return ChatOpenAI(model_name=self._gpt_3_5_turbo, temperature=1.0) # max variation to prevent duplication of filenames
 
     def instructor(self):
         """Returns a strict model for providing user-instructions. User instructions on utilizing the app's features should probably be hard-coded.

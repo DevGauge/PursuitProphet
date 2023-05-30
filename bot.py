@@ -75,7 +75,7 @@ import halo
 import openai
 # Local imports
 sys.path.insert(0, './langchain')
-from langchain_module import TaskGeneratorBot, GoalGeneratorBot
+from langchain_module import TaskGeneratorBot, GoalGeneratorBot, FilenameGeneratorBot
 
 class SingletonMeta(type):
     """Singleton metaclass. If instance already exists, it will be returned. Otherwise, a new instance will be created."""
@@ -94,8 +94,7 @@ class ChatBot:
         self.io_manager = IOManager(primary_goal='')
         if api_key is None:
             api_key = self.io_manager.get_open_ai_key()
-        self.gpt3_interface = GPT3Interface(io_manager=self.io_manager, openapi_key=api_key)
-        self.goal_manager = GoalManager(io_manager=self.io_manager, gpt3_interface=self.gpt3_interface)
+        self.goal_manager = GoalManager(io_manager=self.io_manager)
         self.goal_gen_bot = GoalGeneratorBot(goal='', num_goals=10)
     
     def run(self):
@@ -131,9 +130,8 @@ class ChatBot:
 class GoalManager:
     goals = { }
 
-    def __init__(self, io_manager, gpt3_interface):
+    def __init__(self, io_manager):
         self.io_manager = io_manager
-        self.gpt3_interface = gpt3_interface
         self.completed_goals = []
 
     def create_file_json(self):
@@ -253,12 +251,10 @@ class GoalManager:
                 print(f"Goal: {goal}")
                 print(f"Task: {task}")
                 # Ask the user if they want to work on the subtask
-                user_wants_to_work_on_subtask = self.ask_if_user_wants_to_work_on_task(task)
+                user_wants_to_work_on_subtask = self.ask_if_user_wants_to_work_on_task()
                 if not user_wants_to_work_on_subtask:
                     continue
-
-                # Provide assistance with the subtask
-                self.gpt3_interface.provide_assistance_with_task(task)
+                # TODO Provide assistance with the subtask                
 
     def mark_goal_as_complete(self, n):
         """Mark the nth goal as complete."""
@@ -287,10 +283,8 @@ class GoalManager:
         # eclude existing files
         excluded_filenames = [filename for filename in os.listdir() if filename.endswith(".json")]
 
-        sys_filename_message = f"Please give me a filename to save '{self.io_manager.primary_goal}' using the \".json\" extension. Take care to obey the rules of macOS, Windows, and Unix-based operating systems. Exclude the following filenames from the final result: {excluded_filenames}"
-        self.io_manager.system_message(sys_filename_message)
-        response = self.gpt3_interface.send_message_to_gpt([{'role':'system', 'content':sys_filename_message}], loading_text="Generating...")
-        filename = response['choices'][0]['message']['content']
+        filename_bot = FilenameGeneratorBot(goal=self.io_manager.primary_goal, existing_filenames=excluded_filenames)
+        filename = filename_bot.generate_filename()
 
         if os.path.exists(filename):
             # append timestamp to filename
@@ -315,37 +309,6 @@ class GoalManager:
         for char in invalid_chars:
             filename = filename.replace(char, "")
         return filename
-
-class GPT3Interface:
-    def __init__(self, io_manager, openapi_key, model="gpt-3.5-turbo"):
-        self.io_manager = io_manager
-        self.gpt = model
-        openai.api_key = openapi_key
-
-    def send_message_to_gpt(self, messages, loading_text='Thinking'):
-        """Send a list of messages to the ChatGPT API"""
-        spinner = halo.Halo(text=loading_text, spinner='dots')
-        spinner.start()
-        try:
-            return openai.ChatCompletion.create(
-                model=self.gpt,
-                messages=messages,
-                temperature=1.0,
-                top_p=1
-            )
-        finally:
-            spinner.stop()
-
-    def provide_assistance_with_task(self, task):
-        """Ask the user what subtask they want to work on and provide assistance."""
-        # Ask the user what task they want to work on
-        # If the bot can provide assistance with the task, do so
-        # Otherwise, let the user know that the bot can't provide the specific assistance requested but can provide other types of assistance
-        message = f"Acting with the goal of {self.io_manager.primary_goal}, what assistance can you provide with {task}? Keep your answer concise and to the point, providing practical advice whenever possible. If unable to complete a task, let the user know and ask if they'd like to move on to the next task or want you to wait for them, using \"/goal complete\" to mark the task as complete."
-        self.io_manager.system_message(message)
-        response = self.send_message_to_gpt(self.io_manager.messages)
-        text = response['choices'][0]['message']['content']
-        self.io_manager.assistant_message(text)
 
 class IOManager(metaclass=SingletonMeta):
     color_map = {
@@ -433,3 +396,4 @@ def main(argv):
 if __name__ == "__main__":    
     # pass commandline arguments to main function
     main(sys.argv[1:])
+    
