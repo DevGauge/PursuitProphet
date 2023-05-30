@@ -60,6 +60,8 @@ If the user exceeds the token limit for a request, the ChatGPTBot divides the re
 # Confirm with the user that the goal should be removed.
 # Test the bot extensively to ensure all functionality works as expected.
 # When user creates a goal, ask if they want to generate subtasks for it, then work on the goal/subtasks
+# Allow user to create goal
+# Allow user to edit goal
 # Work on subtasks in addition to goal
 
 # Standard imports
