@@ -76,6 +76,86 @@ import openai
 sys.path.insert(0, './langchain')
 from langchain_module import TaskGeneratorBot, GoalGeneratorBot, FilenameGeneratorBot
 
+class Task:
+    """
+    A task is a subtask of a goal.
+    Note: Subtasks reuse this class since they follow the same structure and behavior as tasks.
+    """
+    task: str = None
+    completed: bool = False
+    subtasks: list = None
+
+    def __init__(self, task: str):
+        self.task = task
+        self.completed = False
+        self.subtasks = []
+
+    def mark_as_complete(self):
+        """Mark the task as complete."""
+        self.completed = True
+
+    def mark_as_incomplete(self):
+        """Mark the task as incomplete."""
+        self.completed = False
+
+    def is_complete(self) -> bool:
+        """Return True if the task is complete, False if it is incomplete."""
+        return self.completed
+    
+    def add_subtask(self, subtask):
+        """Add a subtask to the task."""
+        self.subtasks.append(subtask)
+
+    def remove_subtask(self, subtask):
+        """Remove a subtask from the task."""
+        self.subtasks.remove(subtask)
+
+    def get_subtasks(self) -> list:
+        """Return a list of subtasks."""
+        return self.subtasks
+    
+    def get_task(self) -> str:
+        """Return the task."""
+        return self.task
+
+class Goal:
+    goal: str = None
+    completed: bool = False
+    tasks: list[Task] = None
+
+    def __init__(self, goal: str):
+        self.goal = goal
+        self.completed = False
+        self.tasks = []
+    
+    def mark_as_complete(self):
+        """Mark the goal as complete."""
+        self.completed = True
+
+    def mark_as_incomplete(self):
+        """Mark the goal as incomplete."""
+        self.completed = False
+
+    def is_complete(self) -> bool:
+        """Return True if the goal is complete, False if it is incomplete."""
+        return self.completed
+    
+    def add_task(self, task: Task):
+        """Add a task to the goal."""
+        self.tasks.append(task)
+
+    def remove_task(self, task: Task):
+        """Remove a task from the goal."""
+        self.tasks.remove(task)
+
+    def get_tasks(self) -> list:
+        """Return a list of tasks."""
+        return self.tasks
+    
+    def get_goal(self) -> str:
+        """Return the goal."""
+        return self.goal
+
 class SingletonMeta(type):
     """Singleton metaclass. If instance already exists, it will be returned. Otherwise, a new instance will be created."""
     _instances = {}
@@ -90,7 +170,7 @@ class SingletonMeta(type):
 
 class ChatBot:
     def __init__(self, api_key=None):
-        self.io_manager = IOManager(primary_goal='')
+        self.io_manager = IOManager()
         if api_key is None:
             api_key = self.io_manager.get_open_ai_key()
         self.goal_manager = GoalManager(io_manager=self.io_manager)
@@ -113,7 +193,8 @@ class ChatBot:
             # self.goal_manager.handle_user_task_interaction()
         self.goal_manager.save_goals_to_disk_in_json()
 
-    def primary_goal(self, primary_goal):
+    def set_primary_goal(self, user_input):
+        primary_goal = Goal(user_input)
         self.io_manager.primary_goal = primary_goal
 
     def display_welcome_message(self):
@@ -124,7 +205,7 @@ class ChatBot:
     def set_assistant_primary_goal(self, primary_goal=None):
         """Set the assistant role based on user input"""
         if primary_goal is None:
-            self.primary_goal(self.io_manager.get_user_input("What are you dreaming of today?"))
+            self.set_primary_goal(self.io_manager.get_user_input("What are you dreaming of today?"))
 
 class GoalManager:
     goals = { }
@@ -293,7 +374,7 @@ class GoalManager:
             sys_filename_message = sys_filename_message + str(datetime.datetime.now())
         
         json_dict = {
-            "primary_goal": self.io_manager.primary_goal,
+            "primary_goal": self.io_manager.primary_goal.get_goal(),
             "goals": self.goals,
             "completed_goals": self.completed_goals,
         }
@@ -320,9 +401,9 @@ class IOManager(metaclass=SingletonMeta):
         "input": "green"
     }
 
-    primary_goal = ""
+    primary_goal: Goal = None
 
-    def __init__(self, primary_goal):
+    def __init__(self, primary_goal: Goal = None):
         self.primary_goal = primary_goal
 
     def formatted_text_output(self, message_type, text):
@@ -332,7 +413,6 @@ class IOManager(metaclass=SingletonMeta):
 
     def assistant_message(self, message):
         """Send a message from the assistant to the user"""
-        if to_user:
         self.formatted_text_output("assistant", message)
 
     def user_instruction(self, message):
