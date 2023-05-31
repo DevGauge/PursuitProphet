@@ -74,7 +74,7 @@ import halo
 import openai
 # Local imports
 sys.path.insert(0, './langchain')
-from langchain_module import TaskGeneratorBot, GoalGeneratorBot, FilenameGeneratorBot
+from langchain_m.langchain_module import TaskGeneratorBot, GoalGeneratorBot, FilenameGeneratorBot
 
 class Task:
     """
