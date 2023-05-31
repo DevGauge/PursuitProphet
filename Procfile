@@ -1,1 +1,1 @@
-web: uwsgi --ini GUI/uwsgi.ini
+web: PORT=${PORT:-5000} uwsgi --ini GUI/uwsgi.ini
