@@ -181,7 +181,7 @@ class ChatBot:
         print()
         self.display_welcome_message()
         self.set_assistant_primary_goal()
-        self.goal_gen_bot.goal = self.io_manager.primary_goal
+        self.goal_gen_bot.goal = self.io_manager.primary_goal.get_goal()
         suggested_goals = self.goal_gen_bot.generate_goals()        
         self.goal_manager.goals = self.goal_manager.strip_goals_and_save(suggested_goals)
         self.io_manager.ask_user_to_review_goals(self.goal_manager.goals)
@@ -216,7 +216,7 @@ class GoalManager:
 
     def create_file_json(self):
         return {
-            "role": self.io_manager.primary_goal,
+            "role": self.io_manager.primary_goal.get_goal(),
             "goals": self.goals,
             "completed_goals": self.completed_goals,
         }
@@ -281,9 +281,6 @@ class GoalManager:
         
         if not isinstance(response_text, str):
             raise ValueError("Input should be a string.")
-        
-        if len(response_text) > char_limit:  # Arbitrary limit based on 2k token limit (4k/2 allowing for 2k response)            
-            raise ValueError("Input is too long.")
         
         # If there's no text, there's nothing to sanitize.
         if response_text == "":
@@ -366,7 +363,7 @@ class GoalManager:
         # eclude existing files
         excluded_filenames = [filename for filename in os.listdir() if filename.endswith(".json")]
 
-        filename_bot = FilenameGeneratorBot(goal=self.io_manager.primary_goal, existing_filenames=excluded_filenames)
+        filename_bot = FilenameGeneratorBot(goal=self.io_manager.primary_goal.get_goal(), existing_filenames=excluded_filenames)
         filename = filename_bot.generate_filename()
 
         if os.path.exists(filename):
