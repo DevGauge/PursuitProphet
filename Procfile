@@ -1,1 +1,1 @@
-web: python GUI/welcome.py
+web: uwsgi --ini uwsgi.ini
