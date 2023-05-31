@@ -1,13 +1,33 @@
 import sys
 from flask import Flask, render_template, request, redirect, url_for
+from flask_restx import Api, Resource, fields
 
 sys.path.append("..")
 from bot import ChatBot
 
-
 app = Flask(__name__)
 
 bot = ChatBot()
+
+api = Api(app, version='1.0', title='Bot API', description='A simple Bot API')
+
+ns = api.namespace('bot', description='Bot operations')
+
+role_model = api.model('Role', {
+    'role': fields.String(required=True, description="The user's primary goal"),
+})
+
+@ns.route('/role')
+class BotRole(Resource):
+    @ns.expect(role_model, validate=True) 
+    @ns.response(200, 'Role set successfully')
+    @ns.response(400, 'Validation Error')
+    def post(self):
+        '''Set a new role for the bot'''
+        role = request.json.get('role')
+        bot.set_assistant_primary_goal(role)
+
+        return {'role': f'{role}'}, 200
 
 @app.route('/', methods=['GET', 'POST'])
 def welcome():
