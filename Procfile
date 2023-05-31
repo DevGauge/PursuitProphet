@@ -1,1 +1,2 @@
-backend: cd backend && python app.py
+web: python backend/welcome.py
+worker: python bot.py
