@@ -49,5 +49,8 @@ def role_selection():
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
         return render_template('role_selection.html', roles=roles)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    if port is None:
+        port = 5000
+    app.run(host='0.0.0.0', port=port)
