@@ -1,1 +1,1 @@
-web: python gui/welcome.py
+web: python GUI/welcome.py
