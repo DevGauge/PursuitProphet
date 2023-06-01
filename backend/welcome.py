@@ -40,7 +40,7 @@ def goal_generation():
     return render_template('generate_goals.html', goals=goals, title=title)
 
 #region API    
-api = Api(app, version='1.0', doc='/api-docs', title='Pursuit Prophet API', description='Pursuit Prophet backend')
+api = Api(app, version='1.0', doc='/api/api-docs', title='Pursuit Prophet API', description='Pursuit Prophet backend')
 
 role_model = api.model('Role', {
     'role': fields.String(required=True, description="The user's primary goal"),
