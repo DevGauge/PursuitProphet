@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 bot = ChatBot()
 
-api = Api(app, version='1.0', title='Bot API', description='A simple Bot API')
+api = Api(app, version='1.0', doc='/api-docs', title='Pursuit Prophet API', description='Pursuit Prophet backend')
 
 ns = api.namespace('bot', description='Bot operations')
 
