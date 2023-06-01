@@ -206,6 +206,19 @@ class ChatBot:
         """Set the assistant role based on user input"""
         if primary_goal is None:
             self.set_primary_goal(self.io_manager.get_user_input("What are you dreaming of today?"))
+        else:
+            self.set_primary_goal(primary_goal)
+        print(f'{self.io_manager.primary_goal.get_goal()} was set')
+    
+    def generate_goals(self):
+        """Generate goals using the OpenAI API"""
+        if self.io_manager.primary_goal is not None:
+            print(f'generating goals for {self.io_manager.primary_goal.get_goal()}')
+            bot = GoalGeneratorBot(goal=self.io_manager.primary_goal.get_goal())
+            #strip and save
+            self.goal_manager.goals = self.goal_manager.strip_goals_and_save(bot.generate_goals())
+            return self.goal_manager.goals
+        return None
 
 class GoalManager:
     goals = { }
@@ -353,6 +366,7 @@ class GoalManager:
         goals = [goal[1:] if goal != "" and goal[0] == "." else goal for goal in goals]
         # strip leading and trailing whitespace
         goals = [goal.strip() for goal in goals]
+        goals = [Goal(goal) for goal in goals]
         self.goals = {goal: [] for goal in goals}  # Store each goal as a key with an empty list as its value
         return self.goals
 
