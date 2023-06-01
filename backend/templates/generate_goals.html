@@ -2,12 +2,7 @@
 
 {% extends "base.html" %}
 {% block content %}
-<h1>Generate Goals</h1>
-<form action="{{ url_for('goal_generation') }}" method="POST">
-    <label for="goal">Enter your goal:</label>
-    <input type="text" id="goal" name="goal">
-    <input type="submit" value="Submit">
-</form>
+<h1>{{ title  }}</h1>
 <ul>
     {% for goal in goals %}
     <div class="goal-card">

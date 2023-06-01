@@ -27,17 +27,17 @@ def welcome():
 def role_selection():
     if request.method == 'POST':
         role = request.form.get('role')
-        print(role)
         bot.set_assistant_primary_goal(role)
-        return redirect(url_for('goal_generation'))  # replace 'next_function' with the name of your next route
+        return redirect(url_for('goal_generation', title=role))  # replace 'next_function' with the name of your next route
     else:
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
         return render_template('role_selection.html', roles=roles)
 
 @app.route('/generate_goals')
 def goal_generation():
+    title = request.args.get('title')
     goals = bot.generate_goals()
-    return render_template('generate_goals.html', goals=goals)
+    return render_template('generate_goals.html', goals=goals, title=title)
 
 #region API    
 api = Api(app, version='1.0', doc='/api-docs', title='Pursuit Prophet API', description='Pursuit Prophet backend')
