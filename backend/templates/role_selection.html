@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="loading">Loading...</div>
 <div class="container mt-5">
     <h1 class="text-center main-heading">What do you want to do today?</h1>
     <div class="text-container">
         <input class="input" type="text" placeholder="Role">
         <span class="border"></span>
-        <form action="{{ url_for('role_selection') }}" method="POST">
+        <form id="primary_goal_form" action="{{ url_for('role_selection') }}" method="POST">
             <input type="hidden" name="role" id="selectedRole">
             <button type="submit" class="btn submit-button">Submit</button>
         </form>
@@ -61,5 +62,15 @@
             });
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var form = document.getElementById('primary_goal_form');
+        var loading = document.querySelector('.loading');
+
+        form.addEventListener('submit', function() {
+            loading.style.display = 'block';
+        });
+    });
+
 </script>
 {% endblock %}
