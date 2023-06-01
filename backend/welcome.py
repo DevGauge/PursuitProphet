@@ -58,6 +58,17 @@ class BotRole(Resource):
         bot.set_assistant_primary_goal(role)
 
         return {'role': f'{role}'}, 200
+    
+@ns.route('/goals')
+class BotGoals(Resource):
+    @ns.response(200, 'Goals generated successfully')
+    def get(self):
+        '''Generate goals for the bot'''
+        if bot.io_manager.primary_goal is None:
+            return {'error': 'Role not set, use /role first'}, 400
+        
+        goals = bot.generate_goals()
+        return {'goals': f'{goals}'}, 200
 #endregion API
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
