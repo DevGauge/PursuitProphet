@@ -2,6 +2,7 @@ import os
 import sys
 from flask import Flask, render_template, request, redirect, url_for
 from flask_restx import Api, Resource, fields
+import asyncio
 
 sys.path.append("..")
 from bot import ChatBot
@@ -26,11 +27,17 @@ def welcome():
 def role_selection():
     if request.method == 'POST':
         role = request.form.get('role')
+        print(role)
         bot.set_assistant_primary_goal(role)
-        return redirect(url_for('next_function'))  # replace 'next_function' with the name of your next route
+        return redirect(url_for('goal_generation'))  # replace 'next_function' with the name of your next route
     else:
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
         return render_template('role_selection.html', roles=roles)
+
+@app.route('/generate_goals')
+def goal_generation():
+    goals = bot.generate_goals()
+    return render_template('generate_goals.html', goals=goals)
 
 #region API    
 api = Api(app, version='1.0', doc='/api-docs', title='Pursuit Prophet API', description='Pursuit Prophet backend')

@@ -41,6 +41,13 @@
     window.onload = function () {
         var cards = document.getElementsByClassName('role-card');
         var inputBox = document.getElementsByClassName('input')[0];
+        var selectedRole = document.getElementById('selectedRole');  // Get the selectedRole input field
+
+        // Add an event listener to the input box that updates selectedRole's value
+        inputBox.addEventListener('input', function () {
+            selectedRole.value = this.value;
+        });
+
         for (var i = 0; i < cards.length; i++) {
             cards[i].addEventListener('click', function (e) {
                 var activeCard = document.getElementsByClassName('active')[0];
@@ -50,6 +57,7 @@
                 var roleName = this.getElementsByClassName('card-title')[0].textContent;
                 inputBox.value = '';
                 typeText(inputBox, roleName, 80); // Adjust the delay to speed up or slow down the typing
+                selectedRole.value = roleName;  // Set the value of the selectedRole input field
             });
         }
     }
