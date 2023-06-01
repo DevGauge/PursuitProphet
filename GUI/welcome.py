@@ -36,8 +36,10 @@ def welcome():
         user_name = request.form.get('user_name')
         if user_name:  # checks if the field isn't empty
             return redirect(url_for('role_selection'))
+        else:
+            print('posted!')
     else:
-        name = "PursuitProphet"
+        name = "Pursuit Prophet"
         return render_template('welcome.html', app_name=name)
 
 @app.route('/role_selection', methods=['GET', 'POST'])
