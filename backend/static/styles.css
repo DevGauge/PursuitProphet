@@ -178,8 +178,45 @@ input ~ .border {
   background-color: #000;
 }
 
-input[type=text]:focus {
-  border-color: #800080;
+.goal-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.goal-card .checkbox-container {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+.goal-card .goal-text {
+  flex: 1 0 auto;
+  text-align: center;
+  margin: 0 20px;
+}
+.goal-card .buttons-container {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+.goal-card .buttons-container button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.goal-card .buttons-container button:not(:last-child) {
+  margin-right: 10px;
+}
+.goal-card .buttons-container button:hover {
+  background-color: #0056b3;
 }
 
 /*# sourceMappingURL=styles.css.map */
