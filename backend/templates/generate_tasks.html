@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class='subtask-container'>
+        <div class='subtask-panel subtask-left-panel'>
+            <h2>{{ goal.get_goal() }}</h2>
+            <div class='subtasks'>
+                {% for subtask in subtasks %}
+                <div class="goal-card" data-goal-id="{{ loop.index }}">
+                    <div class="checkbox-container">
+                        <input type="checkbox">
+                    </div>
+                    <p class="goal-text">{{ loop.index }}. {{ subtask.get_task() }}</p>
+                    <div class="buttons-container">
+                        <button><i class="fas fa-edit"></i></button>
+                        <button><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class='subtask-panel subtask-center-panel'>
+            <div class='chat-area'>
+                <!-- Chat messages will be displayed here -->
+            </div>
+            <div class='subtask-chat-input'>
+                <input type='text' placeholder='Enter your message...'>
+                <button>Send</button>
+            </div>
+        </div>
+        <div class='subtask-panel subtask-right-panel'>
+            <!-- Additional content can be added here -->
+        </div>
+    </div>
+{% endblock %}
