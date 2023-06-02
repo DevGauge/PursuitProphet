@@ -5,16 +5,42 @@
 <h1>{{ title  }}</h1>
 <ul>
     {% for goal in goals %}
-    <div class="goal-card">
+    <div class="goal-card" data-goal-id="{{ loop.index }}">
         <div class="checkbox-container">
             <input type="checkbox">
         </div>
-        <p class="goal-text">{{ goal.get_goal() }}</p>
+        <p class="goal-text">{{ loop.index }}. {{ goal.get_goal() }}</p>
         <div class="buttons-container">
-            <button>Edit</button>
-            <button>Delete</button>
+            <button><i class="fas fa-edit"></i></button>
+            <button><i class="fas fa-trash-alt"></i></button>
         </div>
     </div>
     {% endfor %}
+    <script>
+        // add click listeners to each goal card in order to chat with ChatGPT about the task and generate subtasks
+        document.querySelectorAll('.goal-card').forEach(function(goalCard) {
+            goalCard.addEventListener('click', function() {
+                var goalId = goalCard.getAttribute('data-goal-id');
+
+                fetch('/generate_subtasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'goal_id': goalId,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // once the subtasks are generated, redirect to the new page
+                    window.location.href = `/display_subtasks/${goalId-1}`;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
 </ul>
 {% endblock %}
