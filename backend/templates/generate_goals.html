@@ -2,6 +2,7 @@
 
 {% extends "base.html" %}
 {% block content %}
+<div class="loading">Loading...</div>
 <h1>{{ title  }}</h1>
 <ul>
     {% for goal in goals %}
@@ -40,7 +41,16 @@
                     console.error('Error:', error);
                 });
             });
+            document.addEventListener('DOMContentLoaded', function() {
+                var loading = document.querySelector('.loading');
+
+                goalCard.addEventListener('click', function() {
+                    loading.style.display = 'block';
+                });
+            });
         });
+        
+
     </script>
 </ul>
 {% endblock %}
