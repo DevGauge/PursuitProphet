@@ -104,49 +104,47 @@ h2.sub-heading {
 }
 
 .loading {
-    display: none;
+  display: none;
+  position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  &:before {
+    content: '';
+    display: block;
     position: fixed;
-    z-index: 999;
-    height: 2em;
-    width: 2em;
-    overflow: show;
-    margin: auto;
     top: 0;
     left: 0;
-    bottom: 0;
-    right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.3);
+  }
 
-    &:before {
-        content: '';
-        display: block;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.3);
+  &:not(:required) {
+    font: 0/0 a;
+    color: transparent;
+    text-shadow: none;
+    background-color: transparent;
+    border: 0;
+
+    &:after {
+      content: '';
+      display: block;
+      font-size: 10px;
+      width: 1em;
+      height: 1em;
+      margin-top: -0.5em;
+      animation: spinner 500ms infinite ease-in-out;
+      border-radius: 0.5em;
+      box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0, rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
     }
-
-    &:not(:required) {
-        /* hide "loading..." text */
-        font: 0/0 a;
-        color: transparent;
-        text-shadow: none;
-        background-color: transparent;
-        border: 0;
-
-        &:after {
-            content: '';
-            display: block;
-            font-size: 10px;
-            width: 1em;
-            height: 1em;
-            margin-top: -0.5em;
-            animation: spinner 150ms infinite linear ease-in-out;
-            border-radius: 0.5em;
-            box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0, rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
-        }
-    }
+  }
 }
 
 .role-card {
@@ -253,7 +251,7 @@ input {
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-    padding: 20px;
+    padding: 5px;
     margin-bottom: 20px;
 
     .checkbox-container {
@@ -263,15 +261,18 @@ input {
     }
 
     .goal-text {
-        flex: 1 0 auto;
-        text-align: center;
-        margin: 0 20px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;  
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .buttons-container {
+    .buttons-container {        
         flex: 0 0 auto;
         display: flex;
         align-items: center;
+        padding: 5px;
 
         button {
             background-color: #007bff;
@@ -281,6 +282,7 @@ input {
             padding: 10px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            font-size: 10px;
 
             &:not(:last-child) {
                 margin-right: 10px;
@@ -291,4 +293,74 @@ input {
             }
         }
     }
+
+    &:hover {
+        transform: translateY(-10px);
+        border: 4px solid purple;
+        box-shadow: 0 0 20px purple;
+    }
+
+    &:active,
+    &.active {
+        transform: translateY(-5px);
+        background-color: purple;
+        box-shadow: 0 0 20px purple;
+    }
+}
+
+/* Subtask Generation */
+.subtask-container {
+    display: flex;
+    height: 100vh;
+}
+
+.subtask-panel {
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+.subtask-left-panel, .right-panel {
+    width: 15%;
+}
+
+.subtask-center-panel {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.subtask-chat-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.subtask-chat-input {
+    display: flex;
+}
+
+.subtask-chat-input input {
+    flex-grow: 1;
+    padding: 10px;
+}
+
+.subtask-chat-input button {
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+}
+
+.subtasks {
+    margin-top: 20px;
+}
+
+.subtasks .subtask {
+    background-color: #f8f9fa;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
 }
