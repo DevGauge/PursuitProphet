@@ -319,12 +319,16 @@ input {
     border: 1px solid #ccc;
 }
 
-.subtask-left-panel, .right-panel {
-    width: 15%;
+.subtask-left-panel {
+    width: 40%;
+}
+
+.right-panel {
+    width: 0%;
 }
 
 .subtask-center-panel {
-    width: 70%;
+    width: 60%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

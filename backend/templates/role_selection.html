@@ -49,7 +49,17 @@
             selectedRole.value = this.value;
         });
 
+        inputBox.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {  // 'Enter' is the key for the 'Enter' key
+                console.log('Enter pressed')
+                e.preventDefault(); // prevent the default action (new line in this case)
+                loading.style.display = 'block';
+                form.submit(); // submit the form
+            }
+        });
+
         for (var i = 0; i < cards.length; i++) {
+                // Add an event listener to the input box to submit the form when Enter is pressed
             cards[i].addEventListener('click', function (e) {
                 var activeCard = document.getElementsByClassName('active')[0];
                 if (activeCard) activeCard.classList.remove('active');
@@ -70,6 +80,21 @@
         form.addEventListener('submit', function() {
             loading.style.display = 'block';
         });
+    });
+
+    function submitFormOnEnterPress(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // prevent the default action (form submission in this case)
+            var form = document.getElementById('primary_goal_form');
+            var loading = document.querySelector('.loading');
+            loading.style.display = 'block';
+            form.submit();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var inputBox = document.getElementsByClassName('input')[0];
+        inputBox.addEventListener('keydown', submitFormOnEnterPress);
     });
 
 </script>
