@@ -117,6 +117,14 @@ class Task:
     def get_task(self) -> str:
         """Return the task."""
         return self.task
+    
+    def to_dict(self):
+        """Convert the task to a dictionary."""
+        return {
+            "task": self.task,
+            "completed": self.completed,
+            "subtasks": self.subtasks
+        }
 
 class Goal:
     goal: str = None
@@ -219,9 +227,15 @@ class ChatBot:
             self.goal_manager.goals = self.goal_manager.strip_goals_and_save(bot.generate_goals())
             return self.goal_manager.goals
         return None
+    
+    def generate_subtasks(self, goal_num: int):
+        """Generate subtasks for a given goal"""
+        if goal_num is not None:
+            return self.goal_manager.generate_subtasks(goal_num)
+        return None
 
 class GoalManager:
-    goals = { }
+    goals = []
 
     def __init__(self, io_manager):
         self.io_manager = io_manager
@@ -246,9 +260,10 @@ class GoalManager:
             command, action = text.split(" ")[:2]
             if command == "/goal":
                 if action == "create":
-                    goal = text.split(" ", 2)[2]
-                    self.goals[goal] = []
-                    self.io_manager.user_instruction(f"Created new goal: {goal}")
+                    goal_text = text.split(" ", 2)[2]
+                    goal = Goal(goal_text)
+                    self.goals.append(goal)
+                    self.io_manager.user_instruction(f"Created new goal: {goal.get_goal()}")
                     return True
                 elif action == "complete":
                     goal_number = int(text.split(" ")[2])
@@ -271,14 +286,18 @@ class GoalManager:
 
     def generate_subtasks(self, n):
         """Assist the user with a goal"""
-        task = list(self.goals.keys())[n]
-        bot = TaskGeneratorBot(goal=task)
+        task = self.goals[n]
+        bot = TaskGeneratorBot(goal=task.get_goal())
         response_text = bot.generate_tasks()
         
         text = self.sanitize_bot_goal_response(response_text)
         
         subtasks = text.split('\n')  # Split the response into subtasks
-        self.goals[task] = subtasks  # Assign the subtasks to the corresponding goal
+        # create a task object for each subtask
+        subtasks = [Task(subtask) for subtask in subtasks]
+        self.goals[n].tasks = subtasks  # Assign the subtasks to the corresponding goal
+        print(f'goal {n} tasks: {self.goals[n].tasks}')
+        return subtasks
     
     def  ask_if_user_wants_to_work_on_task(self):
         """Ask the user if they want to work on a task."""
@@ -367,7 +386,7 @@ class GoalManager:
         # strip leading and trailing whitespace
         goals = [goal.strip() for goal in goals]
         goals = [Goal(goal) for goal in goals]
-        self.goals = {goal: [] for goal in goals}  # Store each goal as a key with an empty list as its value
+        self.goals = goals
         return self.goals
 
     def save_goals_to_disk_in_json(self):

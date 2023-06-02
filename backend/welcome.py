@@ -2,7 +2,7 @@ import os
 import sys
 from flask import Flask, render_template, request, redirect, url_for
 from flask_restx import Api, Resource, fields
-import asyncio
+from flask import jsonify
 
 sys.path.append("..")
 from bot import ChatBot
@@ -33,11 +33,48 @@ def role_selection():
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
         return render_template('role_selection.html', roles=roles)
 
-@app.route('/generate_goals')
+@app.route('/generate_goals', methods=['GET', 'POST'])
 def goal_generation():
     title = request.args.get('title')
     goals = bot.generate_goals()
     return render_template('generate_goals.html', goals=goals, title=title)
+
+# route for rendering subtasks for a given task. Endpoint should be dynamic like /display_subtasks/<task_id>
+@app.route('/display_subtasks/<int:goal_id>', methods=['GET'])
+def display_subtasks(goal_id):    
+    goal = bot.goal_manager.goals[goal_id]
+    subtasks = goal.tasks
+    if subtasks is None:
+        json = jsonify(error=f'No subtasks for goal # {goal_id}'), 404
+        print(json)
+        return json
+    else:
+        return render_template('generate_tasks.html', subtasks=subtasks, goal=goal)
+    
+# route for generating subtasks for a given task
+@app.route('/generate_subtasks', methods=['POST'])
+def generate_subtasks():
+    print('hit')
+    data = request.get_json()
+    print(f'data: {data}')
+    goal_id = int(data['goal_id']) - 1
+    
+    if goal_id < 0 or goal_id > len(bot.goal_manager.goals):
+        return jsonify(error='Goal ID not found'), 400
+    
+    # Generate subtasks for the goal with the given ID.
+    bot.generate_subtasks(goal_id)
+    # get subtasks
+    subtasks = bot.goal_manager.goals[goal_id].tasks
+    # convert subtasks to json
+    subtasks_json = [subtask.to_dict() for subtask in subtasks]
+    
+    # Convert the subtasks to a format that can be sent as JSON.
+    # This might not be necessary if your subtasks are already in a suitable format.
+    # subtasks_json = [subtask.to_dict() for subtask in subtasks]
+    
+    # Send the subtasks back to the client.
+    return jsonify(subtasks=subtasks_json)
 
 #region API    
 api = Api(app, version='1.0', doc='/api/api-docs', title='Pursuit Prophet API', description='Pursuit Prophet backend')
