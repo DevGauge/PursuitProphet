@@ -156,39 +156,39 @@ class TaskExampleFactory(ExampleFactory):
     def examples(self) -> list[dict[str, str]]:
         return [
             {
-                "query": f"{ self.task_instructions('learn how to code', 3)}",
+                "query": f"{ self.task_instructions('Develop a solid understanding of programming languages, syntax, and concepts', 3)}",
                 "answer": 
 """
-Develop a solid understanding of programming languages, syntax, and concepts.
-Gain practical experience in writing code and solving programming problems.
-Acquire the ability to design and develop software applications independently.
+Choose a programming language and set up your coding environment
+Learn basic concepts such as variables, data types, control structures (loops, conditionals), and functions and study the syntax of your chosen programming language
+Practice with small programs that solve simple problems and familiarize yourself with basic data structures like arrays, lists, dictionaries, and linked lists
 """
             },
             {
-                "query": f"{ self.task_instructions('clean my house', 10)}",
+                "query": f"{ self.task_instructions('Declutter and eliminate unnecessary items.', 10)}",
                 "answer": 
 """
-Declutter and organize rooms.
-Dust and clean surfaces.
-Vacuum and mop floors.
-Clean and sanitize kitchen and bathrooms.
-Wash, fold, and put away laundry.
-Clean windows, mirrors, and glass.
-Tidy outdoor areas.
-Organize closets, drawers, and cabinets.
-Empty and clean trash bins.
-Wipe down frequently touched surfaces.
+Go through each room and determine what items are no longer needed
+Sort items into categories such as donate, sell, recycle, or throw away
+Create a plan for organizing the remaining items
+Implement the plan and put everything in its place
+Create a system for maintaining organization
+Donate unwanted items to local charities or thrift stores
+Sell items online or in a garage sale
+Recycle items that are eligible
+Dispose of items that cannot be recycled or donated properly
+Consider using a professional organizer for assistance.
 """
             },
             {
-                "query": f"{ self.task_instructions('wash my dog', 5)}",
+                "query": f"{ self.task_instructions('Prepare bathing area and supplies', 5)}",
                 "answer": 
 """
-Prepare bathing area and supplies.
-Wet dog's fur with warm water.
-Apply and lather dog shampoo.
-Thoroughly rinse off shampoo.
-Dry dog's fur with a towel.
+Clean and declutter the bathing area
+Gather necessary bathing supplies such as dog shampoo and dog conditioner (optional, for longer-haired breeds)
+Set up a comfortable and safe environment such as a non-slip bath mat or rubber mat for the tub or bathing area and using warm water at a comfortable temperature for the dog's bath
+Prepare any special accommodations if needed such as dog bathing tether or restraint to secure the dog in place during the bath and treats or rewards to help keep the dog calm and cooperative during the bathing process
+Organize the bathing process
 """
             }
         ]
@@ -211,7 +211,14 @@ class TaskGeneratorBot:
         return TaskPromptHandler(
         example_template=self.factory.example_template,
         examples=self.factory.examples(),
-        prefix=f"You are a task generator. Generate up to {self.num_goals} goals for the user's current goal of {self.goal}.",
+        prefix=f"""
+        You are a task generator. Act as a project manager and generate up to {self.num_goals}
+        goals for the user's current goal of {self.goal}. Goals should be concise and actionable.
+        Examples should be given for goals that may be ambiguous.
+        Goals should be ordered first by priority, but always respect dependency order.
+        For instance, if a user's goal is to bake a cake, it's very important to mix the
+        batter, but first you must have the necessary ingredients!
+        """.replace('\n', ' '),
         suffix="""
         User: {query}
         AI: """,
