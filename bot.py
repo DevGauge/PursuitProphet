@@ -75,94 +75,7 @@ import openai
 # Local imports
 sys.path.insert(0, './langchain')
 from langchain_m.langchain_module import TaskGeneratorBot, GoalGeneratorBot, FilenameGeneratorBot
-
-class Task:
-    """
-    A task is a subtask of a goal.
-    Note: Subtasks reuse this class since they follow the same structure and behavior as tasks.
-    """
-    task: str = None
-    completed: bool = False
-    subtasks: list = None
-
-    def __init__(self, task: str):
-        self.task = task
-        self.completed = False
-        self.subtasks = []
-
-    def mark_as_complete(self):
-        """Mark the task as complete."""
-        self.completed = True
-
-    def mark_as_incomplete(self):
-        """Mark the task as incomplete."""
-        self.completed = False
-
-    def is_complete(self) -> bool:
-        """Return True if the task is complete, False if it is incomplete."""
-        return self.completed
-    
-    def add_subtask(self, subtask):
-        """Add a subtask to the task."""
-        self.subtasks.append(subtask)
-
-    def remove_subtask(self, subtask):
-        """Remove a subtask from the task."""
-        self.subtasks.remove(subtask)
-
-    def get_subtasks(self) -> list:
-        """Return a list of subtasks."""
-        return self.subtasks
-    
-    def get_task(self) -> str:
-        """Return the task."""
-        return self.task
-    
-    def to_dict(self):
-        """Convert the task to a dictionary."""
-        return {
-            "task": self.task,
-            "completed": self.completed,
-            "subtasks": self.subtasks
-        }
-
-class Goal:
-    goal: str = None
-    completed: bool = False
-    tasks: list[Task] = None
-
-    def __init__(self, goal: str):
-        self.goal = goal
-        self.completed = False
-        self.tasks = []
-    
-    def mark_as_complete(self):
-        """Mark the goal as complete."""
-        self.completed = True
-
-    def mark_as_incomplete(self):
-        """Mark the goal as incomplete."""
-        self.completed = False
-
-    def is_complete(self) -> bool:
-        """Return True if the goal is complete, False if it is incomplete."""
-        return self.completed
-    
-    def add_task(self, task: Task):
-        """Add a task to the goal."""
-        self.tasks.append(task)
-
-    def remove_task(self, task: Task):
-        """Remove a task from the goal."""
-        self.tasks.remove(task)
-
-    def get_tasks(self) -> list:
-        """Return a list of tasks."""
-        return self.tasks
-    
-    def get_goal(self) -> str:
-        """Return the goal."""
-        return self.goal
+from app.app import Goal, Task, db
 
 class SingletonMeta(type):
     """Singleton metaclass. If instance already exists, it will be returned. Otherwise, a new instance will be created."""
@@ -203,7 +116,10 @@ class ChatBot:
 
     def set_primary_goal(self, user_input):
         primary_goal = Goal(user_input)
-        self.io_manager.primary_goal = primary_goal
+        # self.io_manager.primary_goal = primary_goal
+        db.session.add(primary_goal)
+        db.session.commit()
+        return primary_goal.id
 
     def display_welcome_message(self):
         """Display the welcome message"""        
@@ -215,27 +131,24 @@ class ChatBot:
         if primary_goal is None:
             self.set_primary_goal(self.io_manager.get_user_input("What are you dreaming of today?"))
         else:
-            self.set_primary_goal(primary_goal)
-        print(f'{self.io_manager.primary_goal.get_goal()} was set')
+            goal_id = self.set_primary_goal(primary_goal)
+            return goal_id
+        # print(f'{self.io_manager.primary_goal.goal} was set')
+        
     
-    def generate_goals(self):
+    def generate_goals(self, primary_goal):
         """Generate goals using the OpenAI API"""
-        if self.io_manager.primary_goal is not None:
-            print(f'generating goals for {self.io_manager.primary_goal.get_goal()}')
-            bot = GoalGeneratorBot(goal=self.io_manager.primary_goal.get_goal())
-            #strip and save
-            self.goal_manager.goals = self.goal_manager.strip_goals_and_save(bot.generate_goals())
-            return self.goal_manager.goals
-        return None
+        
+        print(f'generating goals for {primary_goal.get_goal()}')
+        bot = GoalGeneratorBot(goal=primary_goal.get_goal())
+        #strip and save
+        self.goal_manager.strip_tasks_and_save(bot.generate_goals(), primary_goal.id)
     
-    def generate_subtasks(self, goal_num: int):
+    def generate_subtasks(self, task: Task):
         """Generate subtasks for a given goal"""
-        if goal_num is not None:
-            return self.goal_manager.generate_subtasks(goal_num)
-        return None
+        return self.goal_manager.generate_subtasks(task)
 
 class GoalManager:
-    goals = []
 
     def __init__(self, io_manager):
         self.io_manager = io_manager
@@ -263,7 +176,9 @@ class GoalManager:
                     goal_text = text.split(" ", 2)[2]
                     goal = Goal(goal_text)
                     self.goals.append(goal)
-                    self.io_manager.user_instruction(f"Created new goal: {goal.get_goal()}")
+                    db.session.add(goal)
+                    db.session.commit()
+                    self.io_manager.user_instruction(f"Created new goal: {goal.goal}")
                     return True
                 elif action == "complete":
                     goal_number = int(text.split(" ")[2])
@@ -284,19 +199,16 @@ class GoalManager:
         else:
             self.io_manager.assistant_message(f"Okay, we'll keep working on {item}.")
 
-    def generate_subtasks(self, n):
+    def generate_subtasks(self, task: Task):
         """Assist the user with a goal"""
-        task = self.goals[n]
-        bot = TaskGeneratorBot(goal=task.get_goal())
-        response_text = bot.generate_tasks()
-        
+        print(f'GoalManager generating subtasks for task {task.get_task()}')        
+        bot = TaskGeneratorBot(goal=task.get_task())
+        response_text = bot.generate_tasks()        
         text = self.sanitize_bot_goal_response(response_text)
         
         subtasks = text.split('\n')  # Split the response into subtasks
         # create a task object for each subtask
-        subtasks = [Task(subtask) for subtask in subtasks]
-        self.goals[n].tasks = subtasks  # Assign the subtasks to the corresponding goal
-        print(f'goal {n} tasks: {self.goals[n].tasks}')
+        subtasks = [Task(subtask, task.goal_id, task.id) for subtask in subtasks]
         return subtasks
     
     def  ask_if_user_wants_to_work_on_task(self):
@@ -375,19 +287,21 @@ class GoalManager:
         del self.goals[goal]
         self.io_manager.system_message(f"Goal {n+1} '{goal}' marked as complete.")
 
-    def strip_goals_and_save(self, goals):
+    def strip_tasks_and_save(self, tasks, goal_id):        
         """Strip the goals from the response and save them"""
         #strip the goals from the response
-        goals = goals.split("\n")
+        tasks = tasks.split("\n")
         # if goal starts with number or number and period, strip it
-        goals = [goal.split(" ", 1)[1] if goal != "" and goal[0].isdigit() else goal for goal in goals]
+        tasks = [task.split(" ", 1)[1] if task != "" and task[0].isdigit() else task for task in tasks]
         # if goal starts with period, strip it
-        goals = [goal[1:] if goal != "" and goal[0] == "." else goal for goal in goals]
+        tasks = [task[1:] if task != "" and task[0] == "." else task for task in tasks]
         # strip leading and trailing whitespace
-        goals = [goal.strip() for goal in goals]
-        goals = [Goal(goal) for goal in goals]
-        self.goals = goals
-        return self.goals
+        tasks = [task.strip() for task in tasks]
+        tasks = [Task(task, goal_id) for task in tasks]
+        print(f'goals: {[task.goal_id for task in tasks]}')
+        for goal in tasks:
+            db.session.add(goal)
+            db.session.commit()
 
     def save_goals_to_disk_in_json(self):
         """Save the goals to disk in JSON format."""

@@ -1,14 +1,10 @@
 import os
 import sys
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, jsonify, render_template, request, redirect, url_for
 from flask_restx import Api, Resource, fields
-from flask import jsonify
-
-sys.path.append("..")
-from bot import ChatBot
-
-app = Flask(__name__)
-
+sys.path.insert(0, '../')
+from ..bot import ChatBot
+from app.app import app, Goal, Task
 bot = ChatBot()
 
 @app.route('/', methods=['GET', 'POST'])
@@ -27,8 +23,9 @@ def welcome():
 def role_selection():
     if request.method == 'POST':
         role = request.form.get('role')
-        bot.set_assistant_primary_goal(role)
-        return redirect(url_for('goal_generation', title=role))  # replace 'next_function' with the name of your next route
+        goal_id = bot.set_assistant_primary_goal(role)
+        # goal = Goal.query.filter_by(goal=role).first() # TODO: filter by goal id
+        return redirect(url_for('goal_generation', title=role, goal_id=goal_id))  # replace 'next_function' with the name of your next route
     else:
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
         return render_template('role_selection.html', roles=roles)
@@ -36,36 +33,34 @@ def role_selection():
 @app.route('/generate_goals', methods=['GET', 'POST'])
 def goal_generation():
     title = request.args.get('title')
-    goals = bot.generate_goals()
-    return render_template('generate_goals.html', goals=goals, title=title)
+    goal_id = request.args.get('goal_id')
+    goal = Goal.query.filter_by(id=goal_id).first()
+    bot.generate_goals(goal)
+    tasks = Task.query.filter_by(goal_id=goal_id).all()
+    return render_template('generate_goals.html', goals=tasks, title=title)
 
 # route for rendering subtasks for a given task. Endpoint should be dynamic like /display_subtasks/<task_id>
-@app.route('/display_subtasks/<int:goal_id>', methods=['GET'])
-def display_subtasks(goal_id):    
-    goal = bot.goal_manager.goals[goal_id]
-    subtasks = goal.tasks
-    if subtasks is None:
-        json = jsonify(error=f'No subtasks for goal # {goal_id}'), 404
+@app.route('/display_subtasks/<string:task_id>', methods=['GET'])
+def display_subtasks(task_id):    
+    task = Task.query.filter_by(id=task_id).first()
+    goal = Goal.query.filter_by(id=task.goal_id).first()
+    if task.subtasks is None:
+        json = jsonify(error=f'No subtasks for task # {task_id}'), 404
         print(json)
         return json
     else:
-        return render_template('generate_tasks.html', subtasks=subtasks, goal=goal)
+        return render_template('generate_tasks.html', subtasks=task.subtasks, goal=goal)
     
 # route for generating subtasks for a given task
 @app.route('/generate_subtasks', methods=['POST'])
 def generate_subtasks():
-    print('hit')
     data = request.get_json()
     print(f'data: {data}')
-    goal_id = int(data['goal_id']) - 1
-    
-    if goal_id < 0 or goal_id > len(bot.goal_manager.goals):
-        return jsonify(error='Goal ID not found'), 400
-    
-    # Generate subtasks for the goal with the given ID.
-    bot.generate_subtasks(goal_id)
+    task_id = data['task_id']
+    task = Task.query.filter_by(id=task_id).first()
+    bot.generate_subtasks(task)
     # get subtasks
-    subtasks = bot.goal_manager.goals[goal_id].tasks
+    subtasks = Task.query.filter_by(parent_id=task_id).all()
     # convert subtasks to json
     subtasks_json = [subtask.to_dict() for subtask in subtasks]
     

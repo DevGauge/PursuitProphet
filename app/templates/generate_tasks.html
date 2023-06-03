@@ -5,7 +5,7 @@
             <h2>{{ goal.get_goal() }}</h2>
             <div class='subtasks'>
                 {% for subtask in subtasks %}
-                <div class="goal-card" data-goal-id="{{ loop.index }}">
+                <div class="goal-card" data-task-id="{{ goal.id }}">
                     <div class="checkbox-container">
                         <input type="checkbox">
                     </div>
