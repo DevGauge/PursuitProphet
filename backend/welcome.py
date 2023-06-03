@@ -11,19 +11,19 @@ bot = ChatBot()
 
 app = app.app.app
 
-@app.route('/', methods=['GET', 'POST'])
-def welcome():
-    if request.method == 'POST':
-        print('bar')
-        user_name = request.form.get('user_name')
-        if user_name:  # checks if the field isn't empty
-            return redirect(url_for('role_selection'))
-    else:
-        print('foo')
-        name = "Pursuit Prophet"
-        return render_template('welcome.html', app_name=name)
+# @app.route('/', methods=['GET', 'POST'])
+# def welcome():
+#     if request.method == 'POST':
+#         print('bar')
+#         user_name = request.form.get('user_name')
+#         if user_name:  # checks if the field isn't empty
+#             return redirect(url_for('role_selection'))
+#     else:
+#         print('foo')
+#         name = "Pursuit Prophet"
+#         return render_template('welcome.html', app_name=name)
 
-@app.route('/role_selection', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def role_selection():
     if request.method == 'POST':
         role = request.form.get('role')

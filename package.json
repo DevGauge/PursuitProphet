@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-      "compile-scss": "sass backend/static/styles.scss:backend/static/styles.css"
+      "compile-scss": "sass app/static/styles.scss:app/static/styles.css"
     },
     "devDependencies": {
      "sass": "1.62.1"

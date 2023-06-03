@@ -3,7 +3,7 @@
 {% block content %}
 <div class="loading">Loading...</div>
 <div class="container mt-5">
-    <h1 class="text-center main-heading">What are you dreaming of today?</h1>
+    <h1 class="text-center main-heading">What are you <span class='highlight-text'>dreaming</span> of today?</h1>
     <div class="text-container">
         <input class="input" type="text" placeholder="Role">
         <span class="border"></span>
@@ -62,6 +62,8 @@
                 // Add an event listener to the input box to submit the form when Enter is pressed
             cards[i].addEventListener('click', function (e) {
                 var activeCard = document.getElementsByClassName('active')[0];
+                var textInput = document.getElementsByClassName('input')[0];                
+                textInput.focus();
                 if (activeCard) activeCard.classList.remove('active');
                 this.classList.add('active');
                 // Set the value of the input box to the role name

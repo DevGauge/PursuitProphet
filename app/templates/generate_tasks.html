@@ -2,7 +2,7 @@
 {% block content %}
     <div class='subtask-container'>
         <div class='subtask-panel subtask-left-panel'>
-            <h2>{{ goal.get_goal() }}</h2>
+            <h2><span class='highlight-text'>{{ goal.get_goal() }}</span></h2>
             <div class='subtasks'>
                 {% for subtask in subtasks %}
                 <div class="goal-card" data-task-id="{{ subtask.id }}">

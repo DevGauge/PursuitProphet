@@ -56,25 +56,25 @@ h2.sub-heading {
 }
 
 .submit-button {
-  background-color: #f90; /* Amazon orange */
+  background-color: #FF9800;
   background-image: linear-gradient(to bottom, #f7dfa5, #f0c14b);
   border-color: #a88734 #9c7e31 #846a29;
   color: #111; /* Amazon text color */
   border: 1px solid;
-  padding: 3px 11px; /* Adjust the padding as needed */
+  padding: 3px 11px;
   text-align: center;
   text-decoration: none;
   font-size: 15px;
-  border-radius: 3px; /* Rounded corners */
+  border-radius: 3px;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset;
   cursor: pointer;
   transition: border-color 0.3s ease-in-out;
-  line-height: 20px; /* adjust as needed */
-  padding: 6px 12px; /* adjust as needed */
+  line-height: 20px;
+  padding: 6px 12px;
   width: 100%;
 }
 .submit-button:hover, .submit-button:focus {
-  border-color: purple;
+  border-color: #673AB7;
 }
 
 .card-container {
@@ -89,6 +89,18 @@ h2.sub-heading {
 }
 
 /* Role Selection */
+@keyframes fadeInHighlight {
+  0% {
+    color: #000;
+  }
+  100% {
+    color: #009688;
+  }
+}
+.highlight-text {
+  animation: fadeInHighlight 2s ease-in-out forwards;
+}
+
 @keyframes spinner {
   0% {
     transform: rotate(0deg);
@@ -161,19 +173,24 @@ h2.sub-heading {
 }
 .role-card:hover {
   transform: translateY(-10px);
-  border: 4px solid purple;
-  box-shadow: 0 0 20px purple;
+  border: 4px solid #673AB7;
+  box-shadow: 0 0 20px #673AB7;
 }
 .role-card:active, .role-card.active {
   transform: translateY(-5px);
-  background-color: purple;
-  box-shadow: 0 0 20px purple;
+  background-color: #673AB7;
+  box-shadow: 0 0 20px #673AB7;
 }
 
 .text-container {
   display: flex;
+  transition: all 0.5s ease-in-out;
   justify-content: space-between;
   align-items: center;
+  width: 80%;
+}
+
+.text-container:focus-within {
   width: 100%;
 }
 
@@ -185,36 +202,33 @@ form {
   text-align: center;
 }
 
-input {
-  width: 100%;
+.input {
   padding: 12px 20px;
   margin: 8px 0;
   display: inline-block;
   background-color: darkgray;
   border: 1px solid #000;
-  border-radius: 4px; /* Rounded corners */
+  border-radius: 4px;
   box-sizing: border-box;
   font-size: 16px;
   font-weight: bold;
-  transition: all 0.3s ease-in-out;
-  width: 100%;
+  transition: all 0.5s ease-in-out;
   flex-grow: 1;
-  /* This will make the text box take up the remaining space in the container */
   margin-right: 10px;
-  /* This will put a small margin between the text box and the button */
-  line-height: 20px; /* adjust as needed */
-  padding: 6px 12px; /* adjust as needed */
+  line-height: 20px;
+  padding: 6px 12px;
 }
-input:hover {
+.input:hover {
   border-color: #800080;
 }
-input:focus {
+.input:focus {
   border-color: #800080;
+  outline: none;
 }
-input:valid {
+.input:valid {
   background-color: #F5F5F5;
 }
-input ~ .border {
+.input ~ .border {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -222,10 +236,11 @@ input ~ .border {
   height: 2px;
   background-color: #4eb398;
 }
-.input:focus input ~ .border {
+.input:focus .input ~ .border {
   width: 100%;
-  transition: 0.5s;
-  background-color: #000;
+  height: 100%;
+  border-color: #800080;
+  outline: none;
 }
 
 .goal-card {
@@ -274,13 +289,13 @@ input ~ .border {
 }
 .goal-card:hover {
   transform: translateY(-10px);
-  border: 4px solid purple;
-  box-shadow: 0 0 20px purple;
+  border: 4px solid #673AB7;
+  box-shadow: 0 0 20px #673AB7;
 }
 .goal-card:active, .goal-card.active {
   transform: translateY(-5px);
-  background-color: purple;
-  box-shadow: 0 0 20px purple;
+  background-color: #673AB7;
+  box-shadow: 0 0 20px #673AB7;
 }
 
 /* Subtask Generation */
