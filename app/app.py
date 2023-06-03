@@ -1,5 +1,4 @@
 import os
-import sys
 import uuid
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
