@@ -3,6 +3,7 @@ import sys
 from flask import Flask, jsonify, render_template, request, redirect, url_for
 from flask_restx import Api, Resource, fields
 sys.path.insert(0, '../')
+sys.path.insert(0, '/app')
 from bot import ChatBot
 import app.app
 from app.app import Goal, Task
