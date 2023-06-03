@@ -209,6 +209,9 @@ class GoalManager:
         subtasks = text.split('\n')  # Split the response into subtasks
         # create a task object for each subtask
         subtasks = [Task(subtask, task.goal_id, task.id) for subtask in subtasks]
+        for subtask in subtasks:
+            db.session.add(subtask)
+        db.session.commit()
         return subtasks
     
     def  ask_if_user_wants_to_work_on_task(self):

@@ -48,7 +48,7 @@ def goal_generation():
 def display_subtasks(task_id):    
     task = Task.query.filter_by(id=task_id).first()
     goal = Goal.query.filter_by(id=task.goal_id).first()
-    if task.subtasks is None:
+    if not task.subtasks:
         json = jsonify(error=f'No subtasks for task # {task_id}'), 404
         print(json)
         return json
