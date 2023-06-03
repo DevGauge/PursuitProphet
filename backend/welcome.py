@@ -4,8 +4,11 @@ from flask import Flask, jsonify, render_template, request, redirect, url_for
 from flask_restx import Api, Resource, fields
 sys.path.insert(0, '../')
 from ..bot import ChatBot
-from app.app import app, Goal, Task
+import app.app
+from app.app import Goal, Task
 bot = ChatBot()
+
+app = app.app.app
 
 @app.route('/', methods=['GET', 'POST'])
 def welcome():
