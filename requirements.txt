@@ -1,5 +1,5 @@
 flask_sqlalchemy
-psycopg2-binary
+psycopg2
 tiktoken
 uwsgi
 colorama==0.4.6
