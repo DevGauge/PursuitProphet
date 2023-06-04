@@ -132,7 +132,7 @@ class App:
         flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(flask_app)
         # Create an engine to connect to your database
-        engine = create_engine(DATABASE_URL)
+        engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
         # Create all tables defined in the models
         Goal.metadata.create_all(engine)
