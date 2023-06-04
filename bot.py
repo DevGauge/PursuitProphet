@@ -201,8 +201,9 @@ class GoalManager:
 
     def generate_subtasks(self, task: Task):
         """Assist the user with a goal"""
-        print(f'GoalManager generating subtasks for task {task.get_task()}')        
-        bot = TaskGeneratorBot(goal=task.get_task())
+        print(f'GoalManager generating subtasks for task {task.get_task()}')
+        goal = Goal.query.filter_by(id=task.goal_id).first()
+        bot = TaskGeneratorBot(task=task.get_task(), goal=goal.get_goal())
         response_text = bot.generate_tasks()        
         text = self.sanitize_bot_goal_response(response_text)
         

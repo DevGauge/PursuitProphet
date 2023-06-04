@@ -156,7 +156,7 @@ class TaskExampleFactory(ExampleFactory):
     def examples(self) -> list[dict[str, str]]:
         return [
             {
-                "query": f"{ self.task_instructions('Develop a solid understanding of programming languages, syntax, and concepts', 3)}",
+                "query": f"{ self.task_instructions('Develop a solid understanding of programming languages, syntax, and concepts', 'Learn to code', 3)}",
                 "answer": 
 """
 Choose a programming language and set up your coding environment
@@ -165,7 +165,7 @@ Practice with small programs that solve simple problems and familiarize yourself
 """
             },
             {
-                "query": f"{ self.task_instructions('Declutter and eliminate unnecessary items.', 10)}",
+                "query": f"{ self.task_instructions('Declutter and eliminate unnecessary items.', 'organize my house', 10)}",
                 "answer": 
 """
 Go through each room and determine what items are no longer needed
@@ -181,7 +181,7 @@ Consider using a professional organizer for assistance.
 """
             },
             {
-                "query": f"{ self.task_instructions('Prepare bathing area and supplies', 5)}",
+                "query": f"{ self.task_instructions('Prepare bathing area and supplies', 'wash my dog', 5)}",
                 "answer": 
 """
 Clean and declutter the bathing area
@@ -193,13 +193,14 @@ Organize the bathing process
             }
         ]
 
-    def task_instructions(self, goal: str, num_tasks: int):
-        return f"""Define up to {num_tasks} for the goal of {goal}"""
+    def task_instructions(self, task: str, goal: str, num_tasks: int):
+        return f"""Define up to {num_tasks} tasks for {task}. Keep in mind the user's ultimate goal of {goal}"""
 
 
 class TaskGeneratorBot:
     """Responsible for generating tasks based on a goal"""
-    def __init__(self, goal: str, num_goals: int = 10):
+    def __init__(self, task: str, goal: str, num_goals: int = 10):
+        self.task = task
         self.goal = goal
         self.num_goals = num_goals
 
@@ -213,21 +214,26 @@ class TaskGeneratorBot:
         examples=self.factory.examples(),
         prefix=f"""
         You are a task generator. Act as a project manager and generate up to {self.num_goals}
-        goals for the user's current goal of {self.goal}. Goals should be concise and actionable.
-        Examples should be given for goals that may be ambiguous.
-        Goals should be ordered first by priority, but always respect dependency order.
-        For instance, if a user's goal is to bake a cake, it's very important to mix the
-        batter, but first you must have the necessary ingredients!
+        subtasks for the user's current task of {self.task}. Each task should keep the user's ultimate 
+        goal in mind. For example, if a user's ultimate goal is "write a blog post about cats" and the
+        current task is "choose a specific topic or angle for the blog post" then keep in mind the user
+        has already decided on the overall topic of cats and a sub-topic should be chosen.
+        The user's current ultimate goal is {self.goal}. if the ultimate goal and task are the same,
+        then you're generating top-level tasks and one or the other can be omitted from your context.
+        Otherwise, you're generating subtasks for {self.task} and it was created for the goal of {self.goal}.
+        Tasks should be concise and actionable. Tasks should be ordered first by priority, but always
+        respect dependency order. For instance, if a user's goal is to bake a cake, it's very important
+        to mix the batter, but first you must have the necessary ingredients!
         """.replace('\n', ' '),
         suffix="""
         User: {query}
         AI: """,
     )
 
-    def generate_tasks(self):
-        query = self.factory.task_instructions(f"{self.goal}", self.num_goals)
+    def generate_tasks(self):        
+        query = self.factory.task_instructions(self.task, self.goal, self.num_goals)
         summarizer = ConversationSummarizer()
-        spinner = halo.Halo(text=f"Generating Tasks for {self.goal}", spinner='dots')
+        spinner = halo.Halo(text=f"Generating Tasks for {self.task}", spinner='dots')
         spinner.start()
         try:
             return summarizer.summarize(self.create_prompt_template()
@@ -245,10 +251,11 @@ class GoalGeneratorBot:
 
     def create_prompt_template(self):
         # remove all newlines from prefix
-        prefix=f"""You are a goal generator. Generate up to {self.num_goals} goals for the user's prompt. 
-        Goals should be ordered first by priority, but always respect dependency order. 
-        For instance, if a user's goal is to bake a cake, it's very important to mix the 
-        batter, but first you must have the necessary ingredients!
+        prefix=f"""You are a goal generator.  Act as a project manager and generate up to
+        {self.num_goals} goals for the user's goal of {self.goal}. Goals should be concise
+        and acitonable. Goals should be ordered first by priority, but always respect
+        dependency order. For instance, if a user's goal is to bake a cake, it's very important
+        to mix the batter, but first you must have the necessary ingredients!
         """.replace('\n', ' ')
         return GoalPromptHandler(
         example_template=self.factory.example_template,
