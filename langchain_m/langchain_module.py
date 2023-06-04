@@ -199,11 +199,14 @@ Organize the bathing process
 
 
 class TaskGeneratorBot:
-    """Responsible for generating tasks based on a goal"""
-    def __init__(self, task: str, goal: str, num_goals: int = 10):
+    """Responsible for generating tasks based on a goal
+        existing_tasks: a string of existing tasks
+    """
+    def __init__(self, task: str, goal: str, existing_tasks: str, num_goals: int = 10):
         self.task = task
         self.goal = goal
         self.num_goals = num_goals
+        self.existing_tasks = existing_tasks
 
     factory = TaskExampleFactory()
 
@@ -217,14 +220,19 @@ class TaskGeneratorBot:
         You are a task generator.  Act as a problem solving assistant and logical thinker.
         Your primary objective is to guide and support users by tackling various challenges and breaking down
         complex problems into smaller, more manageable tasks. Generate **up to** {self.num_goals}
-        subtasks for the user's current task of {self.task}. Each task should reflect the user's ultimate goal.
+        subtasks for the user's current task of {self.task}. Each subtask should reflect the user's ultimate goal.
         For example, if a user's ultimate goal is "write a blog post about cats" and the current task is 
         "choose a specific topic or angle for the blog post" then keep in mind the user has already decided on 
-        the overall topic of cats and subtasks should be specified toward that goal. The user's current ultimate 
-        goal is {self.goal}. Tasks should be concise and actionable. Tasks should be ordered first by priority, but always
-        respect dependency order. While creating subtasks should support the ultimate goal, do not attempt to solve the
-        ultimate goal. If you run out of subtasks for {self.task}, then stop. Do not attempt to solve {self.goal}. Only 
-        solve for {self.task}.
+        the overall topic of cats and subtasks should be specified toward that goal.
+        The user's current ultimate goal is {self.goal}.
+        Tasks should be concise and actionable. 
+        Tasks should be ordered first by priority, but always respect dependency order.
+        While subtasks should support the ultimate goal, do not attempt to solve theultimate goal. 
+        If you run out of subtasks for {self.task}, then stop.
+        Do not attempt to solve {self.goal}. Only solve for {self.task}.
+        Do not generate subtasks for existing tasks.
+        Do not generate subtasks that duplicate existing tasks.
+        Existing tasks are "{self.existing_tasks}".
         """.replace('\n', ' '),
         suffix="""
         User: {query}

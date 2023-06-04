@@ -18,6 +18,7 @@ class TokenHandler:
     def handle(self, message: str):
         with get_openai_callback() as cb:
             result = self.llm_chain.run(message)
+            print(self.llm_chain.memory)
             print(result)
             print(f"Spent a total of {cb.total_tokens} tokens")
         return result
@@ -29,12 +30,13 @@ class ConversationSummarizer:
         self.conversation = ConversationChain(
             llm=summarization_model,
             memory=ConversationSummaryBufferMemory(
-                llm=summarization_model, max_token_limit=1000
+                llm=summarization_model, max_token_limit=4000
             ),
         )
 
     def summarize(self, prompt):
         counter = TokenHandler(self.conversation)
+        
         return counter.handle(prompt)
 
 

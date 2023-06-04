@@ -203,7 +203,10 @@ class GoalManager:
         """Assist the user with a goal"""
         print(f'GoalManager generating subtasks for task {task.get_task()}')
         goal = Goal.query.filter_by(id=task.goal_id).first()
-        bot = TaskGeneratorBot(task=task.get_task(), goal=goal.get_goal())
+        existing_tasks = Task.query.filter_by(goal_id=goal.id).all()
+        # convert existing tasks into a string separated by newlines
+        existing_tasks = ", ".join([task.get_task() for task in existing_tasks])
+        bot = TaskGeneratorBot(task=task.get_task(), goal=goal.get_goal(), existing_tasks=existing_tasks)
         response_text = bot.generate_tasks()        
         text = self.sanitize_bot_goal_response(response_text)
         
