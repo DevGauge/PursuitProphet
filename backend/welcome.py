@@ -16,7 +16,7 @@ def role_selection():
     if request.method == 'POST':
         role = request.form.get('role')
         goal_id = bot.set_assistant_primary_goal(role)        
-        return redirect(url_for('goal_generation', title=role, goal_id=goal_id))  # replace 'next_function' with the name of your next route
+        return redirect(url_for('goal_generation', title=role, goal_id=goal_id))
     else:
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
         return render_template('role_selection.html', roles=roles)
@@ -36,7 +36,6 @@ def chat_api():
     response = chatbot_module.get_response(message) # TODO: Chatbot for subtasks
     return jsonify({'response': response})
 
-# route for rendering subtasks for a given task. Endpoint should be dynamic like /display_subtasks/<task_id>
 @app.route('/display_subtasks/<string:task_id>', methods=['GET'])
 def display_subtasks(task_id):    
     task = Task.query.filter_by(id=task_id).first()
@@ -48,7 +47,6 @@ def display_subtasks(task_id):
     else:
         return render_template('generate_tasks.html', task=task, subtasks=task.subtasks, goal=goal)
     
-# route for generating subtasks for a given task
 @app.route('/generate_subtasks', methods=['POST'])
 def generate_subtasks():
     data = request.get_json()
