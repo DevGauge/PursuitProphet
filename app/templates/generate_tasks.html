@@ -3,6 +3,7 @@
     <div class='subtask-container'>
         <div class='subtask-panel subtask-left-panel'>
             <h2><span class='highlight-text'>{{ goal.get_goal() }}</span></h2>
+            <h3><span class='highlight-text'>{{ task.get_task() }}</h3>
             <div class='subtasks'>
                 {% for subtask in subtasks %}
                 <div class="goal-card" data-task-id="{{ subtask.id }}">
@@ -19,16 +20,33 @@
             </div>
         </div>
         <div class='subtask-panel subtask-center-panel'>
-            <div class='chat-area'>
+            <div id='chat-box' class='chat-area'>
                 <!-- Chat messages will be displayed here -->
             </div>
             <div class='subtask-chat-input'>
-                <input type='text' placeholder='Enter your message...'>
-                <button>Send</button>
+                <input id="message-input" type='text' placeholder='Enter your message...'>
+                <button id="send-button">Send</button>
             </div>
         </div>
         <div class='subtask-panel subtask-right-panel'>
             <!-- Additional content can be added here -->
         </div>
     </div>
+    <script>
+        document.getElementById('send-button').addEventListener('click', function() {
+            var userMessage = document.getElementById('message-input').value;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/chat_api', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onload = function() {
+                if (this.status == 200) {
+                    // Display the chatbot's response on the page
+                    var chatbotResponse = JSON.parse(this.responseText).response;  // TODO: Model after response from langchain
+                    var chatArea = document.getElementById('chat-box');
+                    chatArea.innerHTML += "<p class='bot_message'>" + chatbotResponse + '</p>';
+                }
+            };
+            xhr.send(JSON.stringify({'message': userMessage}));
+        });
+    </script>
 {% endblock %}

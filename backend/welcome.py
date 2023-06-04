@@ -11,24 +11,11 @@ bot = ChatBot()
 
 app = app.app.app
 
-# @app.route('/', methods=['GET', 'POST'])
-# def welcome():
-#     if request.method == 'POST':
-#         print('bar')
-#         user_name = request.form.get('user_name')
-#         if user_name:  # checks if the field isn't empty
-#             return redirect(url_for('role_selection'))
-#     else:
-#         print('foo')
-#         name = "Pursuit Prophet"
-#         return render_template('welcome.html', app_name=name)
-
 @app.route('/', methods=['GET', 'POST'])
 def role_selection():
     if request.method == 'POST':
         role = request.form.get('role')
-        goal_id = bot.set_assistant_primary_goal(role)
-        # goal = Goal.query.filter_by(goal=role).first() # TODO: filter by goal id
+        goal_id = bot.set_assistant_primary_goal(role)        
         return redirect(url_for('goal_generation', title=role, goal_id=goal_id))  # replace 'next_function' with the name of your next route
     else:
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
@@ -43,6 +30,12 @@ def goal_generation():
     tasks = Task.query.filter_by(goal_id=goal_id).all()
     return render_template('generate_goals.html', goals=tasks, title=title)
 
+@app.route('/chat_ api', methods=['POST'])
+def chat_api():
+    message = request.json['message']
+    response = chatbot_module.get_response(message) # TODO: Chatbot for subtasks
+    return jsonify({'response': response})
+
 # route for rendering subtasks for a given task. Endpoint should be dynamic like /display_subtasks/<task_id>
 @app.route('/display_subtasks/<string:task_id>', methods=['GET'])
 def display_subtasks(task_id):    
@@ -53,7 +46,7 @@ def display_subtasks(task_id):
         print(json)
         return json
     else:
-        return render_template('generate_tasks.html', subtasks=task.subtasks, goal=goal)
+        return render_template('generate_tasks.html', task=task, subtasks=task.subtasks, goal=goal)
     
 # route for generating subtasks for a given task
 @app.route('/generate_subtasks', methods=['POST'])
