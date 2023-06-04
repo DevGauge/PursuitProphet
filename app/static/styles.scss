@@ -259,7 +259,7 @@ form {
 
 .goal-card {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     background-color: #fff;
     border-radius: 10px;
@@ -271,6 +271,7 @@ form {
         flex: 0 0 auto;
         display: flex;
         align-items: center;
+        margin-right: 10px;
     }
 
     .goal-text {
@@ -279,10 +280,13 @@ form {
         -webkit-box-orient: vertical;  
         overflow: hidden;
         text-overflow: ellipsis;
+        text-align: left;
+        margin-right: auto;
     }
 
-    .buttons-container {        
-        flex: 0 0 auto;
+    .buttons-container {
+        margin-top: 10px;
+        margin-left: auto;
         display: flex;
         align-items: center;
         padding: 5px;
