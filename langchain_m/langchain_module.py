@@ -1,5 +1,6 @@
 from langchain_m.langchain_manager import ConversationSummarizer, ExampleFactory, FewShotPromptHandler, FewShotPromptTemplate, PromptLengthLimiter, PromptTemplate
 import halo
+from app.app import Task
 
 class GoalPromptHandler(FewShotPromptHandler):
     """Prompt Factory for Goals"""
@@ -213,17 +214,17 @@ class TaskGeneratorBot:
         example_template=self.factory.example_template,
         examples=self.factory.examples(),
         prefix=f"""
-        You are a task generator. Act as a project manager and generate up to {self.num_goals}
-        subtasks for the user's current task of {self.task}. Each task should keep the user's ultimate 
-        goal in mind. For example, if a user's ultimate goal is "write a blog post about cats" and the
-        current task is "choose a specific topic or angle for the blog post" then keep in mind the user
-        has already decided on the overall topic of cats and a sub-topic should be chosen.
-        The user's current ultimate goal is {self.goal}. if the ultimate goal and task are the same,
-        then you're generating top-level tasks and one or the other can be omitted from your context.
-        Otherwise, you're generating subtasks for {self.task} and it was created for the goal of {self.goal}.
-        Tasks should be concise and actionable. Tasks should be ordered first by priority, but always
-        respect dependency order. For instance, if a user's goal is to bake a cake, it's very important
-        to mix the batter, but first you must have the necessary ingredients!
+        You are a task generator.  Act as a problem solving assistant and logical thinker.
+        Your primary objective is to guide and support users by tackling various challenges and breaking down
+        complex problems into smaller, more manageable tasks. Generate **up to** {self.num_goals}
+        subtasks for the user's current task of {self.task}. Each task should reflect the user's ultimate goal.
+        For example, if a user's ultimate goal is "write a blog post about cats" and the current task is 
+        "choose a specific topic or angle for the blog post" then keep in mind the user has already decided on 
+        the overall topic of cats and subtasks should be specified toward that goal. The user's current ultimate 
+        goal is {self.goal}. Tasks should be concise and actionable. Tasks should be ordered first by priority, but always
+        respect dependency order. While creating subtasks should support the ultimate goal, do not attempt to solve the
+        ultimate goal. If you run out of subtasks for {self.task}, then stop. Do not attempt to solve {self.goal}. Only 
+        solve for {self.task}.
         """.replace('\n', ' '),
         suffix="""
         User: {query}
@@ -242,6 +243,65 @@ class TaskGeneratorBot:
         finally:
             spinner.stop()
 
+class TaskChatBotFactory(ExampleFactory):
+    """Factory for task prompt examples"""
+    example_template = """
+    User: {query}
+    AI: {answer}
+    """
+
+    example_prompt = PromptTemplate(
+        input_variables=["query", "answer"], template=example_template
+    )
+
+    def examples(self) -> list[dict[str, str]]:
+        return [
+            {
+                "query": f"{ self.task_instructions('Develop a solid understanding of programming languages, syntax, and concepts', 'Learn to code', 3)}",
+                "answer": 
+"""
+Choose a programming language and set up your coding environment
+Learn basic concepts such as variables, data types, control structures (loops, conditionals), and functions and study the syntax of your chosen programming language
+Practice with small programs that solve simple problems and familiarize yourself with basic data structures like arrays, lists, dictionaries, and linked lists
+"""
+            },
+            {
+                "query": f"{ self.task_instructions('Declutter and eliminate unnecessary items.', 'organize my house', 10)}",
+                "answer": 
+"""
+Go through each room and determine what items are no longer needed
+Sort items into categories such as donate, sell, recycle, or throw away
+Create a plan for organizing the remaining items
+Implement the plan and put everything in its place
+Create a system for maintaining organization
+Donate unwanted items to local charities or thrift stores
+Sell items online or in a garage sale
+Recycle items that are eligible
+Dispose of items that cannot be recycled or donated properly
+Consider using a professional organizer for assistance.
+"""
+            },
+            {
+                "query": f"{ self.task_instructions('Prepare bathing area and supplies', 'wash my dog', 5)}",
+                "answer": 
+"""
+Clean and declutter the bathing area
+Gather necessary bathing supplies such as dog shampoo and dog conditioner (optional, for longer-haired breeds)
+Set up a comfortable and safe environment such as a non-slip bath mat or rubber mat for the tub or bathing area and using warm water at a comfortable temperature for the dog's bath
+Prepare any special accommodations if needed such as dog bathing tether or restraint to secure the dog in place during the bath and treats or rewards to help keep the dog calm and cooperative during the bathing process
+Organize the bathing process
+"""
+            }]
+
+class TaskChatBot:
+    def __init__(self, task: Task):
+        self.conversationSummarizer = ConversationSummarizer()
+        self.task = task
+
+    def get_response(self, message: str):
+        return self.conversationSummarizer.summarize(message)
+
+
 class GoalGeneratorBot:
     def __init__(self, goal: str, num_goals: int = 10):
         self.goal = goal
@@ -251,11 +311,12 @@ class GoalGeneratorBot:
 
     def create_prompt_template(self):
         # remove all newlines from prefix
-        prefix=f"""You are a goal generator.  Act as a project manager and generate up to
-        {self.num_goals} goals for the user's goal of {self.goal}. Goals should be concise
-        and acitonable. Goals should be ordered first by priority, but always respect
-        dependency order. For instance, if a user's goal is to bake a cake, it's very important
-        to mix the batter, but first you must have the necessary ingredients!
+        prefix=f"""You are a goal generator.  Act as a problem solving assistant and logical thinker.
+        Your primary objective is to guide and support users by tackling various challenges and breaking down
+        complex problems into smaller, more manageable tasks. Generate up to {self.num_goals} goals for the 
+        user's goal of {self.goal}. Goals should be concise and acitonable. Goals should be ordered first by 
+        priority, but always respect dependency order. For instance, if a user's goal is to bake a cake, it's 
+        very important to mix the batter, but first you must have the necessary ingredients!
         """.replace('\n', ' ')
         return GoalPromptHandler(
         example_template=self.factory.example_template,
