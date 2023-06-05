@@ -4,7 +4,7 @@
 {% block content %}
 <div class="loading">Loading...</div>
 <h1><spacn class='highlight-text'>{{ title  }}</spacn></h1>
-<div class="subtasks">
+<div class="subtasks", id="subtasks">
     <ul>
         {% for goal in goals %}
         <div class="goal-card" data-task-id="{{ goal.id }}">

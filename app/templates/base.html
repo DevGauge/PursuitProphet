@@ -10,5 +10,18 @@
 </head>
 <body>
     {% block content %}{% endblock %}
+    <script>
+    window.addEventListener('DOMContentLoaded', function () {
+        const subtasksContainer = document.getElementById('subtasks');
+        const maxHeight = window.innerHeight - subtasksContainer.offsetTop - 20;
+        subtasksContainer.style.maxHeight = maxHeight + 'px';
+      });
+      
+      window.addEventListener('resize', function () {
+        const subtasksContainer = document.getElementById('subtasks');
+        const maxHeight = window.innerHeight - subtasksContainer.offsetTop - 20;
+        subtasksContainer.style.maxHeight = maxHeight + 'px';
+      });
+    </script>
 </body>
 </html>

@@ -4,7 +4,7 @@
         <div class='subtask-panel subtask-left-panel'>
             <h2><span class='highlight-text'>{{ goal.get_goal() }}</span></h2>
             <h3><span class='highlight-text'>{{ task.get_task() }}</h3>
-            <div class='subtasks'>
+            <div class='subtasks', id="subtasks">
                 {% for subtask in subtasks %}
                 <div class="goal-card" data-task-id="{{ subtask.id }}">
                     <div class="checkbox-container">
