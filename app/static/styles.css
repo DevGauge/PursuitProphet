@@ -365,4 +365,26 @@ form {
   border-radius: 5px;
 }
 
+/* Styles for mobile devices */
+@media (max-width: 767px) {
+  * {
+    padding: 0;
+  }
+  .subtask-container {
+    width: 100%;
+  }
+  .subtask-left-panel {
+    width: 93%;
+  }
+  .subtask-center-panel {
+    width: 93%;
+  }
+  .subtask-container {
+    flex-direction: column;
+  }
+  .subtask-center-panel {
+    order: 1; /* Move the message panel below subtasks */
+  }
+}
+
 /*# sourceMappingURL=styles.css.map */
