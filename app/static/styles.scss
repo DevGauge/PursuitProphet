@@ -329,7 +329,7 @@ form {
 /* Subtask Generation */
 .subtask-container {
     display: flex;
-    height: 100vh;
+    height: 100vh;    
 }
 
 .subtask-panel {
@@ -378,6 +378,8 @@ form {
 
 .subtasks {
     margin-top: 20px;
+    max-height: calc(100vh - 150px);
+    overflow: auto;
 }
 
 .subtasks .subtask {
