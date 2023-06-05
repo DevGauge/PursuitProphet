@@ -303,6 +303,13 @@ form {
   box-shadow: 0 0 20px #673AB7;
 }
 
+.introduction-text {
+  font-weight: 400;
+  width: 50%;
+  margin: auto;
+  line-height: 1.5;
+}
+
 /* Subtask Generation */
 .subtask-container {
   display: flex;
@@ -367,9 +374,10 @@ form {
 
 /* Styles for mobile devices */
 @media (max-width: 767px) {
-  * {
-    padding: 0;
+  .introduction-text {
+    width: 75%;
   }
+  /*subtask gen*/
   .subtask-container {
     width: 100%;
   }

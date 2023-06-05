@@ -326,6 +326,13 @@ form {
     }
 }
 
+.introduction-text {
+    font-weight:400; 
+    width:50%; 
+    margin:auto;
+    line-height: 1.5;
+}
+
 /* Subtask Generation */
 .subtask-container {
     display: flex;
@@ -389,6 +396,10 @@ form {
 }
 /* Styles for mobile devices */
 @media (max-width: 767px) {
+    .introduction-text {
+        width: 75%;
+    }
+    /*subtask gen*/
     .subtask-container {
         width: 100%;
     }
