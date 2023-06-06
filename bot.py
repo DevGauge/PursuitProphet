@@ -175,7 +175,6 @@ class GoalManager:
                 if action == "create":
                     goal_text = text.split(" ", 2)[2]
                     goal = Goal(goal_text)
-                    self.goals.append(goal)
                     db.session.add(goal)
                     db.session.commit()
                     self.io_manager.user_instruction(f"Created new goal: {goal.goal}")
@@ -290,7 +289,6 @@ class GoalManager:
     def mark_goal_as_complete(self, n):
         """Mark the nth goal as complete."""
         goal = list(self.goals.keys())[n]
-        self.completed_goals.append({goal: self.goals[goal]})
         del self.goals[goal]
         self.io_manager.system_message(f"Goal {n+1} '{goal}' marked as complete.")
 
