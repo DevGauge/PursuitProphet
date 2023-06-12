@@ -1,17 +1,18 @@
+from datetime import datetime
 import os
 import uuid
+import sys
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-db = SQLAlchemy()
-
+from .pp_logging.db_logger import DBLogger, db
+from .pp_logging.event_logger import EventLogger
 class Task(db.Model):
     """
     A task is a subtask of a goal.
     Note: Subtasks reuse this class since they follow the same structure and behavior as tasks.
-    """
+    """    
     id = db.Column(db.String(255),
                    primary_key=True, 
                    default=lambda: str(uuid.uuid4()))
@@ -142,7 +143,11 @@ class App:
 
         with flask_app.app_context():
             db.create_all()
+            db_logger = DBLogger(db)
+            self.logger = EventLogger(db_logger)
+            flask_app.logger.addHandler(db_logger)
 
         return flask_app
-    
-app = App().app
+
+app_instance = App()
+app = app_instance.app

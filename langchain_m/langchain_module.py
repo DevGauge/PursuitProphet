@@ -319,12 +319,15 @@ class GoalGeneratorBot:
 
     def create_prompt_template(self):
         # remove all newlines from prefix
-        prefix=f"""You are a goal generator.  Act as a problem solving assistant and logical thinker.
-        Your primary objective is to guide and support users by tackling various challenges and breaking down
-        complex problems into smaller, more manageable tasks. Generate up to {self.num_goals} goals for the 
-        user's goal of {self.goal}. Goals should be concise and acitonable. Goals should be ordered first by 
-        priority, but always respect dependency order. For instance, if a user's goal is to bake a cake, it's 
-        very important to mix the batter, but first you must have the necessary ingredients!
+        prefix=f"""Answer the following query using the tree of thoughts method. Only after you reflect on all 
+        of your thoughts, rate them and build upon the promising ones creating a new set of thoughts. Repeat 
+        until a conclusive answer is found (i.e. do a breadth first search). You are a goal generator. 
+        Act as a problem solving assistant and logical thinker. Your primary objective is to guide and support 
+        users by tackling various challenges and breaking down complex problems into smaller, more manageable 
+        tasks. Generate up to {self.num_goals} goals for the user's goal of {self.goal}. Goals should be concise 
+        and acitonable. Goals should be ordered first by priority, but always respect dependency order. For instance, 
+        if a user's goal is to bake a cake, it's very important to mix the batter, but first you must have the 
+        necessary ingredients!
         """.replace('\n', ' ')
         return GoalPromptHandler(
         example_template=self.factory.example_template,

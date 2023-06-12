@@ -75,7 +75,8 @@ import openai
 # Local imports
 sys.path.insert(0, './langchain')
 from langchain_m.langchain_module import TaskGeneratorBot, GoalGeneratorBot, FilenameGeneratorBot
-from app.app import Goal, Task, db
+from app.app import Goal, Task, db, app as flask_app
+from app.app import app_instance
 
 class SingletonMeta(type):
     """Singleton metaclass. If instance already exists, it will be returned. Otherwise, a new instance will be created."""
@@ -215,6 +216,7 @@ class GoalManager:
         for subtask in subtasks:
             db.session.add(subtask)
         db.session.commit()
+        app_instance.logger.log_event('add_subtask', {'subtask': subtask})
         return subtasks
     
     def  ask_if_user_wants_to_work_on_task(self):

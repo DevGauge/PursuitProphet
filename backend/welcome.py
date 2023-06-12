@@ -7,12 +7,9 @@ sys.path.insert(0, '/app')
 from bot import ChatBot
 import app.app
 from app.app import Goal, Task
-from app.pp_logging.db_logger import DBLogger
-from app.pp_logging.event_logger import EventLogger
 from app.app import db
 bot = ChatBot()
 
-app.app.logger = EventLogger(db)
 app = app.app.app
 
 @app.route('/', methods=['GET', 'POST'])

@@ -418,4 +418,38 @@ form {
     .subtask-center-panel {
         order: 1; /* Move the message panel below subtasks */
     }
+
+    /* error page */
+    .error-container {
+        width: 80%;
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        padding: 50px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .error-container h1 {
+        color: #333;
+    }
+    
+    .error-container p {
+        color: #666;
+    }
+    
+    .error-container a {
+        display: inline-block;
+        margin-top: 30px;
+        padding: 10px 20px;
+        color: #fff;
+        background-color: #007bff;
+        border-radius: 4px;
+        text-decoration: none;
+    }
+    
+    .error-container a:hover {
+        background-color: #0056b3;
+    }
 }

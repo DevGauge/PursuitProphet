@@ -16,12 +16,16 @@ class TokenHandler:
         self.llm_chain = llm_chain
 
     def handle(self, message: str):
-        with get_openai_callback() as cb:
-            result = self.llm_chain.run(message)
-            print(self.llm_chain.memory)
-            print(result)
-            print(f"Spent a total of {cb.total_tokens} tokens")
-        return result
+        try:
+            with get_openai_callback() as cb:
+                result = self.llm_chain.run(message)
+                print(self.llm_chain.memory)
+                print(result)
+                print(f"Spent a total of {cb.total_tokens} tokens")
+        except Exception as e:
+            print(e)
+        finally:
+            return result
 
 
 class ConversationSummarizer:
