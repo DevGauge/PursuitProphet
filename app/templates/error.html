@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="error-container">
+    <!-- Error Icon -->
+    <i class="fas fa-exclamation-triangle fa-5x"></i>
+
+    <!-- Error Message -->
+    <h1>An Error Occurred:</h1>
+    <p>{{ error_message }}</p>
+
+    <!-- Link back to the dashboard -->
+    <a href="{{ url_for('role_selection') }}">Return to Dashboard</a>
+</div>
+{% endblock %}
