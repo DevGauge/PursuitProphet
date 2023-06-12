@@ -12,6 +12,14 @@ bot = ChatBot()
 
 app = app.app.app
 
+@app.route('/error/<string:error_message>')
+def error_page(error_message):
+    return render_template('error.html', error_message=error_message)
+
+@app.errorhandler(500)
+def handle_500(error):
+    return redirect(url_for('error_page', error_message=str(error)))
+
 @app.route('/', methods=['GET', 'POST'])
 def role_selection():
     if request.method == 'POST':
@@ -27,9 +35,14 @@ def goal_generation():
     title = request.args.get('title')
     goal_id = request.args.get('goal_id')
     goal = Goal.query.filter_by(id=goal_id).first()
-    bot.generate_goals(goal)
-    tasks = Task.query.filter_by(goal_id=goal_id).all()
-    return render_template('generate_goals.html', goals=tasks, title=title)
+    try:
+        bot.generate_goals(goal)
+        tasks = Task.query.filter_by(goal_id=goal_id).all()
+    except Exception as e:
+        print(e)
+        return redirect(url_for('error_page', error_message=str(e)))
+    finally:
+        return render_template('generate_goals.html', goals=tasks, title=title)
 
 @app.route('/chat_ api', methods=['POST'])
 def chat_api():

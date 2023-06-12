@@ -248,6 +248,8 @@ class TaskGeneratorBot:
             return summarizer.summarize(self.create_prompt_template()
                                         .few_shot_prompt_template()
                                         .format(query=query))
+        except Exception as e:
+            raise e
         finally:
             spinner.stop()
 

@@ -143,8 +143,12 @@ class ChatBot:
         print(f'generating goals for {primary_goal.get_goal()}')
         bot = GoalGeneratorBot(goal=primary_goal.get_goal())
         #strip and save
-        self.goal_manager.strip_tasks_and_save(bot.generate_goals(), primary_goal.id)
-    
+        try:
+            self.goal_manager.strip_tasks_and_save(bot.generate_goals(), primary_goal.id)
+        except Exception as e:
+            # go to error route
+            raise e
+
     def generate_subtasks(self, task: Task):
         """Generate subtasks for a given goal"""
         return self.goal_manager.generate_subtasks(task)

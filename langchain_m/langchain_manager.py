@@ -23,7 +23,7 @@ class TokenHandler:
                 print(result)
                 print(f"Spent a total of {cb.total_tokens} tokens")
         except Exception as e:
-            print(e)
+            raise e
         finally:
             return result
 
