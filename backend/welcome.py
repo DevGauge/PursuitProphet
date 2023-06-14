@@ -29,6 +29,12 @@ def role_selection():
     else:
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
         return render_template('role_selection.html', roles=roles)
+    
+@app.route('/dashboard')
+def dashboard():
+    # Query the database for all Goals
+    goals = Goal.query.all()
+    return render_template('dashboard.html', goals=goals)
 
 @app.route('/generate_goals', methods=['GET', 'POST'])
 def goal_generation():

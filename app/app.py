@@ -3,7 +3,7 @@ import os
 import uuid
 import sys
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from .pp_logging.db_logger import DBLogger, db

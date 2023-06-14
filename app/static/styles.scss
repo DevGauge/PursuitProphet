@@ -5,6 +5,66 @@ body {
     margin: 0;
 }
 
+// Dashboard
+.dashboard-container {
+    display: flex;
+}
+
+.sidebar {
+    width: 120px;
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    
+    .nav-icon {
+        margin-bottom: 10px;
+    }
+}
+
+.main-panel {
+    flex-grow: 1;
+    background-color: black;
+    color: white;
+    padding: 20px;
+    
+    .header {
+        display: flex;
+        justify-content: space-between;
+        
+        .search-container {
+            display: flex;
+            
+            input[type="text"] {
+                border-radius: 5px;
+                padding: 5px;
+            }
+        }
+        
+        .icon-container {
+            display: flex;
+            gap: 10px;
+        }
+    }
+    
+    .section {
+        margin-bottom: 20px;
+        
+        .dream-icon, .task-icon {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        button.task-button {
+            background-color: blue;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    }
+}
+
+// Demo
 .welcome-screen {
     text-align: center;
     padding: 50px;

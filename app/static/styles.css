@@ -5,6 +5,56 @@ body {
   margin: 0;
 }
 
+.dashboard-container {
+  display: flex;
+}
+
+.sidebar {
+  width: 120px;
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+}
+.sidebar .nav-icon {
+  margin-bottom: 10px;
+}
+
+.main-panel {
+  flex-grow: 1;
+  background-color: black;
+  color: white;
+  padding: 20px;
+}
+.main-panel .header {
+  display: flex;
+  justify-content: space-between;
+}
+.main-panel .header .search-container {
+  display: flex;
+}
+.main-panel .header .search-container input[type=text] {
+  border-radius: 5px;
+  padding: 5px;
+}
+.main-panel .header .icon-container {
+  display: flex;
+  gap: 10px;
+}
+.main-panel .section {
+  margin-bottom: 20px;
+}
+.main-panel .section .dream-icon, .main-panel .section .task-icon {
+  display: inline-block;
+  margin-right: 10px;
+}
+.main-panel .section button.task-button {
+  background-color: blue;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+}
+
 .welcome-screen {
   text-align: center;
   padding: 50px;
@@ -398,7 +448,6 @@ form {
     width: 80%;
     max-width: 800px;
     margin: 0 auto;
-    margin-left: 20px;
     text-align: center;
     padding: 50px;
     background-color: #fff;
