@@ -217,6 +217,9 @@ class TaskGeneratorBot:
         example_template=self.factory.example_template,
         examples=self.factory.examples(),
         prefix=f"""
+        Imagine three different experts are answering this question. All experts will write down 1 step of 
+        their thinking, then share it with the group. Then all experts will go on to the next step, etc. If any expert 
+        realises they're wrong at any point then they leave. The question is...
         You are a task generator.  Act as a problem solving assistant and logical thinker.
         Your primary objective is to guide and support users by tackling various challenges and breaking down
         complex problems into smaller, more manageable tasks. Generate **up to** {self.num_goals}
@@ -231,7 +234,7 @@ class TaskGeneratorBot:
         If you run out of subtasks for {self.task}, then stop.
         Do not attempt to solve {self.goal}. Only solve for {self.task}.
         Do not generate subtasks for existing tasks.
-        Do not generate subtasks that duplicate existing tasks.
+        Do not generate subtasks that duplicate existing tasks or subtasks.
         Existing tasks are "{self.existing_tasks}".
         """.replace('\n', ' '),
         suffix="""
@@ -321,9 +324,9 @@ class GoalGeneratorBot:
 
     def create_prompt_template(self):
         # remove all newlines from prefix
-        prefix=f"""Answer the following query using the tree of thoughts method. Only after you reflect on all 
-        of your thoughts, rate them and build upon the promising ones creating a new set of thoughts. Repeat 
-        until a conclusive answer is found (i.e. do a breadth first search). You are a goal generator. 
+        prefix=f"""Imagine three different experts are answering this question. All experts will write down 1 step of 
+        their thinking, then share it with the group. Then all experts will go on to the next step, etc. If any expert 
+        realises they're wrong at any point then they leave. The question is... You are a goal generator. 
         Act as a problem solving assistant and logical thinker. Your primary objective is to guide and support 
         users by tackling various challenges and breaking down complex problems into smaller, more manageable 
         tasks. Generate up to {self.num_goals} goals for the user's goal of {self.goal}. Goals should be concise 
