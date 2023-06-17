@@ -1,6 +1,6 @@
 from langchain_m.langchain_manager import ConversationSummarizer, ExampleFactory, FewShotPromptHandler, FewShotPromptTemplate, PromptLengthLimiter, PromptTemplate
 import halo
-from app.app import Task
+from app.app import Task, Goal
 
 class GoalPromptHandler(FewShotPromptHandler):
     """Prompt Factory for Goals"""
@@ -218,8 +218,8 @@ class TaskGeneratorBot:
         examples=self.factory.examples(),
         prefix=f"""
         Imagine three different experts are answering this question. All experts will write down 1 step of 
-        their thinking, then share it with the group. Then all experts will go on to the next step, etc. If any expert 
-        realises they're wrong at any point then they leave. The question is...
+        their thinking, then share it with the group. Then all experts will go on to the next step until the
+        user's problem is solved. If any expert realizes they're wrong at any point then they leave. The question is...
         You are a task generator.  Act as a problem solving assistant and logical thinker.
         Your primary objective is to guide and support users by tackling various challenges and breaking down
         complex problems into smaller, more manageable tasks. Generate **up to** {self.num_goals}
@@ -268,51 +268,36 @@ class TaskChatBotFactory(ExampleFactory):
     )
 
     def examples(self) -> list[dict[str, str]]:
-        return [
-            {
-                "query": f"{ self.task_instructions('Develop a solid understanding of programming languages, syntax, and concepts', 'Learn to code', 3)}",
-                "answer": 
-"""
-Choose a programming language and set up your coding environment
-Learn basic concepts such as variables, data types, control structures (loops, conditionals), and functions and study the syntax of your chosen programming language
-Practice with small programs that solve simple problems and familiarize yourself with basic data structures like arrays, lists, dictionaries, and linked lists
-"""
-            },
-            {
-                "query": f"{ self.task_instructions('Declutter and eliminate unnecessary items.', 'organize my house', 10)}",
-                "answer": 
-"""
-Go through each room and determine what items are no longer needed
-Sort items into categories such as donate, sell, recycle, or throw away
-Create a plan for organizing the remaining items
-Implement the plan and put everything in its place
-Create a system for maintaining organization
-Donate unwanted items to local charities or thrift stores
-Sell items online or in a garage sale
-Recycle items that are eligible
-Dispose of items that cannot be recycled or donated properly
-Consider using a professional organizer for assistance.
-"""
-            },
-            {
-                "query": f"{ self.task_instructions('Prepare bathing area and supplies', 'wash my dog', 5)}",
-                "answer": 
-"""
-Clean and declutter the bathing area
-Gather necessary bathing supplies such as dog shampoo and dog conditioner (optional, for longer-haired breeds)
-Set up a comfortable and safe environment such as a non-slip bath mat or rubber mat for the tub or bathing area and using warm water at a comfortable temperature for the dog's bath
-Prepare any special accommodations if needed such as dog bathing tether or restraint to secure the dog in place during the bath and treats or rewards to help keep the dog calm and cooperative during the bathing process
-Organize the bathing process
-"""
-            }]
+        return []
 
 class TaskChatBot:
-    def __init__(self, task: Task):
+    def __init__(self, task: Task, goal: Goal, existing_tasks: str):
         self.conversationSummarizer = ConversationSummarizer()
         self.task = task
+        self.goal = goal
+        self.existing_tasks = existing_tasks
 
     def get_response(self, message: str):
         return self.conversationSummarizer.summarize(message)
+    
+    def create_prompt_template(self):
+        preamble="Imagine three different experts are answering {query}."
+        prefix=f"""{preamble}. All experts will write down 1 step of their thinking, then share it with the group. Then 
+        all experts will go on to the next step until the user's problem is solved. If any expert realises they're wrong at any point then they leave. 
+        You are a helpful assistant that helps users fulfill their dreams. In this context, you are assisting user with {self.task} 
+        in context of {self.goal}. You should only help the user with {self.task} and {self.goal}. Simulate a conversation amongst 
+        experts, only asking the user for input when required. Give the user sample solutions and implementations when possible and
+        appropriate. If you think of supporting tasks the user can perform, check { self.existing_tasks } and do not repeat. If the 
+        task exists, simply remind the user they have that task to perform later and  you will be happy to assist them with it at that time.
+        """.replace('\n', ' ')
+        return GoalPromptHandler(
+        example_template=self.factory.example_template,
+        examples=self.factory.examples(),
+        prefix=prefix,
+        suffix="""
+        User: {query}
+        AI: """,
+    )
 
 
 class GoalGeneratorBot:
@@ -325,7 +310,7 @@ class GoalGeneratorBot:
     def create_prompt_template(self):
         # remove all newlines from prefix
         prefix=f"""Imagine three different experts are answering this question. All experts will write down 1 step of 
-        their thinking, then share it with the group. Then all experts will go on to the next step, etc. If any expert 
+        their thinking, then share it with the group. Then all experts will go on to the next step until the user's problem is solved. If any expert 
         realises they're wrong at any point then they leave. The question is... You are a goal generator. 
         Act as a problem solving assistant and logical thinker. Your primary objective is to guide and support 
         users by tackling various challenges and breaking down complex problems into smaller, more manageable 
