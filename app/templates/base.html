@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-16x16.png') }}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32x32.png') }}">
-    <!-- Add any additional stylesheets or scripts here -->
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 </head>
 <body>
     {% block content %}{% endblock %}
@@ -25,5 +25,6 @@
         subtasksContainer.style.maxHeight = maxHeight + 'px';
       });
     </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

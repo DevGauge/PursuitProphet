@@ -49,6 +49,7 @@ class ModelFactory:
 
     # region Expensive Models
     _gpt_3_5_turbo = "gpt-3.5-turbo"
+    _gpt_3_5_turbo_16k = "gpt-3.5-turbo-16k"
 
     # region private methods
     def _creative_gpt3(self):
