@@ -1,0 +1,173 @@
+import pytest
+from app.app import db, Task, Goal
+from app.app.App import create_app
+
+@pytest.fixture
+def client():
+    app = create_app('testing')
+    with app.test_client() as client:
+        with app.app_context():
+            db.create_all()
+            yield client
+            db.drop_all()
+
+def test_register_user(client):
+    response = client.post('/register', data={'username': 'testuser', 'email': 'testuser@example.com', 'password': 'password'})
+    assert response.status_code == 200
+    assert User.query.filter_by(username='testuser').first() is not None
+
+def test_login_user(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    db.session.add(user)
+    db.session.commit()
+    response = client.post('/login', data={'username': 'testuser', 'password': 'password'})
+    assert response.status_code == 302
+    assert response.headers['Location'] == 'http://localhost/dashboard'
+
+def test_create_task(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    db.session.add(user)
+    db.session.commit()
+    response = client.post('/create_task', data={'title': 'Test Task', 'description': 'This is a test task', 'due_date': '2022-01-01'})
+    assert response.status_code == 302
+    assert Task.query.filter_by(title='Test Task').first() is not None
+
+def test_edit_task(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    task = Task(title='Test Task', description='This is a test task', due_date='2022-01-01', user=user)
+    db.session.add(user)
+    db.session.add(task)
+    db.session.commit()
+    response = client.post(f'/edit_task/{task.id}', data={'title': 'New Title', 'description': 'This is a new description', 'due_date': '2022-02-01'})
+    assert response.status_code == 302
+    assert Task.query.filter_by(title='New Title').first() is not None
+
+def test_delete_task(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    task = Task(title='Test Task', description='This is a test task', due_date='2022-01-01', user=user)
+    db.session.add(user)
+    db.session.add(task)
+    db.session.commit()
+    response = client.post(f'/delete_task/{task.id}')
+    assert response.status_code == 302
+    assert Task.query.filter_by(title='Test Task').first() is None
+
+def test_mark_task_complete(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    task = Task(title='Test Task', description='This is a test task', due_date='2022-01-01', user=user)
+    db.session.add(user)
+    db.session.add(task)
+    db.session.commit()
+    response = client.post(f'/mark_task_complete/{task.id}')
+    assert response.status_code == 302
+    assert Task.query.filter_by(title='Test Task', completed=True).first() is not None
+
+def test_view_completed_tasks(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    task1 = Task(title='Test Task 1', description='This is a test task', due_date='2022-01-01', completed=True, user=user)
+    task2 = Task(title='Test Task 2', description='This is a test task', due_date='2022-01-01', completed=False, user=user)
+    db.session.add(user)
+    db.session.add(task1)
+    db.session.add(task2)
+    db.session.commit()
+    response = client.get('/completed_tasks')
+    assert response.status_code == 200
+    assert b'Test Task 1' in response.data
+    assert b'Test Task 2' not in response.data
+
+def test_view_task_statistics(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    task1 = Task(title='Test Task 1', description='This is a test task', due_date='2022-01-01', completed=True, user=user)
+    task2 = Task(title='Test Task 2', description='This is a test task', due_date='2022-01-01', completed=True, user=user)
+    task3 = Task(title='Test Task 3', description='This is a test task', due_date='2022-01-01', completed=False, user=user)
+    db.session.add(user)
+    db.session.add(task1)
+    db.session.add(task2)
+    db.session.add(task3)
+    db.session.commit()
+    response = client.get('/task_statistics')
+    assert response.status_code == 200
+    assert b'2' in response.data
+    assert b'33.33' in response.data
+
+def test_create_list(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    db.session.add(user)
+    db.session.commit()
+    response = client.post('/create_list', data={'title': 'Test List', 'description': 'This is a test list'})
+    assert response.status_code == 302
+    assert List.query.filter_by(title='Test List').first() is not None
+
+def test_edit_list(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    lst = List(title='Test List', description='This is a test list', user=user)
+    db.session.add(user)
+    db.session.add(lst)
+    db.session.commit()
+    response = client.post(f'/edit_list/{lst.id}', data={'title': 'New Title', 'description': 'This is a new description'})
+    assert response.status_code == 302
+    assert List.query.filter_by(title='New Title').first() is not None
+
+def test_delete_list(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    lst = List(title='Test List', description='This is a test list', user=user)
+    db.session.add(user)
+    db.session.add(lst)
+    db.session.commit()
+    response = client.post(f'/delete_list/{lst.id}')
+    assert response.status_code == 302
+    assert List.query.filter_by(title='Test List').first() is None
+
+def test_add_task_to_list(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    lst = List(title='Test List', description='This is a test list', user=user)
+    task = Task(title='Test Task', description='This is a test task', due_date='2022-01-01', user=user)
+    db.session.add(user)
+    db.session.add(lst)
+    db.session.add(task)
+    db.session.commit()
+    response = client.post(f'/add_task_to_list/{lst.id}', data={'task_id': task.id})
+    assert response.status_code == 302
+    assert task in lst.tasks
+
+def test_remove_task_from_list(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    lst = List(title='Test List', description='This is a test list', user=user)
+    task = Task(title='Test Task', description='This is a test task', due_date='2022-01-01', user=user)
+    lst.tasks.append(task)
+    db.session.add(user)
+    db.session.add(lst)
+    db.session.add(task)
+    db.session.commit()
+    response = client.post(f'/remove_task_from_list/{lst.id}', data={'task_id': task.id})
+    assert response.status_code == 302
+    assert task not in lst.tasks
+
+def test_view_list_tasks(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    lst = List(title='Test List', description='This is a test list', user=user)
+    task1 = Task(title='Test Task 1', description='This is a test task', due_date='2022-01-01', user=user)
+    task2 = Task(title='Test Task 2', description='This is a test task', due_date='2022-01-01', user=user)
+    lst.tasks.append(task1)
+    db.session.add(user)
+    db.session.add(lst)
+    db.session.add(task1)
+    db.session.add(task2)
+    db.session.commit()
+    response = client.get(f'/list_tasks/{lst.id}')
+    assert response.status_code == 200
+    assert b'Test Task 1' in response.data
+    assert b'Test Task 2' not in response.data
+
+def test_search_tasks(client):
+    user = User(username='testuser', email='testuser@example.com', password='password')
+    task1 = Task(title='Test Task 1', description='This is a test task', due_date='2022-01-01', user=user)
+    task2 = Task(title='Test Task 2', description='This is another test task', due_date='2022-01-01', user=user)
+    db.session.add(user)
+    db.session.add(task1)
+    db.session.add(task2)
+    db.session.commit()
+    response = client.get('/search_tasks?q=test')
+    assert response.status_code == 200
+    assert b'Test Task 1' in response.data
+    assert b'Test Task 2' in response.data

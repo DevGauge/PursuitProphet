@@ -1,6 +1,7 @@
 from langchain_m.langchain_manager import ConversationSummarizer, ExampleFactory, FewShotPromptHandler, FewShotPromptTemplate, PromptLengthLimiter, PromptTemplate
 import halo
 from app.app import Task, Goal
+from typing import List
 
 class GoalPromptHandler(FewShotPromptHandler):
     """Prompt Factory for Goals"""
@@ -256,8 +257,57 @@ class TaskGeneratorBot:
         finally:
             spinner.stop()
 
-class TaskChatBotFactory(ExampleFactory):
-    """Factory for task prompt examples"""
+class TaskChatPromptHandler(FewShotPromptHandler):
+    """Prompt Factory for Goals"""
+    def __init__(
+        self,
+        example_template: PromptTemplate,
+        examples: list[str],
+        prefix: str,
+        suffix: str,
+        task: Task,
+        goal: Goal,
+        existing_tasks: str,
+        example_prompt: PromptTemplate = None,
+        limiter: PromptLengthLimiter = None,
+    ):
+        super().__init__(example_template, examples, prefix, suffix, limiter)
+        self.example_factory = TaskChatExampleFactory(task=task, goal=goal, existing_tasks=existing_tasks)
+        self.example_prompt = (
+            example_prompt
+            if example_prompt is not None
+            else self.example_factory.example_prompt
+        )
+
+        self.task = task
+        self.goal = goal
+        self.existing_tasks = existing_tasks
+
+    def _example_prompt(self, variables_list: list[str]) -> PromptTemplate:
+        return PromptTemplate(
+            input_variables=variables_list, template=self.example_template
+        )
+
+    def few_shot_prompt_template(
+        self,
+        input_variables=["query"],
+        example_separator="\n",
+        limiter: PromptLengthLimiter = None,
+    ) -> PromptTemplate:
+        self.prompt_template = FewShotPromptTemplate(
+            examples=self.examples,
+            example_prompt=limiter.length_based_selector()
+            if limiter is not None
+            else self.example_prompt,
+            prefix=self.prefix,
+            suffix=self.suffix,
+            input_variables=input_variables,
+            example_separator=example_separator,
+        )
+        return self.prompt_template
+
+class TaskChatExampleFactory(ExampleFactory):
+    """Factory for goal prompt examples"""
     example_template = """
     User: {query}
     AI: {answer}
@@ -267,38 +317,101 @@ class TaskChatBotFactory(ExampleFactory):
         input_variables=["query", "answer"], template=example_template
     )
 
-    def examples(self) -> list[dict[str, str]]:
-        return []
+    def __init__(self, task: Task, goal: Goal, existing_tasks: str) -> None:
+        super().__init__()
+        self.task = task
+        self.goal = goal
+        self.existing_tasks = existing_tasks
 
+    def examples(self) -> list[dict[str, str]]:
+        return [
+            # TODO: Need ability to get specific subtasks the user requests help with. This may require OpenAI functions
+            # invalid example
+#             {
+#                 "query": f"{self.user_task_chat(invalid_message='Chinese food recommendations')} ",
+#                 "answer": 
+# """
+# As a prophet of dreams, my goal is to help you with your dreams and tasks. I will be glad to help you with {task}, {goal}, and any related questions.
+# """
+#             },
+#             {
+#                 "query": f"{ self.user_task_chat(subtask=self.task.subtasks[0].get_task())}",
+#                 "answer": 
+# """
+# I will be happy to help you with {task.subtasks[0].get_task()}. {answer}
+# """
+#             },
+#             {
+#                 "query": f"{ self.user_task_chat(task_num=0) }",
+#                 "answer": 
+# """
+# I will be happy to help you with {task.subtasks[0].get_task()}. {answer}
+# """
+#             },
+#             {
+#                 "query": f"{ self.user_task_chat(invalid_message='Can you help me rob a bank') }",
+#                 "answer":
+# """
+# As a prophet of dreams, I will only help you with dreams and tasks that fit within my morality criteria. I will be glad to help you with {task}, {goal}, and any related questions.
+# """
+#             },
+        ]
+
+    def user_task_chat(self, subtask: Task = None, task_num: int=None, invalid_message: str = None):
+        """Helper for user instructions. 
+           Task_num is the index of the task in the list of subtasks and overwrites subtask if not None
+           If both subtask and task_num are None, self.task is used
+           invalid_message overwrites both
+        """
+        if task_num is not None:
+            subtask = self.task.subtasks[task_num].get_task()
+        
+        if task_num and subtask is None:
+            subtask = self.task.get_task()
+
+        if invalid_message is not None:
+            subtask = invalid_message
+
+        return f"Can you help me with {subtask}?"
+    
 class TaskChatBot:
     def __init__(self, task: Task, goal: Goal, existing_tasks: str):
         self.conversationSummarizer = ConversationSummarizer()
         self.task = task
         self.goal = goal
         self.existing_tasks = existing_tasks
+        self.example_factory = TaskChatExampleFactory(task=task, goal=goal, existing_tasks=existing_tasks)
 
     def get_response(self, message: str):
-        return self.conversationSummarizer.summarize(message)
+        prompt_template = self.create_prompt_template()
+        print(f"prompt template is {prompt_template}")
+        few_shot_template = prompt_template.few_shot_prompt_template()
+        print(f"few shot template is {few_shot_template}")
+        return self.conversationSummarizer.summarize(few_shot_template.format(query=message))
     
     def create_prompt_template(self):
         preamble="Imagine three different experts are answering {query}."
-        prefix=f"""{preamble}. All experts will write down 1 step of their thinking, then share it with the group. Then 
-        all experts will go on to the next step until the user's problem is solved. If any expert realises they're wrong at any point then they leave. 
-        You are a helpful assistant that helps users fulfill their dreams. In this context, you are assisting user with {self.task} 
-        in context of {self.goal}. You should only help the user with {self.task} and {self.goal}. Simulate a conversation amongst 
+        prefix=f"""{preamble}. If any expert requires the user's input, they will ask the user and await the user's input before sharing their 
+        opinion. Do not generate the user's response, ask for it instead. All experts will write down 1 step of their thinking, then share it with the group. 
+        Then all experts will go on to the next step until the user's problem is solved. 
+        If any expert realises they're wrong at any point then they leave. 
+        You are a helpful assistant that helps users fulfill their dreams. In this context, you are assisting user with {self.task.get_task()} 
+        in context of {self.goal.get_goal()}. You should only help the user with {self.task.get_task()} and {self.goal.get_goal()}. Simulate a conversation amongst 
         experts, only asking the user for input when required. Give the user sample solutions and implementations when possible and
         appropriate. If you think of supporting tasks the user can perform, check { self.existing_tasks } and do not repeat. If the 
         task exists, simply remind the user they have that task to perform later and  you will be happy to assist them with it at that time.
         """.replace('\n', ' ')
-        return GoalPromptHandler(
-        example_template=self.factory.example_template,
-        examples=self.factory.examples(),
-        prefix=prefix,
-        suffix="""
-        User: {query}
-        AI: """,
-    )
-
+        return TaskChatPromptHandler(
+            example_template=self.example_factory.example_template,
+            examples=self.example_factory.examples(),
+            prefix=prefix,
+            suffix="""
+            User: {query}
+            AI: """,
+            task=self.task,
+            goal=self.goal,
+            existing_tasks=self.existing_tasks
+        )
 
 class GoalGeneratorBot:
     def __init__(self, goal: str, num_goals: int = 10):
