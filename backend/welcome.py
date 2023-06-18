@@ -5,12 +5,21 @@ from flask_restx import Api, Resource, fields
 sys.path.insert(0, '../')
 sys.path.insert(0, '/app')
 from bot import ChatBot
+from langchain_m.langchain_module import TaskChatBot
 import app.app
 from app.app import Goal, Task
-from app.app import db
+from app.app import db, app_instance
+from flask_socketio import SocketIO, send, emit
+
+app = app_instance.app
+socketio = SocketIO(app)
+
 bot = ChatBot()
 
-app = app.app.app
+@socketio.on('message')
+def handle_message(data):
+    print('received message: ' + data)
+    send(data, broadcast=True)
 
 @app.route('/error/<string:error_message>')
 def error_page(error_message):
@@ -32,7 +41,6 @@ def role_selection():
     
 @app.route('/dashboard')
 def dashboard():
-    # Query the database for all Goals
     goals = Goal.query.all()
     return render_template('dashboard.html', goals=goals)
 
@@ -50,10 +58,13 @@ def goal_generation():
     finally:
         return render_template('generate_goals.html', goals=tasks, title=title)
 
-@app.route('/chat_ api', methods=['POST'])
-def chat_api():
+@app.route('/chat_api/<string:task_id>', methods=['POST'])
+def chat_api(task_id):
+    task = Task.query.filter_by(id=task_id).first()
+    goal = Goal.query.filter_by(id=task.goal_id).first()
     message = request.json['message']
-    response = chatbot_module.get_response(message) # TODO: Chatbot for subtasks
+    chat_bot = TaskChatBot(task, goal, [task.get_task() for task in task.subtasks])
+    response = chat_bot.get_response(message)
     return jsonify({'response': response})
 
 @app.route('/display_subtasks/<string:task_id>', methods=['GET'])
@@ -121,4 +132,4 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     if port is None:
         port = 5000
-    app.run(host='0.0.0.0', port=port)
+    socketio.run(app, host='0.0.0.0', port=port)

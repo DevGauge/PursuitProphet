@@ -6,8 +6,8 @@ halo==0.0.31
 langchain==0.0.190
 openai==0.27.2
 psycopg2
+flask-socketio
 SQLAlchemy==2.0.15
 termcolor==2.3.0
 tiktoken
 uwsgi
-
