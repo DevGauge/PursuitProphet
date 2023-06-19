@@ -12,7 +12,7 @@ from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMix
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
-from wtforms.validators import DataRequired, Length, Regexp, Email
+from wtforms.validators import DataRequired, Length, Regexp, email_validator, Email
 
 roles_users = db.Table('roles_users',
     db.Column('user_id', db.String(255), db.ForeignKey('user.id')),

@@ -1,4 +1,5 @@
 colorama
+email_validator
 Flask
 flask_migrate
 flask_restx
