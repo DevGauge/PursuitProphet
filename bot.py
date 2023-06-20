@@ -70,6 +70,7 @@ import threading
 # 3rd party imports
 from colorama import Fore, Style
 from termcolor import colored
+from dotenv import load_dotenv
 import halo
 import openai
 # Local imports
@@ -77,7 +78,7 @@ sys.path.insert(0, './langchain')
 from langchain_m.langchain_module import TaskGeneratorBot, GoalGeneratorBot, FilenameGeneratorBot
 from app.app import Goal, Task, db, app as flask_app
 from app.app import app_instance
-
+load_dotenv()
 class SingletonMeta(type):
     """Singleton metaclass. If instance already exists, it will be returned. Otherwise, a new instance will be created."""
     _instances = {}

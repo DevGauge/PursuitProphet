@@ -3,6 +3,7 @@ import os
 import uuid
 from flask import Flask
 from flask_migrate import Migrate
+from dotenv import load_dotenv
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -11,9 +12,10 @@ from .pp_logging.event_logger import EventLogger
 from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
+from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, Regexp, email_validator, Email
 
+load_dotenv()
 roles_users = db.Table('roles_users',
     db.Column('user_id', db.String(255), db.ForeignKey('user.id')),
     db.Column('role_id', db.String(255), db.ForeignKey('role.id')))
@@ -38,6 +40,24 @@ class RegistrationForm(FlaskForm):
                'Nicknames must have only letters, '
                'numbers, dots or underscores')
     ])
+
+    submit = SubmitField('Register')
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', [
+        DataRequired(),
+        Email(message='Invalid email'),
+        Length(max=254)
+    ])
+
+    password = PasswordField('Password', [
+        DataRequired(),
+        Length(min=12, max=64),
+        Regexp('^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).*$',
+               message="Password must have at least one lowercase letter, one uppercase letter, one number, and one special character")
+    ])
+
+    submit = SubmitField('Login')
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -208,6 +228,8 @@ class App:
 
     def create_app(self):
         flask_app = Flask(__name__)
+        flask_app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+        print('secret key: ', flask_app.config['SECRET_KEY'])
         DATABASE_URL = os.getenv("DATABASE_URL")
         if DATABASE_URL is None:
             DATABASE_URL = 'postgresql://kenny:password@localhost:5432/postgres'

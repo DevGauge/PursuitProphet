@@ -7,9 +7,12 @@ sys.path.insert(0, '/app')
 from bot import ChatBot
 from langchain_m.langchain_module import TaskChatBot
 import app.app
-from app.app import Goal, Task
+from app.app import Goal, Task, User 
+from app.app import LoginForm, RegistrationForm
 from app.app import db, app_instance
 from flask_socketio import SocketIO, send, emit
+from flask_security import roles_required, login_required
+import uuid
 
 app = app_instance.app
 socketio = SocketIO(app)
@@ -38,10 +41,42 @@ def role_selection():
     else:
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
         return render_template('role_selection.html', roles=roles)
+
+@app.route('/admin')
+@login_required
+@roles_required('admin')
+def admin_home():
+    return "Hello, Admin!"
+
+@app.route('/register', methods=['GET', 'POST'])
+def registration():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user = User(email=email, password=password)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('dashboard', user_id=user.id))
+    else:
+        return render_template('register.html', form=RegistrationForm())
     
-@app.route('/dashboard')
-def dashboard():
-    goals = Goal.query.all()
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')        
+        user = User.query.filter_by(email=email).first()
+        if user is None or not user.check_password(password):
+            return redirect(url_for('error_page', error_message='Invalid email or password'))
+        else:
+            return redirect(url_for('dashboard', user_id=user.id))
+    else:
+        return render_template('login.html', form=LoginForm())
+
+@login_required
+@app.route('/dashboard/<string:user_id>')
+def dashboard(user_id):
+    goals = Goal.query.filter_by(user_id=user_id).all()
     return render_template('dashboard.html', goals=goals)
 
 @app.route('/generate_goals', methods=['GET', 'POST'])
