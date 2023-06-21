@@ -25,23 +25,23 @@ class RegistrationForm(FlaskForm):
         DataRequired(),
         Email(message='Invalid email'),
         Length(max=254)
-    ])
+    ], render_kw={"placeholder": "Enter your email address"})
 
     password = PasswordField('Password', [
         DataRequired(),
         Length(min=12, max=64),
         Regexp('^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).*$',
                message="Password must have at least one lowercase letter, one uppercase letter, one number, and one special character")
-    ])
+    ], render_kw={"placeholder": "Enter your password"})
 
     username = StringField('Nickname (Optional)', [
         Length(min=4, max=20),
         Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
                'Nicknames must have only letters, '
                'numbers, dots or underscores')
-    ])
+    ], render_kw={"placeholder": "Enter your preferred name"})
 
-    submit = SubmitField('Register')
+    submit = SubmitField('Register', render_kw={"class": "standard-button"})
 
 class LoginForm(FlaskForm):
     email = StringField('Email', [
@@ -57,7 +57,7 @@ class LoginForm(FlaskForm):
                message="Password must have at least one lowercase letter, one uppercase letter, one number, and one special character")
     ])
 
-    submit = SubmitField('Login')
+    submit = SubmitField('Login', render_kw={"class": "standard-button"})
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.String(255), primary_key=True, default=lambda: str(uuid.uuid4()))

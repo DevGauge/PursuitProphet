@@ -1,12 +1,56 @@
+@font-face {
+  font-family: "Source Sans Pro";
+  src: url("/static/source-sans-pro.black.woff") format("woff");
+  font-weight: black;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  src: url("/static/source-sans-pro.bold.woff") format("woff");
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  src: url("/static/source-sans-pro.extralight.woff") format("woff");
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  src: url("/static/source-sans-pro.italic.woff") format("woff");
+  font-weight: normal;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  src: url("/static/source-sans-pro.light.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  src: url("/static/source-sans-pro.regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Source Sans Pro";
+  src: url("/static/source-sans-pro.semibold.woff") format("woff");
+  font-weight: 500;
+  font-style: italic;
+}
 body {
   background-color: #f0f0f0;
   color: #000000;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Source Sans Pro", sans-serif;
   margin: 0;
+  height: 100%;
 }
 
 .dashboard-container {
   display: flex;
+  height: 100vh;
 }
 
 .sidebar {
@@ -43,7 +87,8 @@ body {
 .main-panel .section {
   margin-bottom: 20px;
 }
-.main-panel .section .dream-icon, .main-panel .section .task-icon {
+.main-panel .section .dream-icon,
+.main-panel .section .task-icon {
   display: inline-block;
   margin-right: 10px;
 }
@@ -53,6 +98,89 @@ body {
   color: white;
   padding: 10px;
   border-radius: 5px;
+}
+
+.register-form-container,
+.login-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 0px;
+  margin: 0;
+}
+.register-form-container .register-form,
+.register-form-container .login-form,
+.login-form-container .register-form,
+.login-form-container .login-form {
+  display: flex;
+  flex-direction: column;
+  background-color: #333;
+  border-radius: 24px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0px;
+  padding: 16px;
+}
+.register-form-container .register-form label,
+.register-form-container .login-form label,
+.login-form-container .register-form label,
+.login-form-container .login-form label {
+  font-weight: 300;
+  font-size: 14px;
+}
+.register-form-container .register-form input,
+.register-form-container .login-form input,
+.login-form-container .register-form input,
+.login-form-container .login-form input {
+  border: 1px solid transparent;
+  background-color: #333;
+  height: 40px;
+  color: white;
+}
+.register-form-container .register-form input::placeholder,
+.register-form-container .login-form input::placeholder,
+.login-form-container .register-form input::placeholder,
+.login-form-container .login-form input::placeholder {
+  padding: 10px;
+}
+.register-form-container .register-form input:hover, .register-form-container .register-form input:focus, .register-form-container .register-form input:active,
+.register-form-container .login-form input:hover,
+.register-form-container .login-form input:focus,
+.register-form-container .login-form input:active,
+.login-form-container .register-form input:hover,
+.login-form-container .register-form input:focus,
+.login-form-container .register-form input:active,
+.login-form-container .login-form input:hover,
+.login-form-container .login-form input:focus,
+.login-form-container .login-form input:active {
+  outline: none;
+  border-color: #910FF1 #6826AA #910FF1;
+}
+.register-form-container .register-form input:-webkit-autofill, .register-form-container .register-form input:-webkit-autofill:focus,
+.register-form-container .login-form input:-webkit-autofill,
+.register-form-container .login-form input:-webkit-autofill:focus,
+.login-form-container .register-form input:-webkit-autofill,
+.login-form-container .register-form input:-webkit-autofill:focus,
+.login-form-container .login-form input:-webkit-autofill,
+.login-form-container .login-form input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #333 inset;
+  box-shadow: 0 0 0px 1000px #333 inset;
+  outline-color: transparent;
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+.register-form-container .register-form input:-moz-autofill,
+.register-form-container .login-form input:-moz-autofill,
+.login-form-container .register-form input:-moz-autofill,
+.login-form-container .login-form input:-moz-autofill {
+  box-shadow: 0 0 0px 1000px #333 inset;
+  outline: none;
+}
+.register-form-container .register-form input:-ms-autofill,
+.register-form-container .login-form input:-ms-autofill,
+.login-form-container .register-form input:-ms-autofill,
+.login-form-container .login-form input:-ms-autofill {
+  box-shadow: 0 0 0px 1000px #333 inset;
+  outline: none;
 }
 
 .welcome-screen {
@@ -106,17 +234,18 @@ h2.sub-heading {
   border-bottom: 2px solid #4A90E2;
 }
 
-.submit-button {
-  background-color: #FF9800;
-  background-image: linear-gradient(to bottom, #f7dfa5, #f0c14b);
-  border-color: #a88734 #9c7e31 #846a29;
-  color: #111; /* Amazon text color */
+.standard-button {
+  background-color: #910FF1;
+  background-image: linear-gradient(to bottom, #910FF1, #4C0D8C);
+  border-color: #910FF1 #6826AA #4C0D8C;
+  color: #fff;
+  border-radius: 24px;
   border: 1px solid;
   padding: 3px 11px;
   text-align: center;
   text-decoration: none;
   font-size: 15px;
-  border-radius: 3px;
+  border-radius: 24px;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset;
   cursor: pointer;
   transition: border-color 0.3s ease-in-out;
@@ -124,8 +253,12 @@ h2.sub-heading {
   padding: 6px 12px;
   width: 100%;
 }
-.submit-button:hover, .submit-button:focus {
-  border-color: #673AB7;
+
+button.submit-button {
+  background-color: #FF9800;
+  background-image: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+  border-color: #a88734 #9c7e31 #846a29;
+  color: #111;
 }
 
 .card-container {
@@ -224,13 +357,12 @@ h2.sub-heading {
 }
 .role-card:hover {
   transform: translateY(-10px);
-  border: 4px solid #673AB7;
-  box-shadow: 0 0 20px #673AB7;
+  border: 4px solid #910FF1;
+  box-shadow: 0 0 20px #910FF1;
 }
 .role-card:active, .role-card.active {
   transform: translateY(-5px);
-  background-color: #673AB7;
-  box-shadow: 0 0 20px #673AB7;
+  background-color: #910FF1;
 }
 
 .text-container {
@@ -243,10 +375,6 @@ h2.sub-heading {
 
 .text-container:focus-within {
   width: 100%;
-}
-
-form {
-  width: 20%;
 }
 
 .text-center {
@@ -344,13 +472,13 @@ form {
 }
 .goal-card:hover {
   transform: translateY(-10px);
-  border: 4px solid #673AB7;
-  box-shadow: 0 0 20px #673AB7;
+  border: 4px solid #910FF1;
+  box-shadow: 0 0 20px #910FF1;
 }
 .goal-card:active, .goal-card.active {
   transform: translateY(-5px);
-  background-color: #673AB7;
-  box-shadow: 0 0 20px #673AB7;
+  background-color: #910FF1;
+  box-shadow: 0 0 20px #910FF1;
 }
 
 .introduction-text {
@@ -441,7 +569,8 @@ form {
     flex-direction: column;
   }
   .subtask-center-panel {
-    order: 1; /* Move the message panel below subtasks */
+    order: 1;
+    /* Move the message panel below subtasks */
   }
   /* error page */
   .error-container {

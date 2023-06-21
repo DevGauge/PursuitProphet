@@ -1,17 +1,19 @@
-{% extends 'base.html' %}
-{% block content %}
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <p>
-        {{ form.email.label }}<br>
-        {{ form.email(size=32) }}
-    </p>
-    <p>
-        {{ form.password.label }}<br>
-        {{ form.password(size=32) }}
-    </p>
-    <p>{{ form.submit() }}</p>
-</form>
+{% extends 'dashboard.html' %}
+{% block main %}
+<div class="login-form-container">
+    <form method="POST", class="login-form">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=32) }}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+</div>
 {% endblock %}
 {% block scripts %}
 {% endblock %}

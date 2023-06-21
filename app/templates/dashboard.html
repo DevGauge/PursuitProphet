@@ -19,21 +19,7 @@
                 <div class="dropdown-icon">Dropdown Icon</div>
             </div>
         </div>
-        <!-- Dreams section -->
-        {% for goal in goals %}
-        <div class="section">
-            <!-- Display goal -->
-            <div class="dream-icon">Placeholder</div>
-            <div class="dream-text">{{ goal.goal }}</div>
-
-            <!-- Display tasks related to the goal
-            <h3>Tasks in progress</h3>
-            {% for task in goal.tasks %}
-            <div class="task-icon">{{ task.icon }}</div>
-            <button class="task-button">{{ task.task }}</button>
-            {% endfor %} -->
-        </div>
-        {% endfor %}
+        {% block main %}{% endblock %}
     </div>
 </div>
 {% endblock %}

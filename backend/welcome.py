@@ -77,7 +77,7 @@ def login():
 @app.route('/dashboard/<string:user_id>')
 def dashboard(user_id):
     goals = Goal.query.filter_by(user_id=user_id).all()
-    return render_template('dashboard.html', goals=goals)
+    return render_template('dream-home.html', goals=goals)
 
 @app.route('/generate_goals', methods=['GET', 'POST'])
 def goal_generation():
