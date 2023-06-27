@@ -42,8 +42,12 @@ class DBLogger(logging.Handler):
     def log(self, message, level='INFO'):
         """Logs a message with a given level."""
         log_entry = Log(level=level, message=message)
-        self.db.session.add(log_entry)
-        self.db.session.commit()
+        try:
+            self.db.session.add(log_entry)
+            self.db.session.commit()
+        except Exception as error:
+            print(f'Error: {error}')
+            self.db.session.rollback()
 
 # Example usage:
 # from flask_sqlalchemy import SQLAlchemy

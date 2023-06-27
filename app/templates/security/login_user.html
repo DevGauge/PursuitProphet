@@ -1,0 +1,30 @@
+{% extends "dashboard.html" %}
+
+{% block head %}
+{{ super() }}
+{{ login_user_form.javascript() }}
+{% endblock %}
+
+{% block main %}
+<div class="login-form-container">
+  <form class="login-form" method="POST" action="{{ url_for_security('login') }}">
+    {{ login_user_form.hidden_tag() }}
+
+    {{ login_user_form.email.label }}<br>
+    {{ login_user_form.email(size=32, placeholder="name@example.com") }}
+    {% for error in login_user_form.email.errors %}
+        <span class="form-error">{{ error }}</span>
+    {% endfor %}
+    <br>
+
+    {{ login_user_form.password.label }}<br>
+    {{ login_user_form.password(size=32, placeholder="Enter your desired password") }}
+    {% for error in login_user_form.password.errors %}
+        <span class="form-error">{{ error }}</span>
+    {% endfor %}
+    <br>
+
+    {{ login_user_form.submit(class="standard-button") }}
+  </form>
+</div>
+{% endblock %}

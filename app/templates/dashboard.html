@@ -3,11 +3,18 @@
 <div class="dashboard-container">
     <div class="sidebar">
         <!-- Sidebar with navigation icons -->
-        <div class="nav-icon">Home</div>
-        <div class="nav-icon">Tasks</div>
+        {% if current_user.is_authenticated %}
+        <a class="nav-link" href="/">Home</a>
+        <!-- <div class="nav-icon">Tasks</div> -->
+        {% else %}
+        <a class="nav-link" href="/demo">Demo</a>
+        <a class="nav-link" href="{{ url_for_security('login') }}">Login</a>
+        <a class="nav-link" href="{{ url_for_security('register') }}">Register</a>
+        {% endif %}
     </div>
     <div class="main-panel">
         <!-- Header section -->
+        {% if current_user.is_authenticated %}
         <div class="header">
             <div class="search-container">
                 <input type="text" placeholder="Search Tasks">
@@ -17,8 +24,11 @@
                 <div class="profile-icon">Profile Icon</div>
                 <div class="notification-icon">Notification Icon</div>
                 <div class="dropdown-icon">Dropdown Icon</div>
+                <a class="nav-link" href="{{ url_for_security('logout') }}">Logout</a>
             </div>
         </div>
+        {% endif %}
+        
         {% block main %}{% endblock %}
     </div>
 </div>

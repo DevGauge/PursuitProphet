@@ -1,6 +1,8 @@
+bcrypt
 colorama
 email_validator
 Flask
+Flask-Mail
 flask_migrate
 flask_restx
 Flask-Security
@@ -16,4 +18,3 @@ termcolor
 tiktoken
 wtforms
 uwsgi
-

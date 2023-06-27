@@ -78,6 +78,8 @@ sys.path.insert(0, './langchain')
 from langchain_m.langchain_module import TaskGeneratorBot, GoalGeneratorBot, FilenameGeneratorBot
 from app.app import Goal, Task, db, app as flask_app
 from app.app import app_instance
+from sqlalchemy.exc import SQLAlchemyError
+
 load_dotenv()
 class SingletonMeta(type):
     """Singleton metaclass. If instance already exists, it will be returned. Otherwise, a new instance will be created."""
@@ -116,12 +118,20 @@ class ChatBot:
             # self.goal_manager.handle_user_task_interaction()
         self.goal_manager.save_goals_to_disk_in_json()
 
-    def set_primary_goal(self, user_input):
-        primary_goal = Goal(user_input)
+    def set_primary_goal(self, user_input, user = None):
+        if user:
+            primary_goal = Goal(user_input, user)
+        else:
+            primary_goal = Goal(user_input)
         # self.io_manager.primary_goal = primary_goal
-        db.session.add(primary_goal)
-        db.session.commit()
-        return primary_goal.id
+        try:
+            db.session.add(primary_goal)
+            db.session.commit()
+            return primary_goal.id
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            raise e
 
     def display_welcome_message(self):
         """Display the welcome message"""        
@@ -204,7 +214,7 @@ class GoalManager:
         else:
             self.io_manager.assistant_message(f"Okay, we'll keep working on {item}.")
 
-    def generate_subtasks(self, task: Task):
+    def generate_subtasks(self, task: Task, user = None):
         """Assist the user with a goal"""
         print(f'GoalManager generating subtasks for task {task.get_task()}')
         goal = Goal.query.filter_by(id=task.goal_id).first()
@@ -218,10 +228,17 @@ class GoalManager:
         subtasks = text.split('\n')  # Split the response into subtasks
         # create a task object for each subtask
         subtasks = [Task(subtask, task.goal_id, task.id) for subtask in subtasks]
+        errors = [] # TODO handle errors thrown while saving subtasks
         for subtask in subtasks:
-            db.session.add(subtask)
-        db.session.commit()
-        app_instance.logger.log_event('add_subtask', {'subtask': subtask})
+            try:
+                db.session.add(subtask)
+                db.session.commit()
+            except SQLAlchemyError as err:
+                db.session.rollback()
+                app_instance.logger.log_event('ERR_add_subtask', {'Error encountered while saving': subtask.get_task(), 'Error': err, 'traceback': err.with_traceback()})
+                errors.append(err)
+                
+            app_instance.logger.log_event('add_subtask', {'subtask': subtask})
         return subtasks
     
     def  ask_if_user_wants_to_work_on_task(self):
@@ -311,9 +328,15 @@ class GoalManager:
         tasks = [task.strip() for task in tasks]
         tasks = [Task(task, goal_id) for task in tasks]
         print(f'goals: {[task.goal_id for task in tasks]}')
+        errors = [] #TODO handle errors thrown while generating tasks
         for goal in tasks:
-            db.session.add(goal)
-            db.session.commit()
+            try:
+                db.session.add(goal)
+                db.session.commit()
+            except SQLAlchemyError as err:
+                db.session.rollback()
+                app_instance.logger.log_event('ERR_add_goal', {'Error encountered while saving': goal.get_task(), 'Error': err, 'traceback': err.with_traceback()})
+                errors.append(err)
 
     def save_goals_to_disk_in_json(self):
         """Save the goals to disk in JSON format."""

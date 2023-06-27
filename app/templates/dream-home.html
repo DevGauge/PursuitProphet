@@ -1,12 +1,9 @@
 {% extends 'dashboard.html' %}
 {% block main %}
-<!-- Dreams section -->
 {% for goal in goals %}
 <div class="section">
-    <!-- Display goal -->
     <div class="dream-icon">Placeholder</div>
     <div class="dream-text">{{ goal.goal }}</div>
-
     <!-- Display tasks related to the goal
     <h3>Tasks in progress</h3>
     {% for task in goal.tasks %}

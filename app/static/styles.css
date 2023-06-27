@@ -1,45 +1,62 @@
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("/static/source-sans-pro.black.woff") format("woff");
+  src: url("/static/Fonts/source-sans-pro.black.woff") format("woff");
   font-weight: black;
   font-style: normal;
 }
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("/static/source-sans-pro.bold.woff") format("woff");
+  src: url("/static/Fonts/source-sans-pro.bold.woff") format("woff");
   font-weight: bold;
   font-style: normal;
 }
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("/static/source-sans-pro.extralight.woff") format("woff");
+  src: url("/static/Fonts/source-sans-pro.extralight.woff") format("woff");
   font-weight: 200;
   font-style: normal;
 }
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("/static/source-sans-pro.italic.woff") format("woff");
+  src: url("/static/Fonts/source-sans-pro.italic.woff") format("woff");
   font-weight: normal;
   font-style: italic;
 }
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("/static/source-sans-pro.light.woff") format("woff");
+  src: url("/static/Fonts/source-sans-pro.light.woff") format("woff");
   font-weight: 300;
   font-style: normal;
 }
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("/static/source-sans-pro.regular.woff") format("woff");
+  src: url("/static/Fonts/source-sans-pro.regular.woff") format("woff");
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: "Source Sans Pro";
-  src: url("/static/source-sans-pro.semibold.woff") format("woff");
+  src: url("/static/Fonts/source-sans-pro.semibold.woff") format("woff");
   font-weight: 500;
   font-style: italic;
 }
+.nav-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: text;
+  padding: 10px;
+}
+.nav-link:visited {
+  color: inherit;
+}
+.nav-link:hover, .nav-link:active, .nav-link:focus {
+  background-image: linear-gradient(to bottom, #910FF1, #4C0D8C);
+  text-align: center;
+  border: 1px solid #910FF1;
+  cursor: pointer;
+  border-radius: 24px;
+}
+
 body {
   background-color: #f0f0f0;
   color: #000000;
@@ -54,6 +71,8 @@ body {
 }
 
 .sidebar {
+  display: flex;
+  flex-direction: column;
   width: 120px;
   background-color: #333;
   color: #fff;
@@ -109,6 +128,18 @@ body {
   padding: 0px;
   margin: 0;
 }
+.register-form-container .email-input input[type=text],
+.login-form-container .email-input input[type=text] {
+  padding: 10px;
+  position: relative;
+}
+.register-form-container .email-input i,
+.login-form-container .email-input i {
+  position: absolute;
+  z-index: 9999;
+  height: 10px;
+  line-height: 2;
+}
 .register-form-container .register-form,
 .register-form-container .login-form,
 .login-form-container .register-form,
@@ -136,6 +167,7 @@ body {
   background-color: #333;
   height: 40px;
   color: white;
+  font-size: 14px;
 }
 .register-form-container .register-form input::placeholder,
 .register-form-container .login-form input::placeholder,
@@ -601,6 +633,34 @@ button.submit-button {
   .error-container a:hover {
     background-color: #0056b3;
   }
+}
+/* form errors */
+.register-form-container .register-form .form-error,
+.register-form-container .login-form .form-error {
+  display: inline-block;
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Thank you email */
+.email-links {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 20px;
+  flex: 1;
+  justify-content: space-evenly;
+}
+.email-links a {
+  padding: 10px 20px;
+  color: #fff;
+  background-color: #007bff;
+  border-radius: 4px;
+  text-decoration: none;
+}
+.email-links a:hover {
+  background-color: #0056b3;
 }
 
 /*# sourceMappingURL=styles.css.map */

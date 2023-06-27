@@ -1,50 +1,73 @@
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('/static/source-sans-pro.black.woff') format('woff');
+    src: url('/static/Fonts/source-sans-pro.black.woff') format('woff');
     font-weight: black;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('/static/source-sans-pro.bold.woff') format('woff');
+    src: url('/static/Fonts/source-sans-pro.bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('/static/source-sans-pro.extralight.woff') format('woff');
+    src: url('/static/Fonts/source-sans-pro.extralight.woff') format('woff');
     font-weight: 200;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('/static/source-sans-pro.italic.woff') format('woff');
+    src: url('/static/Fonts/source-sans-pro.italic.woff') format('woff');
     font-weight: normal;
     font-style: italic;
 }
 
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('/static/source-sans-pro.light.woff') format('woff');
+    src: url('/static/Fonts/source-sans-pro.light.woff') format('woff');
     font-weight: 300;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('/static/source-sans-pro.regular.woff') format('woff');
+    src: url('/static/Fonts/source-sans-pro.regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Source Sans Pro';
-    src: url('/static/source-sans-pro.semibold.woff') format('woff');
+    src: url('/static/Fonts/source-sans-pro.semibold.woff') format('woff');
     font-weight: 500;
     font-style: italic;
+}
+
+.nav-link {
+    text-decoration: none; // Remove underline
+    color: inherit; // Use the inherited color
+    cursor: text; // Change cursor to text
+    padding: 10px;
+
+    &:visited {
+        color: inherit; // Use the inherited color for visited links
+    }
+
+    &:hover,
+    &:active,
+    &:focus {
+        // Add additional styling for hover, active, and focus states
+        // For example, you can change the background color or add a border
+        background-image: linear-gradient(to bottom, #910FF1, #4C0D8C);
+        text-align: center;
+        border: 1px solid #910FF1;
+        cursor: pointer;
+        border-radius: 24px;
+    }
 }
 
 body {
@@ -62,6 +85,8 @@ body {
 }
 
 .sidebar {
+    display: flex;
+    flex-direction: column;
     width: 120px;
     background-color: #333;
     color: #fff;
@@ -146,6 +171,7 @@ body {
             background-color: #333;
             height: 40px;
             color: white;
+            font-size: 14px;
 
             &::placeholder {
                 padding: 10px;
@@ -157,6 +183,7 @@ body {
                 outline: none;
                 border-color: #910FF1 #6826AA #910FF1;
             }
+
             // replace autofill background color with transparency
             &:-webkit-autofill,
             &:-webkit-autofill:focus {
@@ -165,10 +192,12 @@ body {
                 outline-color: transparent;
                 transition: background-color 600000s 0s, color 600000s 0s;
             }
+
             &:-moz-autofill {
                 box-shadow: 0 0 0px 1000px #333 inset;
                 outline: none;
             }
+
             &:-ms-autofill {
                 box-shadow: 0 0 0px 1000px #333 inset;
                 outline: none;
@@ -636,6 +665,42 @@ button.submit-button {
     }
 
     .error-container a:hover {
+        background-color: #0056b3;
+    }
+}
+
+/* form errors */
+.register-form-container {
+
+    .register-form,
+    .login-form {
+        .form-error {
+            display: inline-block;
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    }
+}
+
+/* Thank you email */
+.email-links {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 20px;
+    flex: 1;
+    justify-content: space-evenly;
+
+    a {
+        padding: 10px 20px;
+        color: #fff;
+        background-color: #007bff;
+        border-radius: 4px;
+        text-decoration: none;
+    }
+
+    a:hover {
         background-color: #0056b3;
     }
 }

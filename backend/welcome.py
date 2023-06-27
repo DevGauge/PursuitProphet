@@ -11,13 +11,18 @@ from app.app import Goal, Task, User
 from app.app import LoginForm, RegistrationForm
 from app.app import db, app_instance
 from flask_socketio import SocketIO, send, emit
-from flask_security import roles_required, login_required
+from flask_security import roles_required, login_required, login_user, current_user
+from flask_security.confirmable import confirm_user, confirm_email_token_status
 import uuid
 
 app = app_instance.app
 socketio = SocketIO(app)
 
 bot = ChatBot()
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
 
 @socketio.on('message')
 def handle_message(data):
@@ -32,7 +37,7 @@ def error_page(error_message):
 def handle_500(error):
     return redirect(url_for('error_page', error_message=str(error)))
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/demo', methods=['GET', 'POST'])
 def role_selection():
     if request.method == 'POST':
         role = request.form.get('role')
@@ -48,36 +53,34 @@ def role_selection():
 def admin_home():
     return "Hello, Admin!"
 
-@app.route('/register', methods=['GET', 'POST'])
-def registration():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        user = User(email=email, password=password)
-        db.session.add(user)
-        db.session.commit()
-        return redirect(url_for('dashboard', user_id=user.id))
-    else:
-        return render_template('register.html', form=RegistrationForm())
+@app.route('/thank_you')
+def thank_you():
+    return render_template('thank_you.html')
+
+@app.route('/confirm/<token>')
+def confirm_email(token):
+    # Check the token status first
+    expired, invalid, user = confirm_email_token_status(token)
     
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')        
-        user = User.query.filter_by(email=email).first()
-        if user is None or not user.check_password(password):
-            return redirect(url_for('error_page', error_message='Invalid email or password'))
-        else:
-            return redirect(url_for('dashboard', user_id=user.id))
-    else:
-        return render_template('login.html', form=LoginForm())
+    if not expired and not invalid:
+        # confirm the user
+        if confirm_user(token):
+            # if successful, log the user in
+            login_user(user)
+            return redirect(url_for('/'))
+    return 'The confirmation link is invalid or has expired.'
 
 @login_required
-@app.route('/dashboard/<string:user_id>')
-def dashboard(user_id):
-    goals = Goal.query.filter_by(user_id=user_id).all()
-    return render_template('dream-home.html', goals=goals)
+@app.route('/')
+def dashboard():
+    if current_user.is_authenticated:
+        user_id = current_user.id
+        user = app_instance.user_datastore.find_user(id=user_id)
+        if user is not None:
+            goals = Goal.query.filter_by(user_id=user_id).all()
+            return render_template('dream-home.html', goals=goals)
+        
+    return redirect(url_for('security.login'))
 
 @app.route('/generate_goals', methods=['GET', 'POST'])
 def goal_generation():
@@ -87,11 +90,10 @@ def goal_generation():
     try:
         bot.generate_goals(goal)
         tasks = Task.query.filter_by(goal_id=goal_id).all()
+        return render_template('generate_goals.html', goals=tasks, title=title)
     except Exception as e:
         print(e)
-        return redirect(url_for('error_page', error_message=str(e)))
-    finally:
-        return render_template('generate_goals.html', goals=tasks, title=title)
+        return redirect(url_for('error_page', error_message=str(e)))        
 
 @app.route('/chat_api/<string:task_id>', methods=['POST'])
 def chat_api(task_id):
@@ -124,12 +126,7 @@ def generate_subtasks():
     subtasks = Task.query.filter_by(parent_id=task_id).all()
     # convert subtasks to json
     subtasks_json = [subtask.to_dict() for subtask in subtasks]
-    
-    # Convert the subtasks to a format that can be sent as JSON.
-    # This might not be necessary if your subtasks are already in a suitable format.
-    # subtasks_json = [subtask.to_dict() for subtask in subtasks]
-    
-    # Send the subtasks back to the client.
+
     return jsonify(subtasks=subtasks_json)
 
 #region API    

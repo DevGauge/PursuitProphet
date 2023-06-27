@@ -29,13 +29,15 @@ class TokenHandler:
 
 
 class ConversationSummarizer:
-    def __init__(self):
+    def __init__(self, memory: ConversationSummaryBufferMemory = None):
         summarization_model = ModelFactory().summarizer()
+        if memory is None:
+            memory = ConversationSummaryBufferMemory(
+                llm=summarization_model, max_token_limit=4000
+            )
         self.conversation = ConversationChain(
             llm=summarization_model,
-            memory=ConversationSummaryBufferMemory(
-                llm=summarization_model, max_token_limit=4000
-            ),
+            memory=memory
         )
 
     def summarize(self, prompt):
@@ -54,6 +56,9 @@ class ModelFactory:
     # region private methods
     def _creative_gpt3(self):
         return ChatOpenAI(model_name=self._gpt_3_5_turbo, temperature=0.8)
+    
+    def _creative_gpt3_16k(self):
+        return ChatOpenAI(model_name=self._gpt_3_5_turbo_16k, temperature=0.8)
 
     def _strict_gpt3(self):
         return ChatOpenAI(model_name=self._gpt_3_5_turbo, temperature=0.2)
