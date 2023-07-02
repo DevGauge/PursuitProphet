@@ -1,6 +1,6 @@
 {% extends "dashboard.html" %}
 {% block main %}
-<div class="loading">Loading...</div>
+<div class="loading light-spinner">Loading...</div>
 <div class='subtask-container' id='subtask-container' data-task-id="{{ task.id }}">
     <div class='subtask-panel subtask-left-panel'>
         <h2><span class='highlight-text'>{{ goal.get_goal() }}</span></h2>
@@ -21,7 +21,7 @@
         </div>
     </div>
     <div class='subtask-panel subtask-center-panel'>
-        <div id='chat-box' class='chat-area'>
+        <div id='subtask-chat-box' class='subtask-chat-area'>
             <!-- Chat messages will be displayed here -->
         </div>
         <div class='subtask-chat-input'>
@@ -36,5 +36,7 @@
 <script>
     var Scrollbar = window.Scrollbar;
     Scrollbar.init(document.querySelector('#subtasks'));
+    Scrollbar = window.Scrollbar;
+    Scrollbar.init(document.querySelector('#subtask-chat-box'));
 </script>
 {% endblock %}

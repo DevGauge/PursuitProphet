@@ -16,7 +16,7 @@ function send_message() {
     var userInput = document.getElementById('user-message-input')
     var userMessage = userInput.value;
     userInput.value = '';
-    var chatArea = document.getElementById('chat-box');
+    var chatArea = document.getElementById('subtask-chat-box');
     
     var loading = document.querySelector('.loading');
     loading.style.display = 'block';
