@@ -18,6 +18,9 @@ function send_message() {
     userInput.value = '';
     var chatArea = document.getElementById('chat-box');
     
+    var loading = document.querySelector('.loading');
+    loading.style.display = 'block';
+    
     var userMessageElement = document.createElement('p');
     userMessageElement.className = 'user_message';
     userMessageElement.innerHTML = userMessage;
@@ -30,6 +33,7 @@ function send_message() {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onload = function() {
         if (this.status == 200) {
+            loading.style.display = 'none';
             // Display the chatbot's response on the page
             var chatbotResponse = JSON.parse(this.responseText).response;  // TODO: Model after response from langchain
             chatbotResponse = chatbotResponse.replace(/\n/g, '<br>');

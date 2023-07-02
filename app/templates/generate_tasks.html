@@ -1,5 +1,6 @@
 {% extends "dashboard.html" %}
 {% block main %}
+<div class="loading">Loading...</div>
 <div class='subtask-container' id='subtask-container' data-task-id="{{ task.id }}">
     <div class='subtask-panel subtask-left-panel'>
         <h2><span class='highlight-text'>{{ goal.get_goal() }}</span></h2>
