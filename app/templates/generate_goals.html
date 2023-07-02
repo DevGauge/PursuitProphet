@@ -3,9 +3,9 @@
 {% extends "dashboard.html" %}
 {% block main %}
 <div class="loading dark-spinner">Loading...</div>
-<h1><spacn class='highlight-text'>{{ title  }}</spacn></h1>
-<div class="subtasks", id="subtasks">
-    <ul>
+<div class="goal-container">
+    <h1><span class='highlight-text'>{{ title }}</span></h1>
+    <div class="subtasks" , id="subtasks">
         {% for goal in goals %}
         <div class="goal-card" data-task-id="{{ goal.id }}">
             <div class="checkbox-container">
@@ -18,41 +18,46 @@
             </div>
         </div>
         {% endfor %}
-        <script>
-            // add click listeners to each goal card in order to chat with ChatGPT about the task and generate subtasks
-            document.querySelectorAll('.goal-card').forEach(function(goalCard) {
-                goalCard.addEventListener('click', function() {
-                    var taskId = goalCard.getAttribute('data-task-id');
-
-                    fetch('/generate_subtasks', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            'task_id': taskId,
-                        }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // once the subtasks are generated, redirect to the new page
-                        window.location.href = `/display_subtasks/${taskId}`;
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                    });
-                });
-                document.addEventListener('DOMContentLoaded', function() {
-                    var loading = document.querySelector('.loading');
-
-                    goalCard.addEventListener('click', function() {
-                        loading.style.display = 'block';
-                    });
-                });
-            });
-            
-
-        </script>
-    </ul>
+    </div>
 </div>
 {% endblock %}
+{% block scripts %}
+<script>
+    var Scrollbar = window.Scrollbar;
+    Scrollbar.init(document.querySelector('#subtasks'));
+</script>
+<script>
+    // add click listeners to each goal card in order to chat with ChatGPT about the task and generate subtasks
+    document.querySelectorAll('.goal-card').forEach(function (goalCard) {
+        goalCard.addEventListener('click', function () {
+            var taskId = goalCard.getAttribute('data-task-id');
+
+            fetch('/generate_subtasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    'task_id': taskId,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // once the subtasks are generated, redirect to the new page
+                    window.location.href = `/display_subtasks/${taskId}`;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            var loading = document.querySelector('.loading');
+
+            goalCard.addEventListener('click', function () {
+                loading.style.display = 'block';
+            });
+        });
+    });
+</script>
+{% endblock %}
+```

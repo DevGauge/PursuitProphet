@@ -121,6 +121,10 @@ body {
   box-sizing: border-box;
 }
 
+.container.mt-5 {
+  width: 100%;
+}
+
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -512,6 +516,13 @@ button.submit-button {
   height: 100%;
   border-color: #800080;
   outline: none;
+}
+
+.goal-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
 }
 
 .goal-card {
