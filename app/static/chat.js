@@ -13,7 +13,9 @@
 // });
 
 function send_message() {
-    var userMessage = document.getElementById('user-message-input').value;
+    var userInput = document.getElementById('user-message-input')
+    var userMessage = userInput.value;
+    userInput.value = '';
     var chatArea = document.getElementById('chat-box');
     
     var userMessageElement = document.createElement('p');
