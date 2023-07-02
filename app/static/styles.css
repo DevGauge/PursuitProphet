@@ -118,6 +118,7 @@ body {
 .dashboard-container {
   display: flex;
   height: 100vh;
+  box-sizing: border-box;
 }
 
 .sidebar {
@@ -133,10 +134,13 @@ body {
 }
 
 .main-panel {
+  display: flex;
+  height: 100vh;
   flex-grow: 1;
   background-color: black;
   color: white;
   padding: 20px;
+  box-sizing: border-box;
 }
 .main-panel .header {
   display: flex;
@@ -579,16 +583,18 @@ button.submit-button {
 /* Subtask Generation */
 .subtask-container {
   display: flex;
-  height: 100vh;
+  height: 100%;
+  width: 40%;
 }
 
 .subtask-panel {
   padding-left: 10px;
+  padding-right: 10px;
   border: 1px solid #ccc;
 }
 
 .subtask-left-panel {
-  width: 40%;
+  height: 100%;
 }
 
 .subtasks {
@@ -606,12 +612,8 @@ button.submit-button {
   margin-bottom: 0;
 }
 
-.right-panel {
-  width: 0%;
-}
-
-.subtask-center-panel {
-  height: 100vh;
+.subtask-chat-panel {
+  height: 100%;
   width: 60%;
   display: flex;
   flex-direction: column;
@@ -621,7 +623,6 @@ button.submit-button {
 .subtask-chat-area {
   flex-grow: 1;
   overflow-y: auto;
-  border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 10px;
   height: calc(100% - 60px);
@@ -630,7 +631,7 @@ button.submit-button {
 
 .subtask-chat-input {
   display: flex;
-  height: 100px;
+  height: 75px;
 }
 
 .subtask-chat-input input {
@@ -662,13 +663,13 @@ button.submit-button {
   .subtask-left-panel {
     width: 93%;
   }
-  .subtask-center-panel {
+  .subtask-chat-panel {
     width: 93%;
   }
   .subtask-container {
     flex-direction: column;
   }
-  .subtask-center-panel {
+  .subtask-chat-panel {
     order: 1;
     /* Move the message panel below subtasks */
   }
