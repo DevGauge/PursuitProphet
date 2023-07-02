@@ -19,14 +19,12 @@ class TokenHandler:
         try:
             with get_openai_callback() as cb:
                 result = self.llm_chain.run(message)
-                print(self.llm_chain.memory)
-                print(result)
+                print("memory: ", self.llm_chain.memory)
+                print("chat result: ", result)
                 print(f"Spent a total of {cb.total_tokens} tokens")
+                return result
         except Exception as e:
             raise e
-        finally:
-            return result
-
 
 class ConversationSummarizer:
     def __init__(self, memory: ConversationSummaryBufferMemory = None):

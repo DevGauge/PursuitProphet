@@ -25,7 +25,7 @@ function send_message() {
         if (this.status == 200) {
             // Display the chatbot's response on the page
             var chatbotResponse = JSON.parse(this.responseText).response;  // TODO: Model after response from langchain
-            chatArea.innerHTML += "<img src='/static/favicon-32x32.png'></img>" + " <p class='bot_message'>" + chatbotResponse + '</p>';
+            chatArea.innerHTML += "<img src='/static/favicon-32x32.png'></img>" + " <p class='bot_message'>" + chatbotResponse.replace(/\n/g, '<br>') + '</p>';
         }
     };
     xhr.send(JSON.stringify({'message': userMessage}));

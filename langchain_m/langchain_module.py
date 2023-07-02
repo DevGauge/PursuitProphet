@@ -384,20 +384,17 @@ class TaskChatBot:
 
     def get_response(self, message: str):
         prompt_template = self.create_prompt_template()
-        print(f"prompt template is {prompt_template}")
         few_shot_template = prompt_template.few_shot_prompt_template()
-        print(f"few shot template is {few_shot_template}")
         return self.conversationSummarizer.summarize(few_shot_template.format(query=message))
     
     def create_prompt_template(self):
         preamble="Imagine three different experts are answering {query}."
         prefix=f"""{preamble}. If any expert requires the user's input, they will ask the user and await the user's input before sharing their 
         opinion. Do not generate the user's response, ask for it instead. All experts will write down 1 step of their thinking, then share it with the group. 
-        Then all experts will go on to the next step until the user's problem is solved. 
-        If any expert realises they're wrong at any point then they leave. 
+        Then all experts will go on to the next step until the user's problem is solved.
         You are a helpful assistant that helps users fulfill their dreams. In this context, you are assisting user with {self.task.get_task()} 
         in context of {self.goal.get_goal()}. You should only help the user with {self.task.get_task()} and {self.goal.get_goal()}. Simulate a conversation amongst 
-        experts, only asking the user for input when required. Give the user sample solutions and implementations when possible and
+        experts, always asking the user for input when required. Give the user sample solutions and implementations when possible and
         appropriate. If you think of supporting tasks the user can perform, check { self.existing_tasks } and do not repeat. If the 
         task exists, simply remind the user they have that task to perform later and  you will be happy to assist them with it at that time.
         """.replace('\n', ' ')
