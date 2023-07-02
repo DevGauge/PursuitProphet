@@ -607,14 +607,15 @@ button.submit-button {
     }
 
     &:hover {
-        transform: translateY(-10px);
+        // transform: translateY(-10px);
+        height: 100%;
         border: 4px solid #910FF1;
         box-shadow: 0 0 20px #910FF1;
     }
 
     &:active,
     &.active {
-        transform: translateY(-5px);
+        // transform: translateY(-5px);
         background-color: #910FF1;
         box-shadow: 0 0 20px #910FF1;
     }
