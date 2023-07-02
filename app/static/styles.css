@@ -227,10 +227,8 @@ body {
 
 .main-panel-content {
   display: flex;
-  flex-direction: column;
   flex-grow: 1;
-  overflow-y: auto;
-  padding: 20px;
+  overflow-y: inherit;
   box-sizing: border-box;
 }
 
@@ -660,11 +658,11 @@ button.submit-button {
   padding: 10px;
 }
 
-.subtask-chat-input button {
+.subtask-chat-input .standard-button {
   padding: 10px;
-  background-color: #007BFF;
-  color: white;
   border: none;
+  width: 75px;
+  height: 75px;
 }
 
 .bot_message {

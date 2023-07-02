@@ -1,16 +1,13 @@
 {% extends 'dashboard.html' %}
 {% block main %}
 {% for goal in goals %}
-<div class="section">
-    <div class="dream-icon">Placeholder</div>
-    <div class="role-card">{{ goal.goal }}</div>
-    <!-- Display tasks related to the goal
+<div class="goal-card">{{ goal.goal }}</div>
+<!-- Display tasks related to the goal
     <h3>Tasks in progress</h3>
     {% for task in goal.tasks %}
     <div class="task-icon">{{ task.icon }}</div>
     <button class="task-button">{{ task.task }}</button>
     {% endfor %} -->
-</div>
 {% endfor %}
 {% block extended_content %}{% endblock %}
 <a href="{{ url_for('new_dream') }}">
