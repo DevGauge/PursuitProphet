@@ -225,6 +225,15 @@ body {
   width: 45%;
 }
 
+.main-panel-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
 .register-form-container,
 .login-form-container {
   display: flex;
