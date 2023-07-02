@@ -13,9 +13,14 @@
 // });
 
 function send_message() {
-    var userMessage = document.getElementById('message-input').value;
+    var userMessage = document.getElementById('user-message-input').value;
     var chatArea = document.getElementById('chat-box');
-    chatArea.innerHTML += "<p class='user_message'>" + userMessage + '</p>';
+    
+    var userMessageElement = document.createElement('p');
+    userMessageElement.className = 'user_message';
+    userMessageElement.innerHTML = userMessage;
+    chatArea.appendChild(userMessageElement);
+    
     var xhr = new XMLHttpRequest();
     subtaskContainer = document.getElementById('subtask-container');
     var taskId = subtaskContainer.getAttribute('data-task-id');
@@ -25,14 +30,24 @@ function send_message() {
         if (this.status == 200) {
             // Display the chatbot's response on the page
             var chatbotResponse = JSON.parse(this.responseText).response;  // TODO: Model after response from langchain
-            chatArea.innerHTML += "<img src='/static/favicon-32x32.png'></img>" + " <p class='bot_message'>" + chatbotResponse.replace(/\n/g, '<br>') + '</p>';
+            chatbotResponse = chatbotResponse.replace(/\n/g, '<br>');
+            
+            var imgElement = document.createElement('img');
+            imgElement.src = '/static/favicon-32x32.png';
+            
+            var botMessageElement = document.createElement('p');
+            botMessageElement.className = 'bot_message';
+            botMessageElement.innerHTML = chatbotResponse;
+            
+            chatArea.appendChild(imgElement);
+            chatArea.appendChild(botMessageElement);
         }
     };
     xhr.send(JSON.stringify({'message': userMessage}));
 }
 
 document.getElementById('send-button').addEventListener('click', send_message);
-document.getElementById('message-input').addEventListener('keyup', function(event) {
+document.getElementById('user-message-input').addEventListener('keyup', function(event) {
     if (event.key == 'Enter') {
         send_message();
     }
