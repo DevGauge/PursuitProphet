@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'dashboard.html' %}
 
-{% block content %}
+{% block main %}
 <div class="loading">Loading...</div>
 <div class="container mt-5">
     <h1 class="text-center main-heading">What are you <span class='highlight-text'>dreaming</span> of today?</h1>
     <div class="text-container">
-        <input class="input" type="text" placeholder="Dreams start here">
+        <input class="input black-text-input" type="text" placeholder="Dreams start here">
         <span class="border"></span>
         <form id="primary_goal_form" action="{{ url_for('role_selection') }}" method="POST">
             <input type="hidden" name="role" id="selectedRole">
@@ -17,7 +17,7 @@
         <div class="card-container">
             {% for role in roles %}
             <div class="col-sm-6 col-md-4 col-lg-3 mt-4">
-                <div class="card role-card">
+                <div class="card role-card demo-selection-card">
                     <div class="card-body">
                         <h5 class="card-title">{{ role }}</h5>
                     </div>

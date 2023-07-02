@@ -1,35 +1,39 @@
-{% extends "base.html" %}
-{% block content %}
-    <div class='subtask-container' id='subtask-container' data-task-id="{{ task.id }}">
-        <div class='subtask-panel subtask-left-panel'>
-            <h2><span class='highlight-text'>{{ goal.get_goal() }}</span></h2>
-            <h3><span class='highlight-text'>{{ task.get_task() }}</h3>
-            <div class='subtasks', id="subtasks">
-                {% for subtask in subtasks %}
-                <div class="goal-card" data-task-id="{{ subtask.id }}">
-                    <div class="checkbox-container">
-                        <input type="checkbox">
-                    </div>
-                    <p class="goal-text">{{ subtask.get_task() }}</p>
-                    <div class="buttons-container">
-                        <button><i class="fas fa-edit"></i></button>
-                        <button><i class="fas fa-trash-alt"></i></button>
-                    </div>
+{% extends "dashboard.html" %}
+{% block main %}
+<div class='subtask-container' id='subtask-container' data-task-id="{{ task.id }}">
+    <div class='subtask-panel subtask-left-panel'>
+        <h2><span class='highlight-text'>{{ goal.get_goal() }}</span></h2>
+        <h3><span class='highlight-text'>{{ task.get_task() }}</h3>
+        <div class='subtasks' , id="subtasks">
+            {% for subtask in subtasks %}
+            <div class="goal-card" data-task-id="{{ subtask.id }}">
+                <div class="checkbox-container">
+                    <input type="checkbox">
                 </div>
-                {% endfor %}
+                <p class="goal-text">{{ subtask.get_task() }}</p>
+                <div class="buttons-container">
+                    <button><i class="fas fa-edit"></i></button>
+                    <button><i class="fas fa-trash-alt"></i></button>
+                </div>
             </div>
+            {% endfor %}
         </div>
-        <div class='subtask-panel subtask-center-panel'>
-            <div id='chat-box' class='chat-area'>
-                <!-- Chat messages will be displayed here -->
-            </div>
-            <div class='subtask-chat-input'>
-                <input id="message-input" type='text' placeholder='Enter your message...'>
-                <button id="send-button">Send</button>
-            </div>
+    </div>
+    <div class='subtask-panel subtask-center-panel'>
+        <div id='chat-box' class='chat-area'>
+            <!-- Chat messages will be displayed here -->
         </div>
-    </div>    
+        <div class='subtask-chat-input'>
+            <input id="message-input" type='text' placeholder='Enter your message...'>
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='chat.js') }}"></script>
+<script>
+    var Scrollbar = window.Scrollbar;
+    Scrollbar.init(document.querySelector('#subtasks'));
+</script>
 {% endblock %}

@@ -1,6 +1,9 @@
 from datetime import datetime
 import os
 import uuid
+import mimetypes
+mimetypes.add_type('application/javascript', '.js')
+mimetypes.add_type('text/css', '.css')
 from flask import Flask
 from flask_migrate import Migrate
 from flask_mail import Mail

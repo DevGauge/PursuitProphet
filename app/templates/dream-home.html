@@ -12,4 +12,8 @@
     {% endfor %} -->
 </div>
 {% endfor %}
+{% block extended_content %}{% endblock %}
+<a href="{{ url_for('new_dream') }}">
+    <button class="plus-button">+</button>
+</a>
 {% endblock %}

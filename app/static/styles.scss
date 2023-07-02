@@ -1,3 +1,10 @@
+html,
+body {
+    height: 100%;
+    max-height: 100vh;
+    overflow: hidden;
+}
+
 @font-face {
     font-family: 'Source Sans Pro';
     src: url('/static/Fonts/source-sans-pro.black.woff') format('woff');
@@ -47,21 +54,72 @@
     font-style: italic;
 }
 
+// Scrollbars
+/* Styles for the track */
+.scrollbar-track-x, .scrollbar-track-y {
+    background: #4C0D8C !important;
+}
+
+/* Styles for the thumb */
+.scrollbar-thumb .scrollbar-thumb-x, .scrollbar-thumb-y {
+    background: #910FF1 !important;
+}
+
+.black-text-input {
+    color: #000;
+}
+
+input {
+    border: 1px solid transparent;
+    background-color: #333;
+    height: 40px;
+    color: white;
+    font-size: 14px;
+
+    &::placeholder {
+        padding: 10px;
+    }
+
+    &:hover,
+    &:focus,
+    &:active {
+        outline: none;
+        border-color: #910FF1 #6826AA #910FF1;
+    }
+
+    // replace autofill background color with transparency
+    &:-webkit-autofill,
+    &:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0px 1000px #333 inset;
+        box-shadow: 0 0 0px 1000px #333 inset;
+        outline-color: transparent;
+        transition: background-color 600000s 0s, color 600000s 0s;
+    }
+
+    &:-moz-autofill {
+        box-shadow: 0 0 0px 1000px #333 inset;
+        outline: none;
+    }
+
+    &:-ms-autofill {
+        box-shadow: 0 0 0px 1000px #333 inset;
+        outline: none;
+    }
+}
+
 .nav-link {
     text-decoration: none; // Remove underline
-    color: inherit; // Use the inherited color
-    cursor: text; // Change cursor to text
+    color: inherit;
+    cursor: text;
     padding: 10px;
 
     &:visited {
-        color: inherit; // Use the inherited color for visited links
+        color: inherit;
     }
 
     &:hover,
     &:active,
     &:focus {
-        // Add additional styling for hover, active, and focus states
-        // For example, you can change the background color or add a border
         background-image: linear-gradient(to bottom, #910FF1, #4C0D8C);
         text-align: center;
         border: 1px solid #910FF1;
@@ -113,6 +171,7 @@ body {
             input[type="text"] {
                 border-radius: 5px;
                 padding: 5px;
+                color: #000;
             }
         }
 
@@ -139,6 +198,59 @@ body {
             border-radius: 5px;
         }
     }
+
+    .plus-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: #910FF1;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        font-size: 36px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+            background-color: #6826AA;
+        }
+    }
+}
+
+.dialogue {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #333;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
+    h2 {
+        margin-bottom: 10px;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+
+    .button-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    button {
+        padding: 10px 20px;
+        cursor: pointer;
+        width: 45%;
+    }
 }
 
 // Registration/login
@@ -164,44 +276,6 @@ body {
         label {
             font-weight: 300;
             font-size: 14px;
-        }
-
-        input {
-            border: 1px solid transparent;
-            background-color: #333;
-            height: 40px;
-            color: white;
-            font-size: 14px;
-
-            &::placeholder {
-                padding: 10px;
-            }
-
-            &:hover,
-            &:focus,
-            &:active {
-                outline: none;
-                border-color: #910FF1 #6826AA #910FF1;
-            }
-
-            // replace autofill background color with transparency
-            &:-webkit-autofill,
-            &:-webkit-autofill:focus {
-                -webkit-box-shadow: 0 0 0px 1000px #333 inset;
-                box-shadow: 0 0 0px 1000px #333 inset;
-                outline-color: transparent;
-                transition: background-color 600000s 0s, color 600000s 0s;
-            }
-
-            &:-moz-autofill {
-                box-shadow: 0 0 0px 1000px #333 inset;
-                outline: none;
-            }
-
-            &:-ms-autofill {
-                box-shadow: 0 0 0px 1000px #333 inset;
-                outline: none;
-            }
         }
     }
 }
@@ -261,10 +335,8 @@ h2.sub-heading {
     }
 }
 
-.standard-button {
-    background-color: #910FF1;
-    background-image: linear-gradient(to bottom, #910FF1, #4C0D8C);
-    border-color: #910FF1 #6826AA #4C0D8C;
+.standard-button,
+.cancel-button {
     color: #fff;
     border-radius: 24px;
 
@@ -280,6 +352,17 @@ h2.sub-heading {
     line-height: 20px;
     padding: 6px 12px;
     width: 100%;
+}
+
+.standard-button {
+    background-color: #910FF1;
+    background-image: linear-gradient(to bottom, #910FF1, #4C0D8C);
+    border-color: #910FF1 #6826AA #4C0D8C;
+}
+
+.cancel-button {
+    background-color: #FFF;
+    color: #111;
 }
 
 button.submit-button {
@@ -369,6 +452,11 @@ button.submit-button {
     }
 }
 
+.demo-selection-card {
+    width: 200px;
+    height: 200px;
+}
+
 .role-card {
     position: relative;
     transition: transform 0.3s ease-in-out;
@@ -380,8 +468,6 @@ button.submit-button {
     margin: 10px;
     padding: 10px;
     background-color: #fff;
-    width: 200px;
-    height: 200px;
     display: inline-block;
     text-align: center;
     vertical-align: top;
@@ -414,10 +500,6 @@ button.submit-button {
 .text-container:focus-within {
     width: 100%; // expanded width
 }
-
-// form {
-//     width: 20%;
-// }
 
 .text-center {
     text-align: center;
@@ -478,6 +560,7 @@ button.submit-button {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
     padding: 5px;
     margin-bottom: 20px;
+    color: black;
 
     .checkbox-container {
         flex: 0 0 auto;
@@ -551,12 +634,28 @@ button.submit-button {
 }
 
 .subtask-panel {
-    padding: 20px;
+    padding-left: 10px;
     border: 1px solid #ccc;
 }
 
 .subtask-left-panel {
     width: 40%;
+}
+
+.subtasks {
+    margin-top: 20px;
+    overflow-y: auto;
+}
+
+.subtasks .subtask {
+    background-color: #f8f9fa;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+
+    &:last-child {
+        margin-bottom: 0;
+      }
 }
 
 .right-panel {
@@ -594,16 +693,9 @@ button.submit-button {
     border: none;
 }
 
-.subtasks {
-    margin-top: 20px;
-    overflow: auto;
-}
-
-.subtasks .subtask {
-    background-color: #f8f9fa;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+.bot_message {
+    background-color: rgba(52,53,65, 0.5);
+    color: white;
 }
 
 /* Styles for mobile devices */

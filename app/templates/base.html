@@ -1,30 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pursuit Prophet</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-16x16.png') }}">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32x32.png') }}">
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pursuit Prophet</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+  <script src="{{ url_for('static', filename='node_modules/smooth-scrollbar/dist/smooth-scrollbar.js') }}"></script>
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 </head>
+
 <body>
-    {% block content %}{% endblock %}
-    <script>
+  {% block content %}{% endblock %}
+  <script>
     window.addEventListener('DOMContentLoaded', function () {
-        const subtasksContainer = document.getElementById('subtasks');
-        const maxHeight = window.innerHeight - subtasksContainer.offsetTop - 20;
-        subtasksContainer.style.maxHeight = maxHeight + 'px';
-      });
-      
-      window.addEventListener('resize', function () {
-        const subtasksContainer = document.getElementById('subtasks');
-        const maxHeight = window.innerHeight - subtasksContainer.offsetTop - 20;
-        subtasksContainer.style.maxHeight = maxHeight + 'px';
-      });
-    </script>
-    {% block scripts %}{% endblock %}
+      const subtasksContainer = document.getElementById('subtasks');
+      const maxHeight = window.innerHeight - subtasksContainer.offsetTop - 20;
+      subtasksContainer.style.maxHeight = maxHeight + 'px';
+    });
+
+    window.addEventListener('resize', function () {
+      const subtasksContainer = document.getElementById('subtasks');
+      const maxHeight = window.innerHeight - subtasksContainer.offsetTop - 20;
+      subtasksContainer.style.maxHeight = maxHeight + 'px';
+    });
+  </script>
+  {% block scripts %}{% endblock %}
 </body>
+
 </html>

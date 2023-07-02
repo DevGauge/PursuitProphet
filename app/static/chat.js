@@ -19,7 +19,6 @@ function send_message() {
     var xhr = new XMLHttpRequest();
     subtaskContainer = document.getElementById('subtask-container');
     var taskId = subtaskContainer.getAttribute('data-task-id');
-    console.log('task id: ' + taskId);
     xhr.open('POST', '/chat_api/' + taskId, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onload = function() {

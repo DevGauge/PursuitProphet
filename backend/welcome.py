@@ -1,6 +1,6 @@
 import os
 import sys
-from flask import Flask, jsonify, render_template, request, redirect, url_for
+from flask import Flask, jsonify, render_template, request, redirect, url_for, send_from_directory
 from flask_restx import Api, Resource, fields
 sys.path.insert(0, '../')
 sys.path.insert(0, '/app')
@@ -28,6 +28,11 @@ def shutdown_session(exception=None):
 def handle_message(data):
     print('received message: ' + data)
     send(data, broadcast=True)
+    
+# @app.route('/node_modules/<path:filename>')
+# def custom_static(filename):
+#     print('static node filename: ', filename)
+#     return send_from_directory(os.path.join(app.root_path, '..', 'node_modules'), filename)
 
 @app.route('/error/<string:error_message>')
 def error_page(error_message):
@@ -67,7 +72,7 @@ def confirm_email(token):
         if confirm_user(token):
             # if successful, log the user in
             login_user(user)
-            return redirect(url_for('/'))
+            return redirect(url_for('dashboard'))
     return 'The confirmation link is invalid or has expired.'
 
 @login_required
@@ -81,6 +86,21 @@ def dashboard():
             return render_template('dream-home.html', goals=goals)
         
     return redirect(url_for('security.login'))
+
+@app.route('/new_dream', methods=['GET', 'POST'])
+def new_dream():
+    goals = Goal.query.filter_by(user_id=current_user.id).all()
+    if request.method == 'POST':
+        dream = request.form.get('dream')
+        goal = Goal(user_input=dream, user_id=current_user.id)
+        db.session.add(goal)
+        db.session.commit()
+        return redirect(url_for('dashboard'))
+    
+    elif request.method == 'GET' and request.args.get('cancel'):
+        return redirect(url_for('dashboard'))
+    
+    return render_template('new_dream.html', goals=goals)
 
 @app.route('/generate_goals', methods=['GET', 'POST'])
 def goal_generation():

@@ -1,0 +1,13 @@
+{% extends 'dream-home.html' %}
+{% block extended_content %}
+<div class="dialogue" id="dialogue">
+    <h2>What are you dreaming of?</h2>
+    <form method="POST" action="{{ url_for('new_dream') }}">
+        <input type="text" name="dream" placeholder="Enter your dream" required>
+        <div class="button-container">
+            <button type="submit" class="standard-button">Submit</button>
+            <button type="button" class="cancel-button" onclick="location.href='{{ url_for('dashboard') }}'">Cancel</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
