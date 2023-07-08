@@ -263,6 +263,7 @@ body {
 
 .main-panel-content {
     display: flex;
+    flex-direction: column;
     flex-grow: 1;
     overflow-y: inherit;
     box-sizing: border-box;
@@ -599,6 +600,11 @@ button.submit-button {
     }
 }
 
+.goals {
+    display: flex;
+    flex-direction: column;
+}
+
 .goal-container {
     display: flex;
     flex-direction: column;
@@ -685,9 +691,8 @@ button.submit-button {
 
 /* Subtask Generation */
 .subtask-container {
-    display: flex;
+    display: block;
     height: 100%;
-    width: 40%;
 }
 
 .subtask-panel {
@@ -766,6 +771,7 @@ button.submit-button {
     /*subtask gen*/
     .subtask-container {
         width: 100%;
+        flex-direction: column;
     }
 
     .subtask-left-panel {
@@ -774,10 +780,6 @@ button.submit-button {
 
     .subtask-chat-panel {
         width: 93%;
-    }
-
-    .subtask-container {
-        flex-direction: column;
     }
 
     .subtask-chat-panel {

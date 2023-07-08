@@ -14,25 +14,16 @@
                 <p class="goal-text">{{ subtask.get_task() }}</p>
                 <div class="buttons-container">
                     <button><i class="fas fa-edit"></i></button>
-                    <button><i class="fas fa-trash-alt"></i></button>
+                    <button><i class="fas fa-message"></i></button>
+                    <button><i class="fas fa-trash-alt"></i></button>                    
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
 </div>
-<div class='subtask-panel subtask-chat-panel'>
-    <div id='subtask-chat-box' class='subtask-chat-area'>
-        <!-- Chat messages will be displayed here -->
-    </div>
-    <div class='subtask-chat-input'>
-        <input id="user-message-input" type='text' placeholder='Enter your message...'>
-        <button class="standard-button" id="send-button">Send</button>
-    </div>
-</div>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('static', filename='chat.js') }}"></script>
 <script>
     var Scrollbar = window.Scrollbar;
     Scrollbar.init(document.querySelector('#subtasks'));
