@@ -7,17 +7,9 @@
         <h3><span class='highlight-text'>{{ task.get_task() }}</h3>
         <div class='subtasks' , id="subtasks">
             {% for subtask in subtasks %}
-            <div class="goal-card" data-task-id="{{ subtask.id }}">
-                <div class="checkbox-container">
-                    <input type="checkbox">
-                </div>
-                <p class="goal-text">{{ subtask.get_task() }}</p>
-                <div class="buttons-container">
-                    <button><i class="fas fa-edit"></i></button>
-                    <button><i class="fas fa-message"></i></button>
-                    <button><i class="fas fa-trash-alt"></i></button>                    
-                </div>
-            </div>
+                {% with task_name=subtask.get_task() %}
+                    {% include 'goal-card-component.html' %}
+                {% endwith %}
             {% endfor %}
         </div>
     </div>

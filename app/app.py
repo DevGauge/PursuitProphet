@@ -17,15 +17,25 @@ from .pp_logging.event_logger import EventLogger
 from flask_security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, SQLAlchemyUserDatastore
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, DateField, TimeField
 from flask_security.forms import LoginForm, ConfirmRegisterForm
-from wtforms.validators import DataRequired, Length, Regexp, email_validator, Email, Optional
+from wtforms.validators import DataRequired, Length, Regexp, Email, Optional
 
 
 load_dotenv()
 roles_users = db.Table('roles_users',
     db.Column('user_id', db.String(255), db.ForeignKey('user.id')),
     db.Column('role_id', db.String(255), db.ForeignKey('role.id')))
+
+class DreamForm(FlaskForm):
+    goal = StringField('Dream Name', validators=[DataRequired()])
+    description = TextAreaField('Dream Description', validators=[Optional()])
+    target_date = DateField('Target Date', format='%Y-%m-%d', validators=[Optional()])
+    target_time = TimeField('Target Time', format='%H:%M', validators=[Optional()])
+    submit = SubmitField()
+
+    def __init__(self, obj=None, **kwargs):
+        super().__init__(obj=obj, **kwargs)
 
 class RegistrationForm(ConfirmRegisterForm):
     aka = StringField('Nickname (Optional)', [
@@ -141,12 +151,19 @@ class Goal(db.Model):
     completed: bool = db.Column(db.Boolean, nullable=False)
     tasks = db.relationship('Task', backref='goal', lazy=True)
     user_id = db.Column(db.String(255), db.ForeignKey('user.id'), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    target_date = db.Column(db.Date, nullable=True)
+    target_time = db.Column(db.Time, nullable=True)
+    
 
-    def __init__(self, user_input, user_id=None, **kwargs):
+    def __init__(self, user_input, description=None, target_date=None, target_time=None, user_id=None, **kwargs):
         super(Goal, self).__init__(**kwargs)
         self.goal = user_input
         self.completed = kwargs.get('completed', False)
         self.user_id = user_id
+        self.description = description
+        self.target_date = target_date
+        self.target_time = target_time
     
     def mark_as_complete(self):
         """Mark the goal as complete."""

@@ -1,14 +1,14 @@
 import os
 import sys
-from flask import Flask, jsonify, render_template, request, redirect, url_for, send_from_directory
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash
 from flask_restx import Api, Resource, fields
 sys.path.insert(0, '../')
 sys.path.insert(0, '/app')
 from bot import ChatBot
 from langchain_m.langchain_module import TaskChatBot
 import app.app
-from app.app import Goal, Task, User 
-from app.app import LoginForm, RegistrationForm
+from app.app import Goal, Task, User
+from app.app import DreamForm
 from app.app import db, app_instance
 from flask_socketio import SocketIO, send, emit
 from flask_security import roles_required, login_required, login_user, current_user
@@ -87,20 +87,44 @@ def dashboard():
         
     return redirect(url_for('security.login'))
 
-@app.route('/new_dream', methods=['GET', 'POST'])
-def new_dream():
-    goals = Goal.query.filter_by(user_id=current_user.id).all()
-    if request.method == 'POST':
-        dream = request.form.get('dream')
-        goal = Goal(user_input=dream, user_id=current_user.id)
-        db.session.add(goal)
+@app.route('/add_dream', methods=['GET', 'POST'])
+def add_dream():
+    form = DreamForm()
+    form.submit.label.text = 'Add Dream'
+    if form.validate_on_submit():
+        new_goal = Goal(form.goal.data, 
+                        user_id=current_user.id, 
+                        description=form.description.data,
+                        target_date=form.target_date.data, 
+                        target_time=form.target_time.data)
+        db.session.add(new_goal)
         db.session.commit()
+        flash('Your dream has been added.', 'success')
         return redirect(url_for('dashboard'))
-    
-    elif request.method == 'GET' and request.args.get('cancel'):
+    return render_template('goal-detail.html', form=form)
+
+@app.route('/goal/<goal_id>', methods=['GET', 'POST'])
+def goal_detail(goal_id):
+    goal = Goal.query.get(goal_id)
+    form = DreamForm(obj=goal)
+    if form.validate_on_submit():        
+        goal.goal = form.goal.data
+        goal.description = form.description.data
+        goal.target_date = form.target_date.data
+        goal.target_time = form.target_time.data
+        db.session.commit()
+        flash('Your dream has been updated.', 'success')
         return redirect(url_for('dashboard'))
-    
-    return render_template('new_dream.html', goals=goals)
+    else:
+        goal = Goal.query.get(goal_id)
+        if goal is None:
+            flash('Goal not found.', 'error')
+            return redirect(url_for('dashboard'))
+        else:
+            print(goal.goal)
+        form = DreamForm(obj=goal)
+        form.submit.label.text = 'Update Dream'
+        return render_template('goal-detail.html', form=form)
 
 @app.route('/generate_goals', methods=['GET', 'POST'])
 def goal_generation():

@@ -234,7 +234,8 @@ body {
 }
 
 .register-form-container,
-.login-form-container {
+.login-form-container,
+.goal-detail-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -245,8 +246,13 @@ body {
 }
 .register-form-container .register-form,
 .register-form-container .login-form,
+.register-form-container .goal-detail-form,
 .login-form-container .register-form,
-.login-form-container .login-form {
+.login-form-container .login-form,
+.login-form-container .goal-detail-form,
+.goal-detail-container .register-form,
+.goal-detail-container .login-form,
+.goal-detail-container .goal-detail-form {
   display: flex;
   flex-direction: column;
   background-color: #333;
@@ -257,10 +263,120 @@ body {
 }
 .register-form-container .register-form label,
 .register-form-container .login-form label,
+.register-form-container .goal-detail-form label,
 .login-form-container .register-form label,
-.login-form-container .login-form label {
+.login-form-container .login-form label,
+.login-form-container .goal-detail-form label,
+.goal-detail-container .register-form label,
+.goal-detail-container .login-form label,
+.goal-detail-container .goal-detail-form label {
   font-weight: 300;
   font-size: 14px;
+}
+.register-form-container .register-form textarea,
+.register-form-container .login-form textarea,
+.register-form-container .goal-detail-form textarea,
+.login-form-container .register-form textarea,
+.login-form-container .login-form textarea,
+.login-form-container .goal-detail-form textarea,
+.goal-detail-container .register-form textarea,
+.goal-detail-container .login-form textarea,
+.goal-detail-container .goal-detail-form textarea {
+  border: 1px solid transparent;
+  background-color: #333;
+  color: white;
+  font-size: 14px;
+  height: 100px;
+}
+.register-form-container .register-form textarea::placeholder,
+.register-form-container .login-form textarea::placeholder,
+.register-form-container .goal-detail-form textarea::placeholder,
+.login-form-container .register-form textarea::placeholder,
+.login-form-container .login-form textarea::placeholder,
+.login-form-container .goal-detail-form textarea::placeholder,
+.goal-detail-container .register-form textarea::placeholder,
+.goal-detail-container .login-form textarea::placeholder,
+.goal-detail-container .goal-detail-form textarea::placeholder {
+  padding: 10px;
+}
+.register-form-container .register-form textarea:hover, .register-form-container .register-form textarea:focus, .register-form-container .register-form textarea:active,
+.register-form-container .login-form textarea:hover,
+.register-form-container .login-form textarea:focus,
+.register-form-container .login-form textarea:active,
+.register-form-container .goal-detail-form textarea:hover,
+.register-form-container .goal-detail-form textarea:focus,
+.register-form-container .goal-detail-form textarea:active,
+.login-form-container .register-form textarea:hover,
+.login-form-container .register-form textarea:focus,
+.login-form-container .register-form textarea:active,
+.login-form-container .login-form textarea:hover,
+.login-form-container .login-form textarea:focus,
+.login-form-container .login-form textarea:active,
+.login-form-container .goal-detail-form textarea:hover,
+.login-form-container .goal-detail-form textarea:focus,
+.login-form-container .goal-detail-form textarea:active,
+.goal-detail-container .register-form textarea:hover,
+.goal-detail-container .register-form textarea:focus,
+.goal-detail-container .register-form textarea:active,
+.goal-detail-container .login-form textarea:hover,
+.goal-detail-container .login-form textarea:focus,
+.goal-detail-container .login-form textarea:active,
+.goal-detail-container .goal-detail-form textarea:hover,
+.goal-detail-container .goal-detail-form textarea:focus,
+.goal-detail-container .goal-detail-form textarea:active {
+  outline: none;
+  border-color: #910FF1 #6826AA #910FF1;
+}
+.register-form-container .register-form textarea:-webkit-autofill, .register-form-container .register-form textarea:-webkit-autofill:focus,
+.register-form-container .login-form textarea:-webkit-autofill,
+.register-form-container .login-form textarea:-webkit-autofill:focus,
+.register-form-container .goal-detail-form textarea:-webkit-autofill,
+.register-form-container .goal-detail-form textarea:-webkit-autofill:focus,
+.login-form-container .register-form textarea:-webkit-autofill,
+.login-form-container .register-form textarea:-webkit-autofill:focus,
+.login-form-container .login-form textarea:-webkit-autofill,
+.login-form-container .login-form textarea:-webkit-autofill:focus,
+.login-form-container .goal-detail-form textarea:-webkit-autofill,
+.login-form-container .goal-detail-form textarea:-webkit-autofill:focus,
+.goal-detail-container .register-form textarea:-webkit-autofill,
+.goal-detail-container .register-form textarea:-webkit-autofill:focus,
+.goal-detail-container .login-form textarea:-webkit-autofill,
+.goal-detail-container .login-form textarea:-webkit-autofill:focus,
+.goal-detail-container .goal-detail-form textarea:-webkit-autofill,
+.goal-detail-container .goal-detail-form textarea:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #333 inset;
+  box-shadow: 0 0 0px 1000px #333 inset;
+  outline-color: transparent;
+  transition: background-color 600000s 0s, color 600000s 0s;
+}
+.register-form-container .register-form textarea:-moz-autofill,
+.register-form-container .login-form textarea:-moz-autofill,
+.register-form-container .goal-detail-form textarea:-moz-autofill,
+.login-form-container .register-form textarea:-moz-autofill,
+.login-form-container .login-form textarea:-moz-autofill,
+.login-form-container .goal-detail-form textarea:-moz-autofill,
+.goal-detail-container .register-form textarea:-moz-autofill,
+.goal-detail-container .login-form textarea:-moz-autofill,
+.goal-detail-container .goal-detail-form textarea:-moz-autofill {
+  box-shadow: 0 0 0px 1000px #333 inset;
+  outline: none;
+}
+.register-form-container .register-form textarea:-ms-autofill,
+.register-form-container .login-form textarea:-ms-autofill,
+.register-form-container .goal-detail-form textarea:-ms-autofill,
+.login-form-container .register-form textarea:-ms-autofill,
+.login-form-container .login-form textarea:-ms-autofill,
+.login-form-container .goal-detail-form textarea:-ms-autofill,
+.goal-detail-container .register-form textarea:-ms-autofill,
+.goal-detail-container .login-form textarea:-ms-autofill,
+.goal-detail-container .goal-detail-form textarea:-ms-autofill {
+  box-shadow: 0 0 0px 1000px #333 inset;
+  outline: none;
+}
+.register-form-container .goal-detail-form,
+.login-form-container .goal-detail-form,
+.goal-detail-container .goal-detail-form {
+  width: 50%;
 }
 
 .welcome-screen {
@@ -589,7 +705,6 @@ button.submit-button {
   background-color: #0056b3;
 }
 .goal-card:hover {
-  height: 100%;
   border: 4px solid #910FF1;
   box-shadow: 0 0 20px #910FF1;
 }

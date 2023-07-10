@@ -50,10 +50,14 @@ class ModelFactory:
     # region Expensive Models
     _gpt_3_5_turbo = "gpt-3.5-turbo"
     _gpt_3_5_turbo_16k = "gpt-3.5-turbo-16k"
+    _gpt_4 = "gpt-4"
 
     # region private methods
     def _creative_gpt3(self):
         return ChatOpenAI(model_name=self._gpt_3_5_turbo, temperature=0.8)
+    
+    def _creative_gpt4(self):
+        return ChatOpenAI(model_name=self._gpt_4, temperature=0.8)
     
     def _creative_gpt3_16k(self):
         return ChatOpenAI(model_name=self._gpt_3_5_turbo_16k, temperature=0.8)
@@ -65,10 +69,10 @@ class ModelFactory:
 
     def summarizer(self):
         """Returns a creative model for high-value summarization. May be more expensive than `cheap_summarizer()`, should be more accurate."""
-        return self._creative_gpt3()
+        return self._creative_gpt4()
     
     def chatbot(self):
-        return self._creative_gpt3()
+        return self._creative_gpt4()
     
     def filename_bot(self):
         return ChatOpenAI(model_name=self._gpt_3_5_turbo, temperature=1.0) # max variation to prevent duplication of filenames

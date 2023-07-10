@@ -1,7 +1,10 @@
 {% extends 'dashboard.html' %}
 {% block main %}
+<h1 class="highlight-text"> My Dreams </h1>
 {% for goal in goals %}
-<div class="goal-card">{{ goal.goal }}</div>
+    {% with task_name=goal.goal %}
+    {% include 'goal-card-component.html' %}
+    {% endwith %}
 <!-- Display tasks related to the goal
     <h3>Tasks in progress</h3>
     {% for task in goal.tasks %}
@@ -10,7 +13,20 @@
     {% endfor %} -->
 {% endfor %}
 {% block extended_content %}{% endblock %}
-<a href="{{ url_for('new_dream') }}">
+<a href="{{ url_for('add_dream') }}">
     <button class="plus-button">+</button>
 </a>
+{% endblock %}
+{% block scripts %}
+<script>
+window.onload = function() {
+    var goalCards = document.getElementsByClassName('goal-card');
+    for (var i = 0; i < goalCards.length; i++) {
+        goalCards[i].addEventListener('click', function() {
+            var goalId = this.getAttribute('data-task-id');
+            window.location.href = '/goal/' + goalId;
+        });
+    }
+}
+</script>
 {% endblock %}

@@ -1,0 +1,14 @@
+{% extends "dashboard.html" %}
+{% block main %}
+<div class="loading dark-spinner">Loading...</div>
+<div class="goal-detail-container">
+    <form class="goal-detail-form" method="POST">        
+        {{ form.hidden_tag() }}
+        {{ form.goal.label }} {{ form.goal() }}
+        {{ form.description.label }} {{ form.description() }}
+        {{ form.target_date.label }} {{ form.target_date() }}
+        {{ form.target_time.label }} {{ form.target_time() }}
+        {{ form.submit(class="standard-button") }}        
+    </form>
+  </div>
+{% endblock %}
