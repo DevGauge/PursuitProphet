@@ -18,15 +18,6 @@
 </a>
 {% endblock %}
 {% block scripts %}
-<script>
-window.onload = function() {
-    var goalCards = document.getElementsByClassName('goal-card');
-    for (var i = 0; i < goalCards.length; i++) {
-        goalCards[i].addEventListener('click', function() {
-            var goalId = this.getAttribute('data-task-id');
-            window.location.href = '/goal/' + goalId;
-        });
-    }
-}
-</script>
+<script src="{{ url_for('static', filename='show_alert.js') }}"></script>
+<script src="{{ url_for('static', filename='goal-card-component.js') }}"></script>
 {% endblock %}
