@@ -1,24 +1,47 @@
 import os
 import sys
-from flask import Flask, jsonify, render_template, request, redirect, url_for, flash
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session, after_this_request
 from flask_restx import Api, Resource, fields
 sys.path.insert(0, '../')
 sys.path.insert(0, '/app')
 from bot import ChatBot
-from langchain_m.langchain_module import TaskChatBot
+from langchain_m.langchain_module import TaskChatBot, GoalChatBot
 import app.app
 from app.app import Goal, Task, User
 from app.app import DreamForm
 from app.app import db, app_instance
 from flask_socketio import SocketIO, send, emit
-from flask_security import roles_required, login_required, login_user, current_user
+from flask_security import roles_required, login_required, login_user, user_registered, current_user
 from flask_security.confirmable import confirm_user, confirm_email_token_status
 import uuid
+from LangChainAgentFactory import AgentFactory
+from langchain.tools import StructuredTool
 
 app = app_instance.app
+app.debug_mode = True
 socketio = SocketIO(app)
 
 bot = ChatBot()
+
+@user_registered.connect_via(app)
+def user_registered_sighandler(sender, user, confirm_token, confirmation_token, form_data):
+    @after_this_request
+    def transfer_goals_after_request(response):
+        if 'temp_user_id' in session:
+            temp_user_id = session['temp_user_id']
+            temp_user = User.query.get(temp_user_id)
+            if temp_user is not None:
+                # Transfer the goals from the temporary user to the registered user
+                for goal in temp_user.goals:
+                    user.goals.append(goal)
+            
+                # Ensure that goals are persisted in the database before deleting temp_user
+                db.session.flush()
+
+                # Delete the temporary user
+                db.session.delete(temp_user)
+                db.session.commit()
+        return response
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
@@ -28,11 +51,6 @@ def shutdown_session(exception=None):
 def handle_message(data):
     print('received message: ' + data)
     send(data, broadcast=True)
-    
-# @app.route('/node_modules/<path:filename>')
-# def custom_static(filename):
-#     print('static node filename: ', filename)
-#     return send_from_directory(os.path.join(app.root_path, '..', 'node_modules'), filename)
 
 @app.route('/error/<string:error_message>')
 def error_page(error_message):
@@ -87,6 +105,18 @@ def dashboard():
         
     return redirect(url_for('security.login'))
 
+@app.route('/delete_goal/<goal_id>', methods=['GET', 'POST'])
+def delete_goal(goal_id):
+    goal=Goal.query.filter_by(id=goal_id).first()
+    if goal is None:
+        flash('Goal not found.', 'error')
+        return redirect(url_for('dashboard'))
+    else:
+        db.session.delete(goal)
+        db.session.commit()
+        flash('Your dream has been deleted.', 'success')
+        return redirect(url_for('dashboard'))
+
 @app.route('/add_dream', methods=['GET', 'POST'])
 def add_dream():
     form = DreamForm()
@@ -139,14 +169,25 @@ def goal_generation():
         print(e)
         return redirect(url_for('error_page', error_message=str(e)))        
 
-@app.route('/chat_api/<string:task_id>', methods=['POST'])
-def chat_api(task_id):
-    task = Task.query.filter_by(id=task_id).first()
-    goal = Goal.query.filter_by(id=task.goal_id).first()
+@app.route('/chat')
+def chat():
+    return render_template('chat.html')
+
+@app.route('/chat_api/<string:goal_id>', methods=['POST'])
+def chat_api(goal_id):
+    print("a POST request was made to chat")
+    # task = Task.query.filter_by(id=task_id).first()
+    goal = Goal.query.filter_by(id=goal_id).first()
     message = request.json['message']
-    chat_bot = TaskChatBot(task, goal, [task.get_task() for task in task.subtasks])
+    chat_bot = GoalChatBot(goal)
     response = chat_bot.get_response(message)
     return jsonify({'response': response})
+
+@app.route('/task_chat_api/<string:task_id>', methods=['POST'])
+def task_chat_api(task_id):
+    task = Task.query.filter_by(id=task_id).first()
+    goal = Goal.query.filter_by(id=task.goal_id).first()
+    chat_bot = TaskChatBot(task, goal, [task.get_task() for task in task.subtasks])
 
 @app.route('/display_subtasks/<string:task_id>', methods=['GET'])
 def display_subtasks(task_id):    

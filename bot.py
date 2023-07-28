@@ -66,6 +66,7 @@ import datetime
 import json
 import os
 import sys
+import uuid
 import threading
 # 3rd party imports
 from colorama import Fore, Style
@@ -76,9 +77,11 @@ import openai
 # Local imports
 sys.path.insert(0, './langchain')
 from langchain_m.langchain_module import TaskGeneratorBot, GoalGeneratorBot, FilenameGeneratorBot
-from app.app import Goal, Task, db, app as flask_app
+from app.app import Goal, Task, User, db, app as flask_app
 from app.app import app_instance
 from sqlalchemy.exc import SQLAlchemyError
+from flask import session
+from werkzeug.security import generate_password_hash
 
 load_dotenv()
 class SingletonMeta(type):
@@ -122,11 +125,18 @@ class ChatBot:
         if user:
             primary_goal = Goal(user_input, user)
         else:
-            primary_goal = Goal(user_input)
-        # self.io_manager.primary_goal = primary_goal
+            print('creating temp user')
+            temp_user = User(email=str(uuid.uuid4()) + "@temp.com",  # Use a dummy email for the temporary user
+                                       password=generate_password_hash("temp_password"),  # Use a dummy password for the temporary user
+                                       is_temporary=True)
+            db.session.add(temp_user)
+            db.session.commit()
+            primary_goal = Goal(user_input, user_id=temp_user.id)
+            
         try:
             db.session.add(primary_goal)
             db.session.commit()
+            session['temp_user_id'] = temp_user.id
             return primary_goal.id
 
         except SQLAlchemyError as e:

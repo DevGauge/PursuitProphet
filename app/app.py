@@ -149,7 +149,7 @@ class Goal(db.Model):
                    default=lambda: str(uuid.uuid4()))
     goal = db.Column(db.String(255), nullable=False)
     completed: bool = db.Column(db.Boolean, nullable=False)
-    tasks = db.relationship('Task', backref='goal', lazy=True)
+    tasks = db.relationship('Task', backref='goal', lazy=True, cascade="all, delete")
     user_id = db.Column(db.String(255), db.ForeignKey('user.id'), nullable=True)
     description = db.Column(db.Text, nullable=True)
     target_date = db.Column(db.Date, nullable=True)
@@ -218,6 +218,7 @@ class User(UserMixin, db.Model):
                             lazy=True)
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
+    is_temporary = False
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
