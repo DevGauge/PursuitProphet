@@ -16,7 +16,7 @@ function send_message() {
     var userInput = document.getElementById('user-message-input')
     var userMessage = userInput.value;
     userInput.value = '';
-    var chatArea = document.querySelector('#subtask-chat-box .scroll-content');
+    var chatArea = document.querySelector('#chat-box .scroll-content');
     
     var loading = document.querySelector('.loading');
     loading.style.display = 'block';
@@ -28,7 +28,7 @@ function send_message() {
     
     var xhr = new XMLHttpRequest();
     subtaskContainer = document.getElementById('subtask-container');
-    var taskId = subtaskContainer.getAttribute('data-task-id');
+    var taskId = sessionStorage.getItem('goalChatId');    
     xhr.open('POST', '/chat_api/' + taskId, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onload = function() {
@@ -54,6 +54,7 @@ function send_message() {
 
 document.getElementById('send-button').addEventListener('click', send_message);
 document.getElementById('user-message-input').addEventListener('keyup', function(event) {
+    event.preventDefault();
     if (event.key == 'Enter') {
         send_message();
     }
