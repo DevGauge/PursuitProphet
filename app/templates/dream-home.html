@@ -1,17 +1,13 @@
 {% extends 'dashboard.html' %}
 {% block main %}
 <h1 class="highlight-text"> My Dreams </h1>
+<div class="subtasks" , id="subtasks">
 {% for goal in goals %}
     {% with task_name=goal.goal %}
     {% include 'goal-card-component.html' %}
     {% endwith %}
-<!-- Display tasks related to the goal
-    <h3>Tasks in progress</h3>
-    {% for task in goal.tasks %}
-    <div class="task-icon">{{ task.icon }}</div>
-    <button class="task-button">{{ task.task }}</button>
-    {% endfor %} -->
 {% endfor %}
+</div>
 {% block extended_content %}{% endblock %}
 <a href="{{ url_for('add_dream') }}">
     <button class="plus-button">+</button>
@@ -20,4 +16,8 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='show_alert.js') }}"></script>
 <script src="{{ url_for('static', filename='goal-card-component.js') }}"></script>
+<script>
+    var Scrollbar = window.Scrollbar;
+    Scrollbar.init(document.querySelector('#subtasks'));
+</script>
 {% endblock %}

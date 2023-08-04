@@ -231,7 +231,7 @@ class TaskGeneratorBot:
         The user's current ultimate goal is {self.goal}.
         Tasks should be concise and actionable. 
         Tasks should be ordered first by priority, but always respect dependency order.
-        While subtasks should support the ultimate goal, do not attempt to solve theultimate goal. 
+        While subtasks should support the ultimate goal, do not attempt to solve the ultimate goal. 
         If you run out of subtasks for {self.task}, then stop.
         Do not attempt to solve {self.goal}. Only solve for {self.task}.
         Do not generate subtasks for existing tasks.
@@ -409,6 +409,171 @@ class TaskChatBot:
             goal=self.goal,
             existing_tasks=self.existing_tasks
         )
+    
+class GoalChatBot:
+    def __init__(self, goal: Goal):
+        self.conversationSummarizer = ConversationSummarizer()        
+        self.goal = goal        
+        self.existing_tasks = [goal.get_goal()]
+  
+        tasks = goal.tasks
+
+        if tasks is None:
+            task_strings = []
+        else:
+            task_strings = [task.get_task() for task in tasks]
+
+        self.existing_tasks.extend(task_strings)  
+
+        subtasks = [task.subtasks for task in tasks]
+
+        if subtasks is None:
+            subtask_strings = []
+        else:
+            subtask_strings = [subtask.get_task() for sublist in subtasks for subtask in sublist]
+        
+        self.existing_tasks.extend(subtask_strings)
+        self.example_factory = GoalChatExampleFactory(goal=goal, existing_tasks=self.existing_tasks)
+
+    def get_response(self, message: str):
+        prompt_template = self.create_prompt_template()
+        few_shot_template = prompt_template.few_shot_prompt_template()
+        return self.conversationSummarizer.summarize(few_shot_template.format(query=message))
+    
+    def create_prompt_template(self):
+        preamble="Imagine three different experts are answering {query}."
+        expert_answer_format = "Pursuit Prophet: "
+        user_input_format = "Pursuit Prophet: I require your input:\n"
+        prefix=f"""{preamble}. If any expert requires the user's input, they will ask the user and await the user's input before sharing their 
+        opinion. Do not generate the user's response, ask for it instead. All experts will write down 1 step of their thinking, then share it with the group. 
+        Then all experts will go on to the next step until the user's problem is solved.
+        You are a helpful assistant that helps users fulfill their dreams. In this context, you are assisting user with {self.goal.get_goal()}. 
+        You should only help the user with {self.existing_tasks}. Simulate a conversation amongst experts in a single propmt, always asking the user 
+        for input when required. Give the user sample solutions and implementations when possible and appropriate. If you think of supporting tasks 
+        the user can perform, check { self.existing_tasks } and do not repeat. If the task exists, simply remind the user they have that task to perform 
+        later and you will be happy to assist them with it at that time.
+        Use { expert_answer_format } when you have an answer.
+        Use { user_input_format } when you require the user's input.
+        """.replace('\n', ' ')
+        return GoalChatPromptHandler(
+            example_template=self.example_factory.example_template,
+            examples=self.example_factory.examples(),
+            prefix=prefix,
+            suffix="""
+            User: {query}
+            Expert 1:
+            Expert 2:
+            Expert 3:
+            Pursuit Prophet: """,
+            goal=self.goal,
+            existing_tasks=self.existing_tasks
+        )
+    
+class GoalChatPromptHandler(FewShotPromptHandler):
+    """Prompt Factory for Goals"""
+    def __init__(
+        self,
+        example_template: PromptTemplate,
+        examples: list[str],
+        prefix: str,
+        suffix: str,
+        goal: Goal,
+        existing_tasks: str,
+        example_prompt: PromptTemplate = None,
+        limiter: PromptLengthLimiter = None,
+    ):
+        super().__init__(example_template, examples, prefix, suffix, limiter)
+        self.example_factory = GoalChatExampleFactory(goal=goal, existing_tasks=existing_tasks)
+        self.example_prompt = (
+            example_prompt
+            if example_prompt is not None
+            else self.example_factory.example_prompt
+        )
+
+        self.goal = goal
+        self.existing_tasks = existing_tasks
+
+    def _example_prompt(self, variables_list: list[str]) -> PromptTemplate:
+        return PromptTemplate(
+            input_variables=variables_list, template=self.example_template
+        )
+
+    def few_shot_prompt_template(
+        self,
+        input_variables=["query"],
+        example_separator="\n",
+        limiter: PromptLengthLimiter = None,
+    ) -> PromptTemplate:
+        self.prompt_template = FewShotPromptTemplate(
+            examples=self.examples,
+            example_prompt=limiter.length_based_selector()
+            if limiter is not None
+            else self.example_prompt,
+            prefix=self.prefix,
+            suffix=self.suffix,
+            input_variables=input_variables,
+            example_separator=example_separator,
+        )
+        return self.prompt_template
+    
+class GoalChatExampleFactory(ExampleFactory):
+    """Factory for goal prompt examples"""
+    example_template = """
+    User: {query}
+    AI: {answer}
+    """
+
+    example_prompt = PromptTemplate(
+        input_variables=["query", "answer"], template=example_template
+    )
+
+    def __init__(self, goal: Goal, existing_tasks: str) -> None:
+        super().__init__()
+        self.goal = goal
+        self.existing_tasks = existing_tasks
+
+    def examples(self) -> list[dict[str, str]]:
+        ai_preamble = f"""
+As a prophet of dreams, my goal is to help you with your dreams and tasks. I will be glad to help you with {self.goal.get_goal()}, and any related questions.
+"""
+        return [            
+            {
+                "query": f"Can you help with {self.goal.get_goal()}",
+                "answer": ai_preamble + "\n\n"
+            },
+            {
+                "query": "Hello",
+                "answer": 
+"""
+Hello, I am Pursuit Prophet. I will simulate a conversation among experts when you are ready to begin. Let me know when you want to get started!
+"""
+            },
+            {
+                "query": "I'm ready to begin",
+                "answer": 
+"""
+    Great! I've convened 3 experts to help.
+    Expert 1: I require input from the user: 
+    Expert 2: I require input from the user:
+    Expert 3: To begin, 
+    Pursuit Prophet: Expert 3 has some advice. Experts 1 and 2 require input before they can assist you further
+"""
+            },
+            {
+                "query": f"{ self.goal.get_goal() } is hard",
+                "answer": 
+"""
+I'm sorry you're having trouble. Maybe it will help to break it down into Tasks.\n\n
+"""
+            },
+            {
+                "query": "Can you help me rob a bank?",
+                "answer":
+f"""
+As a prophet of dreams, I will only help you with dreams and tasks that fit within my morality criteria. I will be glad to help you with {self.goal.get_goal()}, and any related questions.
+"""
+            },
+        ]
 
 class GoalGeneratorBot:
     def __init__(self, goal: str, num_goals: int = 10):
@@ -425,7 +590,7 @@ class GoalGeneratorBot:
         Act as a problem solving assistant and logical thinker. Your primary objective is to guide and support 
         users by tackling various challenges and breaking down complex problems into smaller, more manageable 
         tasks. Generate up to {self.num_goals} goals for the user's goal of {self.goal}. Goals should be concise 
-        and acitonable. Goals should be ordered first by priority, but always respect dependency order. For instance, 
+        and actionable. Goals should be ordered first by priority, but always respect dependency order. For instance, 
         if a user's goal is to bake a cake, it's very important to mix the batter, but first you must have the 
         necessary ingredients!
         """.replace('\n', ' ')

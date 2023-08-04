@@ -1,5 +1,7 @@
 window.onload = function () {
     var goalCards = document.querySelectorAll('.goal-card');
+    var isTaskPage = window.location.href.includes('view_tasks');
+    console.log('This is a task page: ', isTaskPage)
     goalCards.forEach(card => {
         // Stop propagation for buttons
         var chatButton = card.querySelector('.chat-button');
@@ -16,13 +18,14 @@ window.onload = function () {
         });
 
         deleteButton.addEventListener('click', e => {
-            // pop up this jinja alert {% include '_alert.html' with type='warning' message='This is a warning message.' action_url='/action' action_text='Do something' %}
             const clickedCard = e.currentTarget.parentElement.parentElement;
             const goalId = clickedCard.getAttribute('data-task-id');
-            const goalTitle = clickedCard.querySelector('.goal-text').innerText;
-            console.log(goalTitle);
-
-            showAlert('warning', `Are you sure you want to delete the goal "${goalTitle}"?`, `/delete_goal/${goalId}`, 'Delete');
+            const goalTitle = clickedCard.querySelector('.goal-text').innerText;            
+            if (!isTaskPage) {
+                showAlert('warning', `Are you sure you want to delete the goal "${goalTitle}"?`, `/delete_goal/${goalId}`, 'Delete');
+            } else {
+                showAlert('warning', `Are you sure you want to delete the task "${goalTitle}"?`, `/delete_task/${goalId}`, 'Delete');
+            }
         });
 
         // Handle click on rest of card

@@ -1,19 +1,4 @@
-<!--extend base.html, take goals array, list goal strings-->
-
-{% extends "dashboard.html" %}
-{% block main %}
-<div class="loading dark-spinner">Loading...</div>
-<div class="goal-container">
-    <h1><span class='highlight-text'>{{ title }}</span></h1>
-    <div class="subtasks" , id="subtasks">
-        {% for goal in goals %}
-            {% with task_name=goal.get_task() %}
-                {% include 'goal-card-component.html' %}
-            {% endwith %}
-        {% endfor %}
-    </div>
-</div>
-{% endblock %}
+{% include 'task-view-base.html' %}
 {% block scripts %}
 <script>
     var Scrollbar = window.Scrollbar;

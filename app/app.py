@@ -28,8 +28,8 @@ roles_users = db.Table('roles_users',
     db.Column('role_id', db.String(255), db.ForeignKey('role.id')))
 
 class DreamForm(FlaskForm):
-    goal = StringField('Dream Name', validators=[DataRequired()])
-    description = TextAreaField('Dream Description', validators=[Optional()])
+    goal = StringField('Dream Name', validators=[DataRequired()], render_kw={"placeholder": "What are you dreaming of?"})
+    description = TextAreaField('Dream Description', validators=[Optional()], render_kw={"placeholder": "Describe your dream"})
     target_date = DateField('Target Date', format='%Y-%m-%d', validators=[Optional()])
     target_time = TimeField('Target Time', format='%H:%M', validators=[Optional()])
     submit = SubmitField()
@@ -86,11 +86,10 @@ class Task(db.Model):
     subtasks = db.relationship('Task', backref=db.backref('parent', remote_side=[id]))
     goal_id = db.Column(db.String(255), db.ForeignKey('goal.id'), nullable=False)
 
-    def __init__(self, task: str, goal_id: str, parent_id: str = None, **kwargs):
+    def __init__(self, task: str, goal_id: str, **kwargs):
         super(Task, self).__init__(**kwargs)
         self.task = task
         self.goal_id = goal_id
-        self.parent_id = parent_id
         self.completed = kwargs.get('completed', False)
 
     def mark_as_complete(self):

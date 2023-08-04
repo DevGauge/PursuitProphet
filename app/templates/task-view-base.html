@@ -1,0 +1,19 @@
+{% extends "dashboard.html" %}
+{% block main %}
+<div class="loading dark-spinner">Loading...</div>
+<div class="goal-container">
+    {% if subtitle != None %}
+    <h1><span class='highlight-text'>{{ title }}</span></h1>
+    {% else %}
+    <h1><span class='highlight-text'>{{ subtitle }}</span></h1>
+    <h3><span class='highlight-text'>{{ title }}</span></h3>
+    {% endif %}
+    <div class="subtasks" , id="subtasks">
+        {% for goal in goals %}
+            {% with task_name=goal.get_task() %}
+                {% include 'goal-card-component.html' %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

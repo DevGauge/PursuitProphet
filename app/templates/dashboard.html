@@ -30,9 +30,9 @@
                 </div>
             </div>
             {% endif %}
-
+            <a href="{{ back_button_url }}">{{ back_button_text }}</a>
             {% block main %}{% endblock %}
-            {% block extended_content %}{% endblock %}            
+            {% block extended_content %}{% endblock %}
         </div>
     </div>
 </div>

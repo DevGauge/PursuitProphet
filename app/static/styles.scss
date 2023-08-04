@@ -269,78 +269,6 @@ body {
     box-sizing: border-box;
 }
 
-// // Registration/login
-// .register-form-container,
-// .login-form-container,
-// .goal-detail-container {
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     height: 100vh;
-//     padding: 0px;
-//     margin: 0;
-//     width: 100%;
-
-//     .register-form,
-//     .login-form,
-//     .goal-detail-form {
-//         display: flex;
-//         flex-direction: column;
-//         background-color: #333;
-//         border-radius: 24px;
-//         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-//         letter-spacing: 0px;
-//         padding: 16px;
-
-//         label {
-//             font-weight: 300;
-//             font-size: 14px;
-//         }
-
-//         textarea {
-//             border: 1px solid transparent;
-//             background-color: #333;
-//             color: white;
-//             font-size: 14px;
-//             height: 100px;
-
-//             &::placeholder {
-//                 padding: 10px;
-//             }
-
-//             &:hover,
-//             &:focus,
-//             &:active {
-//                 outline: none;
-//                 border-color: #910FF1 #6826AA #910FF1;
-//             }
-
-//             // replace autofill background color with transparency
-//             &:-webkit-autofill,
-//             &:-webkit-autofill:focus {
-//                 -webkit-box-shadow: 0 0 0px 1000px #333 inset;
-//                 box-shadow: 0 0 0px 1000px #333 inset;
-//                 outline-color: transparent;
-//                 transition: background-color 600000s 0s, color 600000s 0s;
-//             }
-
-//             &:-moz-autofill {
-//                 box-shadow: 0 0 0px 1000px #333 inset;
-//                 outline: none;
-//             }
-
-//             &:-ms-autofill {
-//                 box-shadow: 0 0 0px 1000px #333 inset;
-//                 outline: none;
-//             }
-//         }
-//     }
-
-//     .goal-detail-form {
-//         width: 50%;
-//     }
-// }
-
 @mixin form-container {
     display: flex;
     justify-content: center;
@@ -359,6 +287,37 @@ body {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     letter-spacing: 0px;
     padding: 16px;
+    min-width: 20%;
+
+    label {
+        font-weight: semibold;
+        text-decoration: underline;
+    }
+    
+    input,
+    textarea {
+        margin-bottom: 10px;
+    }
+
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(218deg) brightness(95%) contrast(80%);
+        height: 20px;
+        width: 20px;
+    }
+    
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        height: 20px;
+        width: 20px;
+        filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(218deg) brightness(95%) contrast(80%);
+    }
+
+    input[type="time"]::-webkit-calendar-picker-indicator:hover {
+        filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(291deg) brightness(95%) contrast(80%);
+    }
+    
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(291deg) brightness(95%) contrast(80%);
+    }
 }
 
 .register-form-container,
