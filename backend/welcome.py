@@ -52,6 +52,11 @@ def handle_message(data):
     print('received message: ' + data)
     send(data, broadcast=True)
 
+from sqlalchemy import exc
+@app.errorhandler(exc.SQLAlchemyError)
+def handle_db_exceptions(error):
+    db.session.rollback()
+
 @app.route('/error/<string:error_message>')
 def error_page(error_message):
     return render_template('error.html', error_message=error_message)
