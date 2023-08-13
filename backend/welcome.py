@@ -13,7 +13,7 @@ from app.app import db, app_instance
 from flask_socketio import SocketIO, send, emit
 from flask_security import roles_required, login_required, login_user, user_registered, current_user
 from flask_security.confirmable import confirm_user, confirm_email_token_status
-from flask_security.utils import generate_token
+from flask_security.utils import generate_reset_password_token
 from LangChainAgentFactory import AgentFactory
 from langchain.tools import StructuredTool
 
@@ -380,7 +380,7 @@ def reset_password():
     email = request.form.get('email')
     user = app_instance.user_datastore.find_user(email=email)
     if user is not None:
-        reset_password_token = generate_token(user.id)
+        reset_password_token = generate_reset_password_token(user)
         return redirect(url_for('security.reset_password', token=reset_password_token))
     else:
         flash('Invalid email address.', 'error')
