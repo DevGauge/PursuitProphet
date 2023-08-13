@@ -281,10 +281,7 @@ class App:
         flask_app.config['MAIL_USERNAME'] = 'no-reply@pursuitprophet.com'
         flask_app.config['MAIL_PASSWORD'] = mail_password
         flask_app.config['MAIL_DEFAULT_SENDER'] = 'no-reply@pursuitprophet.com'
-        flask_app.config['SECURITY_EMAIL_SENDER'] = 'Your Custom Email Sender'
-        flask_app.config['SECURITY_EMAIL_SUBJECT_REGISTER'] = 'Your Custom Email Subject'
-        flask_app.config['SECURITY_CONFIRM_EMAIL_WITHIN'] = 'Your Custom Email Confirmation Time'
-        flask_app.config['SECURITY_TEMPLATE_PATH'] = 'Your Custom Template Path'
+        flask_app.config['SECURITY_TEMPLATE_PATH'] = './app/templates/security/'
 
         flask_app.mail = Mail(flask_app)
         
