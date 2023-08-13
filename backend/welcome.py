@@ -285,13 +285,15 @@ def goal_generation():
     title = request.args.get('title')
     goal_id = request.args.get('goal_id')
     goal = Goal.query.filter_by(id=goal_id).first()
+    print(f'received goal: {goal.goal}')
     try:
         bot.generate_goals(goal)
         tasks = Task.query.filter_by(goal_id=goal_id).all()
-        return render_template('generate_goals.html', goals=tasks, title=title)
+        return render_template('generate_goals.html', goals=tasks, title=title, goal=goal)
     except Exception as e:
+        print('exception when generating goals')
         print(e)
-        return redirect(url_for('error_page', error_message=str(e)))        
+        return redirect(url_for('error_page', error_message=str(e)))
 
 @app.route('/chat')
 def chat():

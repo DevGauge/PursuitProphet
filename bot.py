@@ -237,7 +237,7 @@ class GoalManager:
         
         subtasks = text.split('\n')  # Split the response into subtasks
         # create a task object for each subtask
-        subtasks = [Task(subtask, task.goal_id, task.id) for subtask in subtasks]
+        subtasks = [Task(subtask, task.goal_id, parent_id=task.id) for subtask in subtasks]
         errors = [] # TODO handle errors thrown while saving subtasks
         for subtask in subtasks:
             try:
