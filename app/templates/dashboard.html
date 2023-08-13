@@ -6,7 +6,7 @@
         {% if current_user.is_authenticated %}
         <!-- url for dashboard -->
         <a class="nav-link" href="{{ url_for('dashboard') }}">Home</a>
-        <!-- <div class="nav-icon">Tasks</div> -->
+        <a class="nav-link" href="{{ url_for_security('logout') }}">Logout</a>
         {% else %}
         <a class="nav-link" href="/demo">Demo</a>
         <a class="nav-link" href="{{ url_for_security('login') }}">Login</a>
@@ -18,16 +18,15 @@
             <!-- Header section -->
             {% if current_user.is_authenticated %}
             <div class="header">
-                <div class="search-container">
+                <!-- <div class="search-container">
                     <input type="text" class="input" placeholder="Search Tasks">
                     <div class="search-icon">Search Icon</div>
-                </div>
-                <div class="icon-container">
+                </div> -->
+                <!-- <div class="icon-container">
                     <div class="profile-icon">Profile Icon</div>
                     <div class="notification-icon">Notification Icon</div>
-                    <div class="dropdown-icon">Dropdown Icon</div>
-                    <a class="nav-link" href="{{ url_for_security('logout') }}">Logout</a>
-                </div>
+                    <div class="dropdown-icon">Dropdown Icon</div>                    
+                </div> -->
             </div>
             {% endif %}
             <a href="{{ back_button_url }}">{{ back_button_text }}</a>

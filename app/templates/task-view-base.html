@@ -3,9 +3,17 @@
 <div class="loading dark-spinner">Loading...</div>
 <div class="goal-container">
     {% if subtitle != None %}
-    <h1><span class='highlight-text'>{{ title }}</span></h1>
+    <h1>
+        <a href="{{ url_for('goal_detail', goal_id=goal.id) }}">
+            <span class='highlight-text'>{{ title }}</span>
+        </a>
+    </h1>
     {% else %}
-    <h1><span class='highlight-text'>{{ subtitle }}</span></h1>
+    <h1>
+        <a href="{{ url_for('goal_detail', goal_id=goal.id) }}">
+            <span class='highlight-text'>{{ subtitle }}</span>
+        </a>
+    </h1>    
     <h3><span class='highlight-text'>{{ title }}</span></h3>
     {% endif %}
     <div class="subtasks" , id="subtasks">

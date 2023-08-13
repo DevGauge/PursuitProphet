@@ -1,5 +1,3 @@
-<!-- TODO: go back to goal detail -->
-<a href="{{ url_for('goal-detail') }}" style="padding: 10px;">Back to {{ goal.goal }}</a>
 {% include 'task-view-base.html' %}
 {% block scripts %}
 <script>
@@ -8,4 +6,7 @@
 </script>
 <script src="{{ url_for('static', filename='show_alert.js') }}"></script>
 <script src="{{ url_for('static', filename='goal-card-component.js') }}"></script>
+<a href="{{ url_for('new_subtask', task_id=goal.id) }}">
+    <button class="plus-button">+</button>
+</a>
 {% endblock %}

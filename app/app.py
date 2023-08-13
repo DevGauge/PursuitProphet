@@ -37,6 +37,17 @@ class DreamForm(FlaskForm):
     def __init__(self, obj=None, **kwargs):
         super().__init__(obj=obj, **kwargs)
 
+class TaskForm(FlaskForm):
+    goal = StringField('Task Name', validators=[DataRequired()], render_kw={"placeholder": "What do you need to do?"})
+    target_date = DateField('Target Date', format='%Y-%m-%d', validators=[Optional()])
+    target_time = TimeField('Target Time', format='%H:%M', validators=[Optional()])
+    submit = SubmitField()
+
+    def __init__(self, obj=None, **kwargs):
+        super().__init__(obj=obj, **kwargs)
+        if obj:
+            self.goal.data = obj.task
+
 class RegistrationForm(ConfirmRegisterForm):
     aka = StringField('Nickname (Optional)', [
         Optional(),
@@ -85,12 +96,16 @@ class Task(db.Model):
     parent_id = db.Column(db.String(255), db.ForeignKey('task.id'))
     subtasks = db.relationship('Task', backref=db.backref('parent', remote_side=[id]))
     goal_id = db.Column(db.String(255), db.ForeignKey('goal.id'), nullable=False)
+    target_date = db.Column(db.Date, nullable=True)
+    target_time = db.Column(db.Time, nullable=True)
 
-    def __init__(self, task: str, goal_id: str, **kwargs):
+    def __init__(self, task: str, goal_id: str, target_date=None, target_time=None, **kwargs):
         super(Task, self).__init__(**kwargs)
         self.task = task
         self.goal_id = goal_id
         self.completed = kwargs.get('completed', False)
+        self.target_date = target_date
+        self.target_time = target_time
 
     def mark_as_complete(self):
         """Mark the task as complete."""

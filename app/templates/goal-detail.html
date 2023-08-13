@@ -4,27 +4,22 @@
 <div class="goal-detail-container">
     <form class="goal-detail-form" method="POST">
         {% if goal -%}
-        {%- if goal.parent_id -%}
-        {%- if not goal.tasks -%}
-        <a href="{{ url_for('generate_subtasks', task_id=goal.id) }}" onclick="showLoading()">
-            <input class="standard-button" type="button" value="Generate Subtasks"></input></a>
-            {%- else -%}
-            <a href="{{ url_for('view_subtasks', title=goal.goal, goal_id=goal.id, parent_id=goal.parent_id) }}">
-            <input class="standard-button" type="button" value="View Subtasks ({{goal.tasks|length }})"></input></a>
-            {%- endif -%}
-        {%- elif goal and goal.tasks -%}
-        <a href="{{ url_for('view_tasks', goal_id=goal.id) }}">
-        <input class="standard-button" type="button" value="View Tasks ({{goal.tasks|length }})"></input></a>
-        {%- elif goal and not goal.tasks %}
-        <!-- TODO: Loading -->
-        <a href="{{ url_for('goal_generation', title=goal.goal, goal_id=goal.id) }}" onclick="showLoading()">
-        <button class="standard-button" type="button">Generate Tasks</button></a>
+        {%- if 'task' not in request.path -%}
+        <h1>{{ goal.goal }}</h1>
+          <a href="{{ url_for('view_tasks', goal_id=goal.id) }}">
+          <input class="standard-button" type="button" value="View Tasks ({{goal.tasks|length}})"> 
+        {%- elif 'task' in request.path and 'new_subtask' not in request.path-%}
+          <h1>{{ goal.task }}</h1>          
+          <a href="{{ url_for('view_subtasks', title=goal.task, task_id=goal.id) }}">
+          <input class="standard-button" type="button" value="View Subtasks ({{goal.subtasks|length}})">
         {% endif %}
-        {% endif %}
-        
+        {%- endif %}
+        </input></a>        
         {{ form.hidden_tag() }}
         {{ form.goal.label }} {{ form.goal() }}
+        {%- if 'task' not in request.path -%}        
         {{ form.description.label }} {{ form.description() }}
+        {% endif %}
         {{ form.target_date.label }} {{ form.target_date() }}
         {{ form.target_time.label }} {{ form.target_time() }}
         {{ form.submit(class="standard-button") }}        

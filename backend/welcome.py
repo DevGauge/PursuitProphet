@@ -8,7 +8,7 @@ from bot import ChatBot
 from langchain_m.langchain_module import TaskChatBot, GoalChatBot
 import app.app
 from app.app import Goal, Task, User
-from app.app import DreamForm
+from app.app import DreamForm, TaskForm
 from app.app import db, app_instance
 from flask_socketio import SocketIO, send, emit
 from flask_security import roles_required, login_required, login_user, user_registered, current_user
@@ -106,6 +106,7 @@ def dashboard():
         user = app_instance.user_datastore.find_user(id=user_id)
         if user is not None:
             goals = Goal.query.filter_by(user_id=user_id).all()
+            print(app.jinja_env.list_templates())
             return render_template('dream-home.html', goals=goals)
         
     return redirect(url_for('security.login'))
@@ -141,6 +142,27 @@ def delete_task(task_id):
     else:
         print(f'goal with id {task.goal_id} not found')
         return redirect(url_for('dashboard'))
+    
+@app.route('/delete_subtask/<subtask_id>', methods=['GET', 'POST'])
+def delete_subtask(subtask_id):
+    subtask=Task.query.filter_by(id=subtask_id).first()
+    print(f'subtask parent id: {subtask.parent_id}')
+    task = Task.query.filter_by(id=subtask.parent_id).first()
+    goal = Goal.query.filter_by(id=task.goal_id).first()
+    if subtask is None:
+        flash('Subtask not found.', 'error')
+        print("subtask not found")
+        return redirect(url_for('dashboard'))
+    else:
+        db.session.delete(subtask)
+        db.session.commit()
+        flash('Your task has been deleted.', 'success')
+    if task is not None:
+        print(f"task and subtask found: {task.task}\n{subtask.task}")
+        return redirect(url_for('view_subtasks', task_id=task.id, title=goal.goal))
+    else:
+        print(f'goal with id {task.goal_id} not found')
+        return redirect(url_for('dashboard'))
 
 @app.route('/add_dream', methods=['GET', 'POST'])
 def add_dream():
@@ -158,18 +180,55 @@ def add_dream():
         return redirect(url_for('dashboard'))
     return render_template('goal-detail.html', form=form, goal=None)
 
+@app.route('/new_task/<goal_id>', methods=['GET', 'POST'])
+def new_task(goal_id: str):
+    form = TaskForm()
+    form.submit.label.text = 'Add Task'
+    goal = Goal.query.filter_by(id=goal_id).first()
+    if form.validate_on_submit():
+        new_task = Task(form.goal.data,
+                        goal_id=goal_id,
+                        target_date=form.target_date.data,
+                        target_time=form.target_time.data)
+        db.session.add(new_task)
+        db.session.commit()
+        flash('Your task has been added.', 'success')
+        return redirect(url_for('view_tasks', goal_id=goal_id, title=goal.goal))
+    return render_template('goal-detail.html', form=form, goal=goal)
+
+@app.route('/new_subtask/<task_id>', methods=['GET', 'POST'])
+def new_subtask(task_id: str):
+    form = TaskForm()
+    form.submit.label.text = 'Add Subtask'
+    parent_task = Task.query.filter_by(id=task_id).first()
+    goal_id = parent_task.goal_id
+    goal = Goal.query.filter_by(id=goal_id).first()
+    if form.validate_on_submit():
+        submitted_subtask = Task(form.goal.data,
+                        goal_id=goal_id,
+                        parent_id=task_id,
+                        target_date=form.target_date.data,
+                        target_time=form.target_time.data)
+        db.session.add(submitted_subtask)
+        db.session.commit()
+        flash('Your task has been added.', 'success')        
+        return redirect(url_for('view_tasks', goal_id=goal_id, title=goal.goal))
+    return render_template('goal-detail.html', form=form, goal=goal)
+
 @app.route('/goal/<goal_id>', methods=['GET', 'POST'])
 def goal_detail(goal_id):
     goal = Goal.query.get(goal_id)
     form = DreamForm(obj=goal)
-    if form.validate_on_submit():        
+    form.submit.label.text = 'Update Dream'
+    if form.validate_on_submit():
         goal.goal = form.goal.data
         goal.description = form.description.data
         goal.target_date = form.target_date.data
         goal.target_time = form.target_time.data
         db.session.commit()
         flash('Your dream has been updated.', 'success')
-        return redirect(url_for('dashboard'))
+        return render_template('goal-detail.html', form=form, goal=goal)
+        
     else:
         goal = Goal.query.get(goal_id)
         if goal is None:
@@ -180,21 +239,46 @@ def goal_detail(goal_id):
         form = DreamForm(obj=goal)
         form.submit.label.text = 'Update Dream'
         return render_template('goal-detail.html', form=form, goal=goal)
+    
+@app.route('/task/<task_id>', methods=['GET', 'POST'])
+def task_detail(task_id):
+    task = Task.query.get(task_id)
+    form = TaskForm(obj=task)
+    form.submit.label.text = 'Update Task'
+    if form.validate_on_submit():
+        task.task = form.goal.data
+        task.target_date = form.target_date.data
+        task.target_time = form.target_time.data
+        db.session.commit()
+        flash('Your task has been updated.', 'success')
+        return render_template('goal-detail.html', form=form, goal=task)
+        
+    else:
+        if task is None:
+            flash('Task not found.', 'error')
+            return redirect(url_for('dashboard'))
+        else:
+            print(task.task)
+            form = TaskForm(obj=task)
+            form.submit.label.text = 'Update Task'
+            return render_template('goal-detail.html', form=form, goal=task)
+
 @app.route('/view_tasks', methods=['GET'])
 def view_tasks():    
     goal_id = request.args.get('goal_id')
     goal = Goal.query.filter_by(id=goal_id).first()
     tasks = Task.query.filter_by(goal_id=goal_id).all()
+    tasks = [task for task in tasks if task.parent_id is None]
     return render_template('view-tasks.html', goals=tasks, goal=goal, title=goal.goal)
 
 @app.route('/view_subtasks', methods=['GET'])
 def view_subtasks():
-    task_id = request.args.get('goal_id')
+    task_id = request.args.get('task_id')
+    print(f'task id: {task_id}')
     task = Task.query.filter_by(id=task_id).first()
     goal = Goal.query.filter_by(id=task.goal_id).first()
     subtasks = Task.query.filter_by(parent_id=task_id).all()
-    return render_template('view-subtasks.html', goal=task, subtasks=subtasks, title=goal.goal, subtitle=task.task)
-    
+    return render_template('view-subtasks.html', goal=task, goals=subtasks, title=goal.goal, subtitle=task.task)
 
 @app.route('/generate_goals', methods=['GET', 'POST'])
 def goal_generation():
