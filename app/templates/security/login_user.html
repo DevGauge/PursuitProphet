@@ -16,20 +16,10 @@
         <span class="form-error">{{ error }}</span>
     {% endfor %}
     <br>
-
-    {{ login_user_form.password.label }}<br>
-    {{ login_user_form.password(size=32, placeholder="Enter your desired password") }}
-    {% for error in login_user_form.password.errors %}
-        <span class="form-error">{{ error }}</span>
-    {% endfor %}
-    <br>
-    <a href="{{ url_for_security('reset_password', token=reset_password_token) }}">Forgot password?</a>
-    <br>
-
     {{ login_user_form.submit(class="standard-button") }}
     <br>
     <br>
-    <a href="{{ url_for_security('forgot_password') }}">Forgot password?</a>
+    <a href="{{ url_for_security('reset_password', token=reset_password_token) }}">Forgot password?</a>
   </form>  
 </div>
 {% endblock %}
