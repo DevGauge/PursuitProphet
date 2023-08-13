@@ -106,9 +106,8 @@ def dashboard():
         user = app_instance.user_datastore.find_user(id=user_id)
         if user is not None:
             goals = Goal.query.filter_by(user_id=user_id).all()
-            reset_password_token = generate_reset_password_token(user)
             print(app.jinja_env.list_templates())
-            return render_template('dream-home.html', goals=goals, reset_password_token=reset_password_token)
+            return render_template('dream-home.html', goals=goals)
         
     return redirect(url_for('security.login'))
 
@@ -376,3 +375,13 @@ if __name__ == '__main__':
     if port is None:
         port = 5000
     socketio.run(app, host='0.0.0.0', port=port)
+@app.route('/reset_password', methods=['POST'])
+def reset_password():
+    email = request.form.get('email')
+    user = app_instance.user_datastore.find_user(email=email)
+    if user is not None:
+        reset_password_token = generate_reset_password_token(user)
+        return redirect(url_for('security.reset_password', token=reset_password_token))
+    else:
+        flash('Invalid email address.', 'error')
+        return redirect(url_for('security.forgot_password'))
