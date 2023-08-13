@@ -14,7 +14,6 @@ from flask_socketio import SocketIO, send, emit
 from flask_security import roles_required, login_required, login_user, user_registered, current_user
 from flask_security.confirmable import confirm_user, confirm_email_token_status
 from flask_security.utils import generate_token
-import uuid
 from LangChainAgentFactory import AgentFactory
 from langchain.tools import StructuredTool
 
