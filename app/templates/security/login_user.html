@@ -23,6 +23,8 @@
         <span class="form-error">{{ error }}</span>
     {% endfor %}
     <br>
+    <a href="{{ url_for_security('reset_password', email=login_user_form.email.data) }}">Forgot password?</a>
+    <br>
 
     {{ login_user_form.submit(class="standard-button") }}
     <br>
