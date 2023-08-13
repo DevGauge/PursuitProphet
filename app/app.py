@@ -270,7 +270,8 @@ class App:
         flask_app.config['SECURITY_PASSWORD_SALT'] = os.getenv('SECURITY_PASSWORD_SALT')
         # flask-security-too registration settings
         flask_app.config['SECURITY_REGISTERABLE'] = True
-        flask_app.config['SECURITY_CONFIRMABLE'] = True        
+        flask_app.config['SECURITY_CONFIRMABLE'] = True
+        flask_app.config['SECURITY_RECOVERABLE'] = True
         flask_app.config['SECURITY_POST_REGISTER_VIEW'] = 'thank_you'                
         flask_app.config['SECURITY_INCLUDE_JQUERY'] = True
         flask_app.config['SECURITY_WTFORMS_USE_CDN'] = True

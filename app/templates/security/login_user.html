@@ -25,6 +25,9 @@
     <br>
 
     {{ login_user_form.submit(class="standard-button") }}
-  </form>
+    <br>
+    <br>
+    <a href="{{ url_for_security('forgot_password') }}">Forgot password?</a>
+  </form>  
 </div>
 {% endblock %}
