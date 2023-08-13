@@ -11,7 +11,7 @@ from app.app import Goal, Task, User
 from app.app import DreamForm, TaskForm
 from app.app import db, app_instance
 from flask_socketio import SocketIO, send, emit
-from flask_security import roles_required, login_required, login_user, user_registered, current_user
+from flask_security import roles_required, login_required, login_user, user_registered, current_user, generate_reset_password_token
 from flask_security.confirmable import confirm_user, confirm_email_token_status
 import uuid
 from LangChainAgentFactory import AgentFactory
@@ -106,8 +106,9 @@ def dashboard():
         user = app_instance.user_datastore.find_user(id=user_id)
         if user is not None:
             goals = Goal.query.filter_by(user_id=user_id).all()
+            reset_password_token = generate_reset_password_token(user)
             print(app.jinja_env.list_templates())
-            return render_template('dream-home.html', goals=goals)
+            return render_template('dream-home.html', goals=goals, reset_password_token=reset_password_token)
         
     return redirect(url_for('security.login'))
 
