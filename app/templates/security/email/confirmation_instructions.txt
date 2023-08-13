@@ -1,0 +1,10 @@
+Dear {{ user.email }},
+
+Thank you for registering a new account at Pursuit Prophet. Please click the link below to confirm your email and activate your account so you can start getting help with your dreams:
+
+You can confirm your account here: {{ confirmation_link }}
+
+If you did not make this request, please ignore this email.
+
+Thank you,
+The Pursuit Prophet

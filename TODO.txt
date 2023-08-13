@@ -1,0 +1,8 @@
+1. templates for add task and subtask
+  a. takes goal or task in order to link them together
+  b. has generate tasks button
+    i. should alert how many tasks?
+
+2. remove logic for task generation on detail form
+  a. move to task and subtask list views
+  b. or maybe on goal component card or both
