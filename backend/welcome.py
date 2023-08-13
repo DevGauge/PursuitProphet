@@ -13,7 +13,6 @@ from app.app import db, app_instance
 from flask_socketio import SocketIO, send, emit
 from flask_security import roles_required, login_required, login_user, user_registered, current_user
 from flask_security.confirmable import confirm_user, confirm_email_token_status
-from flask_security.utils import generate_reset_password_token
 from LangChainAgentFactory import AgentFactory
 from langchain.tools import StructuredTool
 
@@ -375,13 +374,4 @@ if __name__ == '__main__':
     if port is None:
         port = 5000
     socketio.run(app, host='0.0.0.0', port=port)
-@app.route('/reset_password', methods=['POST'])
-def reset_password():
-    email = request.form.get('email')
-    user = app_instance.user_datastore.find_user(email=email)
-    if user is not None:
-        reset_password_token = generate_reset_password_token(user)
-        return redirect(url_for('security.reset_password', token=reset_password_token))
-    else:
-        flash('Invalid email address.', 'error')
-        return redirect(url_for('security.forgot_password'))
+    

@@ -11,15 +11,31 @@
     {{ login_user_form.hidden_tag() }}
 
     {{ login_user_form.email.label }}<br>
-    {{ login_user_form.email(size=32, placeholder="name@example.com") }}
+    {{ login_user_form.email(size=32, placeholder="name@example.com", id="email-input") }}
     {% for error in login_user_form.email.errors %}
         <span class="form-error">{{ error }}</span>
     {% endfor %}
     <br>
+
+    {{ login_user_form.password.label }}<br>
+    {{ login_user_form.password(size=32, placeholder="Enter your desired password") }}
+    {% for error in login_user_form.password.errors %}
+        <span class="form-error">{{ error }}</span>
+    {% endfor %}
+    <br>
+
     {{ login_user_form.submit(class="standard-button") }}
-    <br>
-    <br>
-    <a href="{{ url_for_security('reset_password', token=reset_password_token) }}">Forgot password?</a>
+    <a id='forgot-password-link' href="#">Forgot password?</a>
   </form>  
 </div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById('forgot-password-link').addEventListener('click', function(e) {
+      var email = document.getElementById('email-input').value;
+      var url = "{{ url_for_security('forgot_password') }}?email_address=" + encodeURIComponent(email);
+      window.location.href = url;
+      e.preventDefault();
+  });
+</script>
 {% endblock %}
