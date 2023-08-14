@@ -44,6 +44,10 @@
                 i++;
             } else {
                 clearInterval(intervalId);
+                var form = document.getElementById('primary_goal_form');
+                var loading = document.querySelector('.loading');
+                loading.style.display = 'block';
+                form.submit();                
             }
         }, delay);
     }
