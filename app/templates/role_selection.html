@@ -9,7 +9,7 @@
         <span class="border"></span>
         <form id="primary_goal_form" action="{{ url_for('role_selection') }}" method="POST">
             <input type="hidden" name="role" id="selectedRole">
-            <button type="submit" class="submit-button" name="goal">Submit</button>
+            <button type="submit" class="standard-button" name="goal">Submit</button>
         </form>
     </div>
     <h2 class="text-center sub-heading">Examples</h2>
@@ -30,9 +30,9 @@
         <p class="introduction-text">Thanks for previewing our plan-generating, task-munching, <span class="highlight-text">dream-achieving</span> goal tracker<br>
             <span class="highlight-text">Pursuit Prophet</span> is a tool that helps you achieve your goals by breaking them down into smaller, more manageable tasks<br>
             <span class="highlight-text">Pursuit Prophet</span> is powered by <span class="highlight-text">ChatGPT</span>, to chat with you about your goals and generate tasks for you to complete<br>
-            Try this sneak-peek of <span class="highlight-text">Pursuit Prophet's</span> task and subtask generation, and <a href='mailto:info@pursuitprophet.com'>tell us how it went</a>!
+            Try this sneak-peek of <span class="highlight-text">Pursuit Prophet's</span> task and subtask generation, and <a href='mailto:info@pursuitprophet.com'>tell us how it went</a>!<br>
+            If you want to save your progress, simply <a href="{{ url_for_security('register') }}">register</a> an account and we'll save your goal and tasks for you.
         </p>
-
     </div>
 </div>
 <script>

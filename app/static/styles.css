@@ -640,11 +640,6 @@ button.submit-button {
   transition: all 0.5s ease-in-out;
   justify-content: space-between;
   align-items: center;
-  width: 80%;
-}
-
-.text-container:focus-within {
-  width: 100%;
 }
 
 .text-center {
