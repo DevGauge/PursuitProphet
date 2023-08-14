@@ -1,0 +1,5 @@
+Your security is important to us at Pursuit Prophet. Please visit the following link to reset your password: {{ _fsdomain('Click here to reset your password') }}
+
+Thanks for your time,
+
+The Prophet - https://pursuitprophet.com
