@@ -35,6 +35,14 @@
         </p>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='show_alert.js') }}"></script>
+<script>
+    // show alert on load
+    // window.onload = showAlert('info', 'Welcome to Early Access and Thanks for previewing Pursuit Prophet!')
+</script>
 <script>
     function typeText(element, text, delay) {
         var i = 0;

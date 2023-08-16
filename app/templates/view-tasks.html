@@ -1,4 +1,11 @@
 {% include 'task-view-base.html' %}
+{% block content %}
+<a href="{{ url_for('new_task', goal_id=goal.id) }}">
+    <button class="plus-button">+</button>
+</a>
+<button class="generate-button"></button>
+
+{% endblock %}
 {% block scripts %}
 <script>
     var Scrollbar = window.Scrollbar;
@@ -6,9 +13,26 @@
 </script>
 <script src="{{ url_for('static', filename='show_alert.js') }}"></script>
 <script src="{{ url_for('static', filename='goal-card-component.js') }}"></script>
-<a href="{{ url_for('new_task', goal_id=goal.id) }}">
-    <button class="plus-button">+</button>
-</a>
-<a href="{{ url_for('goal_generation', goal_id=goal.id) }}">
-    <button class="generate-button"></button>
+<script>
+var generateButton = document.querySelector('.generate-button');
+generateButton.addEventListener('click', function() {
+    max_goals = 20
+    var goalId = '{{ goal.id }}';
+    var numGoals = prompt("How many goals would you like to generate? (Max " + max_goals + ")");
+
+    if (numGoals) {
+        numGoals = parseInt(numGoals);
+        while (isNaN(numGoals) || numGoals <= 0 || numGoals > max_goals) {
+            numGoals = prompt("Please enter a positive number less than or equal to " + max_goals + ".");
+            if (!numGoals) {
+                return;
+            }
+            numGoals = parseInt(numGoals);
+        }
+        var newUrl = "/generate_goals/" + numGoals + "?goal_id=" + goalId;
+        window.location.assign(newUrl);
+    }
+});
+
+</script>
 {% endblock %}

@@ -3,8 +3,10 @@
         <input type="checkbox">
     </div>
     <p class="goal-text">{{ task_name }}</p>
+    {% if 'demo' not in request.url %}
     <div class="buttons-container">
         <button class="chat-button"><i class="fas fa-message"></i></button>
         <button class="delete-button"><i class="fas fa-trash-alt"></i></button>
     </div>
+    {% endif %}
 </div>

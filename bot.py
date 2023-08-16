@@ -158,11 +158,11 @@ class ChatBot:
         # print(f'{self.io_manager.primary_goal.goal} was set')
         
     
-    def generate_goals(self, primary_goal):
+    def generate_goals(self, primary_goal, num_goals=10):
         """Generate goals using the OpenAI API"""
         
         print(f'generating goals for {primary_goal.get_goal()}')
-        bot = GoalGeneratorBot(goal=primary_goal.get_goal())
+        bot = GoalGeneratorBot(goal=primary_goal.get_goal(), num_goals=num_goals)
         #strip and save
         try:
             self.goal_manager.strip_tasks_and_save(bot.generate_goals(), primary_goal.id)
@@ -170,9 +170,9 @@ class ChatBot:
             # go to error route
             raise e
 
-    def generate_subtasks(self, task: Task):
+    def generate_subtasks(self, task: Task, num_tasks=10):
         """Generate subtasks for a given goal"""
-        return self.goal_manager.generate_subtasks(task)
+        return self.goal_manager.generate_subtasks(task, num_tasks)
 
 class GoalManager:
 
@@ -224,15 +224,15 @@ class GoalManager:
         else:
             self.io_manager.assistant_message(f"Okay, we'll keep working on {item}.")
 
-    def generate_subtasks(self, task: Task, user = None):
+    def generate_subtasks(self, task: Task, num_subtasks=10):
         """Assist the user with a goal"""
         print(f'GoalManager generating subtasks for task {task.get_task()}')
         goal = Goal.query.filter_by(id=task.goal_id).first()
         existing_tasks = Task.query.filter_by(goal_id=goal.id).all()
         # convert existing tasks into a string separated by newlines
         existing_tasks = ", ".join([task.get_task() for task in existing_tasks])
-        bot = TaskGeneratorBot(task=task.get_task(), goal=goal.get_goal(), existing_tasks=existing_tasks)
-        response_text = bot.generate_tasks()        
+        bot = TaskGeneratorBot(task=task.get_task(), goal=goal.get_goal(), existing_tasks=existing_tasks, num_goals=num_subtasks)
+        response_text = bot.generate_tasks()
         text = self.sanitize_bot_goal_response(response_text)
         
         subtasks = text.split('\n')  # Split the response into subtasks

@@ -1,4 +1,12 @@
 {% include 'task-view-base.html' %}
+{% block content %}
+<a href="{{ url_for('new_subtask', task_id=goal.id) }}">
+    <button class="plus-button">+</button>
+</a>
+<a href="#">
+    <button class="generate-button"></button>
+</a>
+{% endblock %}
 {% block scripts %}
 <script>
     var Scrollbar = window.Scrollbar;
@@ -6,7 +14,25 @@
 </script>
 <script src="{{ url_for('static', filename='show_alert.js') }}"></script>
 <script src="{{ url_for('static', filename='goal-card-component.js') }}"></script>
-<a href="{{ url_for('new_subtask', task_id=goal.id) }}">
-    <button class="plus-button">+</button>
-</a>
+<script>
+    var generateButton = document.querySelector('.generate-button');
+    generateButton.addEventListener('click', function() {
+        max_tasks = 20
+        var taskId = '{{ goal.id }}';
+        var numTasks = prompt("How many subtasks would you like to generate? (Max " + max_tasks + ")");
+
+        if (numTasks) {
+            numTasks = parseInt(numTasks);
+            while (isNaN(numTasks) || numTasks <= 0 || numTasks > max_tasks) {
+                numTasks = prompt("Please enter a positive number less than or equal to " + max_tasks + ".");
+                if (!numTasks) {
+                    return;
+                }
+                numTasks = parseInt(numTasks);
+            }
+            var newUrl = "/generate_subtasks/" + numTasks + "?task_id=" + taskId;
+            window.location.assign(newUrl);
+        }
+    });    
+</script>
 {% endblock %}

@@ -10,7 +10,7 @@
         goalCard.addEventListener('click', function () {
             var taskId = goalCard.getAttribute('data-task-id');
 
-            fetch('/generate_subtasks', {
+            fetch('/demo/generate_subtasks/10', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -22,7 +22,7 @@
                 .then(response => response.json())
                 .then(data => {
                     // once the subtasks are generated, redirect to the new page
-                    window.location.href = `/display_subtasks/${taskId}`;
+                    window.location.href = `/demo/display_subtasks/${taskId}`;
                 })
                 .catch((error) => {
                     console.error('Error:', error);

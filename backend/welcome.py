@@ -15,6 +15,7 @@ from flask_security import roles_required, login_required, login_user, user_regi
 from flask_security.confirmable import confirm_user, confirm_email_token_status
 from LangChainAgentFactory import AgentFactory
 from langchain.tools import StructuredTool
+import traceback
 
 app = app_instance.app
 app.debug_mode = True
@@ -58,6 +59,7 @@ def handle_db_exceptions(error):
 
 @app.route('/error/<string:error_message>')
 def error_page(error_message):
+    traceback.print_exc()
     return render_template('error.html', error_message=error_message)
 
 @app.errorhandler(500)
@@ -69,7 +71,7 @@ def role_selection():
     if request.method == 'POST':
         role = request.form.get('role')
         goal_id = bot.set_assistant_primary_goal(role)
-        return redirect(url_for('goal_generation', title=role, goal_id=goal_id))
+        return redirect(url_for('demo_goal_generation', num_goals=10, title=role, goal_id=goal_id))
     else:
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
         return render_template('role_selection.html', roles=roles)
@@ -105,7 +107,6 @@ def dashboard():
         user = app_instance.user_datastore.find_user(id=user_id)
         if user is not None:
             goals = Goal.query.filter_by(user_id=user_id).all()
-            print(app.jinja_env.list_templates())
             return render_template('dream-home.html', goals=goals)
         
     return redirect(url_for('security.login'))
@@ -137,7 +138,7 @@ def delete_task(task_id):
         flash('Your task has been deleted.', 'success')    
     if goal is not None:
         print(f"goal and task found: {goal.goal}\n{task.task}")
-        return redirect(url_for('view_tasks', goal_id=goal.id, title=goal.goal))
+        return redirect(url_for('view_tasks', goal_id=goal.id, title=goal.goal, subtitle=None))
     else:
         print(f'goal with id {task.goal_id} not found')
         return redirect(url_for('dashboard'))
@@ -263,12 +264,12 @@ def task_detail(task_id):
             return render_template('goal-detail.html', form=form, goal=task)
 
 @app.route('/view_tasks', methods=['GET'])
-def view_tasks():    
+def view_tasks():
     goal_id = request.args.get('goal_id')
     goal = Goal.query.filter_by(id=goal_id).first()
     tasks = Task.query.filter_by(goal_id=goal_id).all()
     tasks = [task for task in tasks if task.parent_id is None]
-    return render_template('view-tasks.html', goals=tasks, goal=goal, title=goal.goal)
+    return render_template('view-tasks.html', goals=tasks, goal=goal, title=goal.goal, subtitle=None)
 
 @app.route('/view_subtasks', methods=['GET'])
 def view_subtasks():
@@ -277,22 +278,51 @@ def view_subtasks():
     task = Task.query.filter_by(id=task_id).first()
     goal = Goal.query.filter_by(id=task.goal_id).first()
     subtasks = Task.query.filter_by(parent_id=task_id).all()
-    return render_template('view-subtasks.html', goal=task, goals=subtasks, title=goal.goal, subtitle=task.task)
+    return render_template('view-subtasks.html', goal=goal, task=task, goals=subtasks, title=goal.goal, subtitle=task.task)
 
-@app.route('/generate_goals', methods=['GET', 'POST'])
-def goal_generation():
-    title = request.args.get('title')
-    goal_id = request.args.get('goal_id')
+@app.route('/demo/generate_goals/<int:num_goals>/<string:title>/<string:goal_id>', methods=['GET', 'POST'])
+def demo_goal_generation(num_goals, title, goal_id):
+    print(f'num_goals: {num_goals}')
+    print(f'title: {title}')
+    print(f'goal_id: {goal_id}')
     goal = Goal.query.filter_by(id=goal_id).first()
+    if title is None:
+        title = goal.goal
     print(f'received goal: {goal.goal}')
     try:
-        bot.generate_goals(goal)
-        tasks = Task.query.filter_by(goal_id=goal_id).all()
-        return render_template('generate_goals.html', goals=tasks, title=title, goal=goal)
+        num_goals = int(num_goals)
+        bot.generate_goals(goal, num_goals)        
     except Exception as e:
         print('exception when generating goals')
         print(e)
         return redirect(url_for('error_page', error_message=str(e)))
+    try:
+        tasks = Task.query.filter_by(goal_id=goal_id).all()
+        print(f'tasks: {tasks}')
+        print(f'goal: {goal.goal}')
+        print(f'title: {title}')
+        return render_template('generate_goals.html', goals=tasks, title=title, goal=goal)
+    except Exception as e:
+        print('exception when rendering template')
+        print(e)        
+        return redirect(url_for('error_page', error_message=str(e)))
+    
+@app.route('/generate_goals/<int:num_goals>', methods=['GET', 'POST'])
+def goal_generation(num_goals):
+    title = request.args.get('title')
+    goal_id = request.args.get('goal_id')
+    goal = Goal.query.filter_by(id=goal_id).first()
+    if title is None:
+        title = goal.goal
+    try:
+        num_goals = int(num_goals)
+        bot.generate_goals(goal, num_goals)
+        return redirect(url_for('view_tasks', goal_id=goal_id, title=title))
+    except Exception as e:
+        print('exception when generating goals')
+        print(e)
+        return redirect(url_for('error_page', error_message=str(e)))
+
 
 @app.route('/chat')
 def chat():
@@ -314,7 +344,7 @@ def task_chat_api(task_id):
     goal = Goal.query.filter_by(id=task.goal_id).first()
     chat_bot = TaskChatBot(task, goal, [task.get_task() for task in task.subtasks])
 
-@app.route('/display_subtasks/<string:task_id>', methods=['GET'])
+@app.route('/demo/display_subtasks/<string:task_id>', methods=['GET'])
 def display_subtasks(task_id):    
     task = Task.query.filter_by(id=task_id).first()
     goal = Goal.query.filter_by(id=task.goal_id).first()
@@ -323,14 +353,21 @@ def display_subtasks(task_id):
         print(json)
         return json
     else:
-        return render_template('generate_tasks.html', task=task, subtasks=task.subtasks, goal=goal)
+        return render_template('generate_tasks.html', task=task, title=goal.goal, subtitle=task.task, goals=task.subtasks, goal=goal)
     
-@app.route('/generate_subtasks', methods=['POST'])
-def generate_subtasks():
+@app.route('/generate_subtasks/<int:num_subtasks>', methods=['GET', 'POST'])
+def generate_subtasks(num_subtasks):
+    task_id = request.args.get('task_id')
+    task = Task.query.filter_by(id=task_id).first()
+    bot.generate_subtasks(task, num_subtasks)
+    return redirect(url_for('view_subtasks', task_id=task.id))
+
+@app.route('/demo/generate_subtasks/<int:num_subtasks>', methods=['POST'])
+def demo_generate_subtasks(num_subtasks):
     data = request.get_json()
     task_id = data['task_id']
     task = Task.query.filter_by(id=task_id).first()
-    bot.generate_subtasks(task)
+    bot.generate_subtasks(task, num_subtasks)
     # get subtasks
     subtasks = Task.query.filter_by(parent_id=task_id).all()
     # convert subtasks to json
@@ -373,5 +410,6 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     if port is None:
         port = 5000
+    app.debug = True
     socketio.run(app, host='0.0.0.0', port=port)
     
