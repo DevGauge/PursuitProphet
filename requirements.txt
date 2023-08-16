@@ -6,7 +6,7 @@ Flask
 Flask-Mail
 flask_migrate
 flask_restx
-Flask-Security
+Flask-Security-Too
 flask_sqlalchemy
 flask_wtf
 halo
