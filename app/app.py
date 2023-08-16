@@ -267,12 +267,14 @@ class App:
         flask_app.debug = True
         # flask-security-too
         flask_app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+        print('secret key is None: ', os.getenv['SECRET_KEY'] is None)
         flask_app.config['SECURITY_PASSWORD_SALT'] = os.getenv('SECURITY_PASSWORD_SALT')
+        print('salt is None: ', os.getenv['SECURITY_PASSWORD_SALT'] is None)
         # flask-security-too registration settings
         flask_app.config['SECURITY_REGISTERABLE'] = True
         flask_app.config['SECURITY_CONFIRMABLE'] = True
         flask_app.config['SECURITY_RECOVERABLE'] = True
-        flask_app.config['SECURITY_POST_REGISTER_VIEW'] = 'thank_you'                
+        flask_app.config['SECURITY_POST_REGISTER_VIEW'] = 'thank_you'
         flask_app.config['SECURITY_INCLUDE_JQUERY'] = True
         flask_app.config['SECURITY_WTFORMS_USE_CDN'] = True
         # mail operations
