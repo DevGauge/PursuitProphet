@@ -1,6 +1,6 @@
 bcrypt
 colorama
-dotenv
+python-dotenv
 email_validator
 Flask
 Flask-Mail
