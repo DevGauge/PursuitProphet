@@ -12,7 +12,7 @@ flask_wtf
 halo
 langchain
 openai
-psycopg2
+psycopg2-binary
 flask-socketio
 SQLAlchemy
 termcolor

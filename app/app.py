@@ -290,7 +290,8 @@ class App:
         
         DATABASE_URL = os.getenv("DATABASE_URL")
         if DATABASE_URL is None:
-            DATABASE_URL = 'postgresql://kenny:password@localhost:5432/postgres'
+            DATABASE_URL = 'postgresql://kennethdubroff:password@localhost:5432/postgres'
+            print(f'DATABASE_URL is None, using default: {DATABASE_URL}')
         else:
             DATABASE_URL= DATABASE_URL[:8]+'ql' + DATABASE_URL[8:]
         flask_app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
