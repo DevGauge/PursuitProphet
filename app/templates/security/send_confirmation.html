@@ -7,7 +7,7 @@
     <p>You can <a href="{{url_for_security('forgot_password')}}">reset your password here</a></p>
     <form class="login-form", action="{{ url_for_security('send_confirmation') }}" method="post" name="send_confirmation_form">
       {{ send_confirmation_form.hidden_tag() }}
-      {{ render_field_with_errors(send_confirmation_form.email) }}
+      {{ render_field(send_confirmation_form.email) }}
       {{ render_field(send_confirmation_form.submit) }}
     </form>  
   </div>
