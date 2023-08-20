@@ -11,6 +11,7 @@ flask_sqlalchemy
 flask_wtf
 halo
 langchain
+langchainagentfactory
 openai
 psycopg2
 flask-socketio
