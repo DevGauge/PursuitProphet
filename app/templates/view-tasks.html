@@ -29,6 +29,8 @@ generateButton.addEventListener('click', function() {
             }
             numGoals = parseInt(numGoals);
         }
+        var loading = document.querySelector('.loading');
+        loading.style.display = 'block';
         var newUrl = "/generate_goals/" + numGoals + "?goal_id=" + goalId;
         window.location.assign(newUrl);
     }
