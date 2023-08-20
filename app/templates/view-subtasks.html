@@ -1,6 +1,6 @@
 {% include 'task-view-base.html' %}
 {% block content %}
-<a href="{{ url_for('new_subtask', task_id=goal.id) }}">
+<a id="new_subtask" href="#">
     <button class="plus-button">+</button>
 </a>
 <a href="#">
@@ -16,9 +16,13 @@
 <script src="{{ url_for('static', filename='goal-card-component.js') }}"></script>
 <script>
     var generateButton = document.querySelector('.generate-button');
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskId = urlParams.get('task_id');
+    const newSubtaskLink = document.getElementById('new_subtask');
+    newSubtaskLink.href = `new_subtask/${taskId}`;
+
     generateButton.addEventListener('click', function() {
-        max_tasks = 20
-        var taskId = '{{ goal.id }}';
+        max_tasks = 20        
         var numTasks = prompt("How many subtasks would you like to generate? (Max " + max_tasks + ")");
 
         if (numTasks) {
@@ -30,6 +34,8 @@
                 }
                 numTasks = parseInt(numTasks);
             }
+            var loading = document.querySelector('.loading');
+            loading.style.display = 'block';
             var newUrl = "/generate_subtasks/" + numTasks + "?task_id=" + taskId;
             window.location.assign(newUrl);
         }
