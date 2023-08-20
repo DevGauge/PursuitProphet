@@ -1,15 +1,20 @@
 {% extends "dashboard.html" %}
-{% from "security/_macros.html" import render_field_with_errors, render_field %}
+{% block head %}
+  {{ super() }}
+  {{ send_confirmation_form.javascript() }}
+{% endblock head %}
 {% block main %}
   <h1>{{ _fsdomain('Resend confirmation instructions') }}</h1>
   <div class="login-form-container">    
     <form class="login-form", action="{{ url_for_security('send_confirmation') }}" method="post" name="send_confirmation_form">
       <p>{{ _fsdomain('Please enter your email address. You will receive a link to confirm your account.') }}</p>
-    <p>If you encounter this form repeatedly, you've likely already confirmed your email address and can <a href="{{ url_for_security('login') }}">login</a></p>
-    <p>You can <a href="{{url_for_security('forgot_password')}}">reset your password here</a></p>
+      <p>If you encounter this form repeatedly, you've likely already confirmed your email address and can <a href="{{ url_for_security('login') }}">login</a></p>
+      <p>You can <a href="{{ url_for_security('forgot_password') }}">reset your password here</a></p>
+      <hr style="width:75%;">
       {{ send_confirmation_form.hidden_tag() }}
-      {{ render_field_with_errors(send_confirmation_form.email) }}
-      {{ render_field(send_confirmation_form.submit) }}
+      <label for="email">Enter your email address</label><br>
+      {{ send_confirmation_form.email(size=32) }}<br>
+      {{ send_confirmation_form.submit(class="standard-button") }}
     </form>  
   </div>
 {% endblock main %}
