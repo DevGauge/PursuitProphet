@@ -347,14 +347,14 @@ def task_chat_api(task_id):
 @app.route('/goal/complete/<goal_id>', methods=['GET', 'POST'])
 def complete_goal(goal_id):
     goal = Goal.query.filter_by(id=goal_id).first()
-    goal.completed = True
+    goal.completed = not goal.completed
     db.session.commit()
     return redirect(url_for('dashboard'))
 
 @app.route('/task/complete/<task_id>', methods=['GET', 'POST'])
 def complete_task(task_id):
     task = Task.query.filter_by(id=task_id).first()
-    task.completed = True
+    task.completed = not task.completed
     db.session.commit()
     return redirect(url_for('view_tasks', goal_id=task.goal_id))
 

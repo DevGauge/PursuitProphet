@@ -716,6 +716,10 @@ button.submit-button {
   align-items: center;
   margin-right: 10px;
 }
+.goal-card .checkbox-container input[type=checkbox] {
+  height: 20px;
+  width: 20px;
+}
 .goal-card .goal-text {
   display: -webkit-box;
   -webkit-line-clamp: 3;

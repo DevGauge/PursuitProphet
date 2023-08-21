@@ -721,8 +721,13 @@ button.submit-button {
         display: flex;
         align-items: center;
         margin-right: 10px;
+        // checkbox type input
+        input[type="checkbox"] {
+            height: 20px;
+            width: 20px;
+        }
     }
-
+    
     .goal-text {
         display: -webkit-box;
         -webkit-line-clamp: 3;
