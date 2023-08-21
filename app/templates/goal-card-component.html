@@ -1,6 +1,6 @@
 <div class="goal-card" data-task-id="{{ goal.id }}">
     <div class="checkbox-container">
-        <input type="checkbox">
+        <input type="checkbox" class="complete-button" {{ "checked" if goal.completed == True }}>
     </div>
     <p class="goal-text">{{ task_name }}</p>
     {% if 'demo' not in request.url %}

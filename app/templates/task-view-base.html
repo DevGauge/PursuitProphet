@@ -27,9 +27,9 @@
     </h3>
     {% endif %}
     <div class="subtasks" , id="subtasks">
-        {% for goal in goals %}
+        {% for goal in goals|sort(attribute='completed') %}
             {% with task_name=goal.get_task() %}
-                {% include 'goal-card-component.html' %}
+                {% include 'goal-card-component.html' %}                
             {% endwith %}
         {% endfor %}
     </div>
