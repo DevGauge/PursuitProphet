@@ -256,10 +256,11 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #333;
-    padding: 20px;
+    background-color: #fff;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    color: #000;
+    padding: 30px;
 
     h2 {
         margin-bottom: 10px;
@@ -279,9 +280,30 @@ body {
     }
 
     button {
+        margin-top: 10px;
         padding: 10px 20px;
         cursor: pointer;
-        width: 45%;
+        a {
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+        }
+    }
+
+    .close-btn {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 30px;
+        height: 30px;
+        background-color: transparent;
+        border: none;
+        border-radius: 50%;
+        font-size: 24px;
+        color: #333;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
     }
 }
 
@@ -384,7 +406,7 @@ body {
                 margin: 10px;
                 border-radius: 5px;
             }
-            .close-btn {
+            .close-btn {               
                 border: none;
                 font-size: 24px;
                 &:hover {

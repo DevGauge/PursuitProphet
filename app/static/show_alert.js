@@ -3,16 +3,18 @@ function showAlert(type, message, action_url, action_text) {
     const alertContainer = document.getElementById('alert-container'); // Container for alerts
 
     let alertHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+        <div class="dialogue alert-${type} alert-dismissible fade show" role="alert">
             ${message}
             <div class="alert-btn-container">
     `;
 
     if (action_url) {
         alertHTML += `
-                <a href="${action_url}" class="alert-btn btn-${type}">
-                    ${action_text}
-                </a>
+                <button class="btn-${type}">
+                    <a href="${action_url}">
+                        ${action_text}
+                    </a>
+                </button>
         `;
     }
 
@@ -26,11 +28,15 @@ function showAlert(type, message, action_url, action_text) {
 
     alertContainer.innerHTML = alertHTML;
     console.log('alert container innerHTML: ', alertContainer.innerHTML)
-
-    const closeButton = alertContainer.querySelector('.close-btn');
-    closeButton.addEventListener('click', function() {
-        // Remove alert from DOM
-        alertContainer.removeChild(alertContainer.firstChild);
-    });
 }
+
+const alertContainer = document.getElementById('alert-container');
+alertContainer.addEventListener('click', function(event) {
+    const closeButton = event.target.closest('.close-btn');
+    if (closeButton) {
+        const alert = closeButton.closest('.dialogue');
+        alert.remove();
+    }
+});
+
 window.showAlert = showAlert;
