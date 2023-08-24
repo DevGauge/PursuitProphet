@@ -18,7 +18,7 @@
     <br>
 
     {{ login_user_form.password.label }}<br>
-    {{ login_user_form.password(size=32, placeholder="Enter your desired password") }}
+    {{ login_user_form.password(size=32, placeholder="Enter your password") }}
     {% for error in login_user_form.password.errors %}
         <span class="form-error">{{ error }}</span>
     {% endfor %}
