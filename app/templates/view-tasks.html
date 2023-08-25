@@ -35,6 +35,10 @@ generateButton.addEventListener('click', function() {
         window.location.assign(newUrl);
     }
 });
-
+</script>
+<script src="{{ url_for('static', filename='feature_value_request.js') }}"></script>
+<script>
+    var currentUrl = window.location.href;
+    handleFirstTimeFeatureRequest('is_first_new_task', '<h1>Adding a new task</h1> <p>Click the plus button in the lower right portion of your screen to add a new task to this goal.</p><br><button class="tutorial-plus-button">+</button><h1>Generating Tasks</h1><p>To generate tasks, click the brainpower icon in the lower left of your screen</p><button class="tutorial-generate-button"></button>', currentUrl, 'Ok')
 </script>
 {% endblock %}

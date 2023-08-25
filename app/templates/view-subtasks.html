@@ -41,4 +41,9 @@
         }
     });    
 </script>
+<script src="{{ url_for('static', filename='feature_value_request.js') }}"></script>
+<script>
+    var currentUrl = window.location.href;
+    handleFirstTimeFeatureRequest('is_first_new_subtask', '<h1>Adding a new subtask</h1> <p>Click the plus button in the lower right portion of your screen to add a new subtask to this task.</p><br><button class="tutorial-plus-button">+</button><h1>Generating Subtasks</h1><p>To generate subtasks, click the brainpower icon in the lower left of your screen</p><button class="tutorial-generate-button"></button>', currentUrl, 'Ok');
+</script>
 {% endblock %}

@@ -10,12 +10,14 @@ import app.app
 from app.app import Goal, Task, User
 from app.app import DreamForm, TaskForm
 from app.app import db, app_instance
+from app.user_tutorial_columns_migration import reset
 from flask_socketio import SocketIO, send, emit
 from flask_security import roles_required, login_required, login_user, user_registered, current_user
 from flask_security.confirmable import confirm_user, confirm_email_token_status
 from LangChainAgentFactory import AgentFactory
 from langchain.tools import StructuredTool
 import traceback
+from urllib.parse import quote
 
 app = app_instance.app
 app.debug_mode = True
@@ -59,12 +61,14 @@ def handle_db_exceptions(error):
 
 @app.route('/error/<string:error_message>')
 def error_page(error_message):
-    traceback.print_exc()
+    print(f'error message: {error_message}')
+    # traceback.print_exc()
     return render_template('error.html', error_message=error_message)
 
 @app.errorhandler(500)
 def handle_500(error):
-    return redirect(url_for('error_page', error_message=str(error)))
+    error_message = "Internal Server Error"
+    return redirect(url_for('error_page', error_message=error_message))
 
 @app.route('/demo', methods=['GET', 'POST'])
 def role_selection():
@@ -99,16 +103,48 @@ def confirm_email(token):
             return redirect(url_for('dashboard'))
     return 'The confirmation link is invalid or has expired.'
 
+@app.route('/feature/<feature_key>', methods=['GET'])
+@login_required
+def get_user_feature(feature_key):
+    user = current_user  # Assuming you are using Flask-Security-Too and have logged in user
+    feature_value = getattr(user, feature_key, None)
+    if feature_value is not None:
+        print(f'feature value: {feature_value}')
+        return jsonify({feature_key: feature_value})
+    else:
+        print(f'feature value not found. user attribs: {user.__dict__}')
+        return jsonify({feature_key: False})
+    
+@app.route('/feature/<feature_key>', methods=['PUT'])
+@login_required
+def update_feature_value(feature_key):
+    print('welcome to the update feature value function!')
+    user = current_user
+    if hasattr(user, feature_key):
+            print(f'feature value: {feature_key} found')
+            setattr(user, feature_key, False)
+            db.session.commit()
+            return jsonify({'success': True})
+    else:
+        print(f'feature value {feature_key} not found. user attribs: {user.__dict__}')
+        app.logger.error(f'feature value {feature_key} not found. user attribs: {user.__dict__}')
+        return jsonify({'success': False})
+
 @login_required
 @app.route('/')
 def dashboard():
-    if current_user.is_authenticated:
-        user_id = current_user.id
-        user = app_instance.user_datastore.find_user(id=user_id)
-        if user is not None:
-            goals = Goal.query.filter_by(user_id=user_id).all()
-            return render_template('dream-home.html', goals=goals)
-        
+    try:        
+        if current_user.is_authenticated:
+            user_id = current_user.id
+            user = app_instance.user_datastore.find_user(id=user_id)
+            if user is not None:
+                goals = Goal.query.filter_by(user_id=user_id).all()
+                return render_template('dream-home.html', goals=goals)
+        else:
+            raise ValueError("User not found")
+    except Exception as e:
+        return redirect(url_for('security.login'))
+    
     return redirect(url_for('security.login'))
 
 @app.route('/delete_goal/<goal_id>', methods=['GET', 'POST'])

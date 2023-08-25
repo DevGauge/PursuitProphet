@@ -227,16 +227,45 @@ class User(UserMixin, db.Model):
     aka = db.Column(db.String(20), 
                     nullable=True)
     confirmed_at = db.Column(DateTime)
-    goals = db.relationship('Goal', 
-                            backref='user', 
+    goals = db.relationship('Goal',
+                            backref='user',
                             lazy=True)
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
-    is_temporary = False
+    # region tutorial
+    is_first_login = db.Column(db.Boolean(), default=True)
+    is_first_detail_view = db.Column(db.Boolean(), default=True)
+    is_first_new_goal = db.Column(db.Boolean(), default=True)
+    is_first_new_task = db.Column(db.Boolean(), default=True)
+    is_first_new_subtask = db.Column(db.Boolean(), default=True)
+    
+    # region demo
+    is_temporary = False # true for demo user, used as holding for goal
+    is_first_demo_task_gen = db.Column(db.Boolean(), default=True)
+    is_first_demo_subtask_gen = db.Column(db.Boolean(), default=True)
+    is_demo_finished = db.Column(db.Boolean(), default=False)
+    # endregion demo
+    # endregion tutorial
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         self.fs_uniquifier = str(uuid.uuid4())
+        if self.is_first_login is None:
+            self.is_first_login = True
+        if self.is_first_detail_view is None:
+            self.is_first_detail_view = True
+        if self.is_first_new_goal is None:
+            self.is_first_new_goal = True
+        if self.is_first_new_task is None:
+            self.is_first_new_task = True
+        if self.is_first_new_subtask is None:
+            self.is_first_new_subtask = True
+        if self.is_first_demo_task_gen is None:
+            self.is_first_demo_task_gen = True
+        if self.is_first_demo_subtask_gen is None:
+            self.is_first_demo_subtask_gen = True
+        if self.is_demo_finished is None:
+            self.is_demo_finished = False
     
     def set_role(self, role):
         self.roles.append(role)        
@@ -244,6 +273,9 @@ class User(UserMixin, db.Model):
     def add_goal(self, goal: Goal):
         """Add a goal to the user."""
         self.goals.append(goal)
+    
+    def does_user_have_goal(self):
+        return len(self.goals) > 0
 
     def remove_goal(self, goal: Goal):
         """Remove a goal from the user."""

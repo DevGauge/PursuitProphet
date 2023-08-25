@@ -47,4 +47,11 @@
     window.replace(url, '_self')
   }
 </script>
+<script src="{{ url_for('static', filename='show_alert.js') }}"></script>
+<script src="{{ url_for('static', filename='feature_value_request.js') }}"></script>
+<script>
+    var currentUrl = window.location.href;
+    handleFirstTimeFeatureRequest('is_first_detail_view', '<h1>Dream/Task/Subtask Details</h1><p>Here you can add details about your dreams such as a description and due date.</p>', currentUrl, 'Ok')
+</script>
+
 {% endblock %}

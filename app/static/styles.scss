@@ -208,30 +208,35 @@ body {
     }
 }
 
-.plus-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+.base-plus-button {
     width: 60px;
     height: 60px;
     background-color: #910FF1;
     color: #fff;
     border: none;
     border-radius: 50%;
-    font-size: 36px;
-    cursor: pointer;
+    font-size: 36px;    
     transition: background-color 0.3s ease;
     margin-right: 20px;
 
     &:hover {
         background-color: #6826AA;
-    }
-}
-
-.generate-button {
+      }
+  }
+  
+  .plus-button {
+    @extend .base-plus-button;
     position: fixed;
     bottom: 20px;
-    left: 20px;
+    right: 20px;
+    cursor: pointer;
+  }
+  
+  .tutorial-plus-button {
+    @extend .base-plus-button;
+  }
+
+.base-generate-button {
     width: 60px;
     height: 60px;
     background-color: transparent;
@@ -241,14 +246,24 @@ body {
     background-position: center;
     border: none;
     border-radius: 50%;
-    font-size: 36px;
-    cursor: pointer;
+    font-size: 36px;    
     transition: background-color 0.3s ease;
-    margin-left: 20px;
 
     &:hover {
         border: 4px solid #6826AA;
     }
+}
+
+.generate-button {
+    @extend .base-generate-button;
+    position: fixed;
+    bottom: 20px;
+    left: 40px;
+    cursor: pointer;
+}
+
+.tutorial-generate-button {
+    @extend .base-generate-button;
 }
 
 .dialogue {

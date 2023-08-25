@@ -20,4 +20,9 @@
     var Scrollbar = window.Scrollbar;
     Scrollbar.init(document.querySelector('#subtasks'));
 </script>
+<script src="{{ url_for('static', filename='feature_value_request.js') }}"></script>
+<script>
+    const featureKey = 'is_first_login'
+    handleFirstTimeFeatureRequest(featureKey, '<h1>Welcome to Pursuit Prophet!</h1> <p>We\'re excited to have you here.</p> <p>Pursuit Prophet is a tool to help you achieve your goals. We\'ll help you break down your goals into smaller, more manageable tasks.</p> <p>To get started, click on an existing dream if you have one listed, or the plus button to add your new Dream.</p>', '/', 'Ok')
+    </script>
 {% endblock %}
