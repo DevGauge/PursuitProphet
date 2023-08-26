@@ -7,15 +7,6 @@ import os
 from sqlalchemy import text
 
 def migrate():
-    with current_app.app_context():
-        DATABASE_URL = os.environ['DATABASE_URL']
-        DATABASE_URL = DATABASE_URL[:8]+'ql' + DATABASE_URL[8:]
-        engine = create_engine(DATABASE_URL)
-        metadata = MetaData()
-
-        table_name = 'user'
-
-       def migrate():
     print('Initializing application context...')
     with current_app.app_context():
         DATABASE_URL = os.environ['DATABASE_URL']
