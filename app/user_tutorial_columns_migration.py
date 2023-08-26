@@ -46,3 +46,4 @@ def reset():
 
     # Commit the changes
     db.session.commit()
+    return jsonify({'message': 'Reset successful'}), 200
