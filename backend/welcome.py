@@ -73,6 +73,7 @@ def handle_500(error):
 @app.route('/manual_migrate', methods=['GET'])
 def manual_migrate():
     reset()
+    return jsonify({'success': True})
 
 @app.route('/demo', methods=['GET', 'POST'])
 def role_selection():
