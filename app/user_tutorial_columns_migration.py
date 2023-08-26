@@ -27,7 +27,7 @@ def migrate():
 
 def reset():
     rows_to_update = User.query.all()
-
+    
     columns = [
         'is_first_login',
         'is_first_detail_view',
