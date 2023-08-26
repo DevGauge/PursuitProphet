@@ -1,10 +1,6 @@
 {% include 'task-view-base.html' %}
 {% block scripts %}
 <script>
-    var Scrollbar = window.Scrollbar;
-    Scrollbar.init(document.querySelector('#subtasks'));
-</script>
-<script>
     // add click listeners to each goal card in order to chat with ChatGPT about the task and generate subtasks
     document.querySelectorAll('.goal-card').forEach(function (goalCard) {
         goalCard.addEventListener('click', function () {
@@ -35,6 +31,25 @@
                 loading.style.display = 'block';
             });
         });
+    });
+</script>
+<script src="{{ url_for('static', filename='show_alert.js') }}"></script>
+<script src="{{ url_for('static', filename='feature_value_request.js') }}"></script>
+<script>
+    const tempUserId = '{{ session["temp_user_id"] }}';    
+    handleFirstTimeFeatureRequest('is_first_demo_task_gen', '<h1>Welcome to the Pursuit Prophet Task Generation Demo!</h1><p>The prophet just generated 10 Tasks to break your dream down and make it more manageable. To generate subtasks for a Task, simply click on the task to see the AI break it down further!', '#', 'Keep Dreaming!', tempUserId);
+    // Attach the event listener to the parent container
+    document.getElementById("alert-container").addEventListener("click", function(event) {
+        // walk up the DOM until a node with class="btn-is_first_demo_task_gen" is found
+        let targetElement = event.target;        
+        while (targetElement != null) {
+            if (targetElement.classList && targetElement.classList.contains("btn-is_first_demo_task_gen")) {
+                document.querySelector('.dialogue').style.display = 'none';
+                console.log('clicked continue');
+                return;
+            }
+            targetElement = targetElement.parentElement;
+        }
     });
 </script>
 {% endblock %}

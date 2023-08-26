@@ -1,1 +1,9 @@
 {% include 'task-view-base.html' %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='show_alert.js') }}"></script>
+<script src="{{ url_for('static', filename='feature_value_request.js') }}"></script>
+<script>
+    const tempUserId = '{{ session["temp_user_id"] }}';    
+    handleFirstTimeFeatureRequest('is_first_demo_subtask_gen', '<h1>Thanks for finishing the demo!</h1><p>To continue using Pursuit Prophet to achieve your dreams and explore exciting features such as chatting with your tasks, subtasks, and dreams, simply register an account by clicking the button below!', '{{ url_for_security("register") }}', 'Register an Account', tempUserId);
+</script>
+{% endblock %}

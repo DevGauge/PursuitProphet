@@ -71,7 +71,8 @@ def handle_500(error):
     return redirect(url_for('error_page', error_message=error_message))
 
 @app.route('/demo', methods=['GET', 'POST'])
-def role_selection():    
+def role_selection():
+    reset()
     if request.method == 'POST':
         role = request.form.get('role')
         goal_id = bot.set_assistant_primary_goal(role)
