@@ -14,36 +14,35 @@ def migrate():
         table_name = 'user'
         user_table = Table(table_name, metadata, autoload_with=engine)
 
-        with engine.begin() as connection:
-            for column in ["is_first_login", "is_first_detail_view", "is_first_new_goal", "is_first_new_task", "is_first_new_subtask", "is_first_demo_task_gen", "is_first_demo_subtask_gen", "is_demo_finished"]:
-                connection.execute(f"ALTER TABLE {table_name} ADD COLUMN {column} boolean DEFAULT false")    
+        for column in ["is_first_login", "is_first_detail_view", "is_first_new_goal", "is_first_new_task", "is_first_new_subtask", "is_first_demo_task_gen", "is_first_demo_subtask_gen", "is_demo_finished"]:
+            engine.execute(f"ALTER TABLE {table_name} ADD COLUMN IF NOT EXISTS {column} boolean DEFAULT false")    
             # Query all existing rows
-            print('Migrating user tutorial columns...')
-            rows_to_update = User.query.all()
+        print('Migrating user tutorial columns...')
+        rows_to_update = User.query.all()
 
-            columns = [
-                'is_first_login',
-                'is_first_detail_view',
-                'is_first_new_goal',
-                'is_first_new_task',
-                'is_first_new_subtask',
-                'is_first_demo_task_gen',
-                'is_first_demo_subtask_gen'
-            ]
+        columns = [
+            'is_first_login',
+            'is_first_detail_view',
+            'is_first_new_goal',
+            'is_first_new_task',
+            'is_first_new_subtask',
+            'is_first_demo_task_gen',
+            'is_first_demo_subtask_gen'
+        ]
 
-            # Update each row with the default values
-            for row in rows_to_update:
-                for column in columns:
-                    if getattr(row, column) is None:
-                        setattr(row, column, True)
-                if getattr(row, 'is_demo_finished') is None:
-                    setattr(row, 'is_demo_finished', False)
+        # Update each row with the default values
+        for row in rows_to_update:
+            for column in columns:
+                if getattr(row, column) is None:
+                    setattr(row, column, True)
+            if getattr(row, 'is_demo_finished') is None:
+                setattr(row, 'is_demo_finished', False)
 
-            print('Committing changes...')
+        print('Committing changes...')
 
-            # Commit the changes
-            db.session.commit()
-            print('Migration successful')
+        # Commit the changes
+        db.session.commit()
+        print('Migration successful')
 
 def reset():
     print('Resetting user tutorial columns...')
