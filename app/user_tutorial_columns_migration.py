@@ -1,6 +1,7 @@
 from app.app import app as current_app
 from app.app import db, User
 from sqlalchemy import create_engine, MetaData, Table
+import os
 
 
 def migrate():
