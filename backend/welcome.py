@@ -70,9 +70,12 @@ def handle_500(error):
     error_message = "Internal Server Error"
     return redirect(url_for('error_page', error_message=error_message))
 
+@app.route('/manual_migrate', methods=['GET'])
+def manual_migrate():
+    reset()
+
 @app.route('/demo', methods=['GET', 'POST'])
 def role_selection():
-    reset()
     if request.method == 'POST':
         role = request.form.get('role')
         goal_id = bot.set_assistant_primary_goal(role)
