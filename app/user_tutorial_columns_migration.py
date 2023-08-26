@@ -54,4 +54,5 @@ def reset():
     return jsonify({'message': 'Reset successful'}), 200
 
 if __name__ == '__main__':
+    sys.path.append("/app")
     migrate()
