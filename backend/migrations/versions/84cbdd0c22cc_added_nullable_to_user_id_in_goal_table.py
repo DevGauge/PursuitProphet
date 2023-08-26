@@ -27,6 +27,9 @@ def upgrade():
         op.drop_table(table_name=table_name)
 
     with op.batch_alter_table('goal', schema=None) as batch_op:
+        # check if the column exists before adding it
+        if 'user_id' in [c['name'] for c in inspector.get_columns('goal')]:
+            return
         batch_op.add_column(sa.Column('user_id', sa.String(length=255), nullable=True))
         batch_op.create_foreign_key(None, 'user', ['user_id'], ['id'])
 
