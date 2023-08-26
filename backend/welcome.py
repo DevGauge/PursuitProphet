@@ -71,7 +71,7 @@ def handle_500(error):
     return redirect(url_for('error_page', error_message=error_message))
 
 @app.route('/demo', methods=['GET', 'POST'])
-def role_selection():
+def role_selection():    
     if request.method == 'POST':
         role = request.form.get('role')
         goal_id = bot.set_assistant_primary_goal(role)
@@ -104,24 +104,31 @@ def confirm_email(token):
     return 'The confirmation link is invalid or has expired.'
 
 @app.route('/feature/<feature_key>', methods=['GET'])
-@login_required
 def get_user_feature(feature_key):
-    user = current_user  # Assuming you are using Flask-Security-Too and have logged in user
+    user_id = request.args.get('user_id', None)
+    if user_id is None:
+        user = current_user
+    else:
+        user = User.query.get(user_id)
+
     feature_value = getattr(user, feature_key, None)
     if feature_value is not None:
-        print(f'feature value: {feature_value}')
+        print(f'feature key value: {feature_value}')
         return jsonify({feature_key: feature_value})
     else:
-        print(f'feature value not found. user attribs: {user.__dict__}')
+        print(f'feature key {feature_key} not found. user attribs: {user.__dict__}')
         return jsonify({feature_key: False})
     
 @app.route('/feature/<feature_key>', methods=['PUT'])
-@login_required
 def update_feature_value(feature_key):
-    print('welcome to the update feature value function!')
-    user = current_user
+    user_id = request.args.get('user_id', None)
+    print(f'user id from request: {user_id}')
+    if user_id is None:
+        user = current_user
+    else:
+        user = User.query.get(user_id)
     if hasattr(user, feature_key):
-            print(f'feature value: {feature_key} found')
+            print(f'feature value: {feature_key} found, setting false')
             setattr(user, feature_key, False)
             db.session.commit()
             return jsonify({'success': True})
@@ -132,7 +139,7 @@ def update_feature_value(feature_key):
 
 @login_required
 @app.route('/')
-def dashboard():
+def dashboard():    
     try:        
         if current_user.is_authenticated:
             user_id = current_user.id

@@ -250,22 +250,6 @@ class User(UserMixin, db.Model):
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         self.fs_uniquifier = str(uuid.uuid4())
-        if self.is_first_login is None:
-            self.is_first_login = True
-        if self.is_first_detail_view is None:
-            self.is_first_detail_view = True
-        if self.is_first_new_goal is None:
-            self.is_first_new_goal = True
-        if self.is_first_new_task is None:
-            self.is_first_new_task = True
-        if self.is_first_new_subtask is None:
-            self.is_first_new_subtask = True
-        if self.is_first_demo_task_gen is None:
-            self.is_first_demo_task_gen = True
-        if self.is_first_demo_subtask_gen is None:
-            self.is_first_demo_subtask_gen = True
-        if self.is_demo_finished is None:
-            self.is_demo_finished = False
     
     def set_role(self, role):
         self.roles.append(role)        
