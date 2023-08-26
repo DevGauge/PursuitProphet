@@ -27,8 +27,10 @@ def migrate():
 
     # Commit the changes
     db.session.commit()
+    print('Migration successful')
 
 def reset():
+    print('Resetting user tutorial columns...')
     rows_to_update = User.query.all()
     
     columns = [
@@ -50,3 +52,6 @@ def reset():
     # Commit the changes
     db.session.commit()
     return jsonify({'message': 'Reset successful'}), 200
+
+if __name__ == '__main__':
+    migrate()
