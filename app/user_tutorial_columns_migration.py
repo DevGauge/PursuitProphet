@@ -1,4 +1,4 @@
-from app import db, User
+from app.app import db, User
 
 def migrate():
     # Query all existing rows
@@ -54,5 +54,4 @@ def reset():
     return jsonify({'message': 'Reset successful'}), 200
 
 if __name__ == '__main__':
-    sys.path.append("/app")
     migrate()
