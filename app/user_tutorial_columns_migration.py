@@ -7,6 +7,7 @@ import os
 def migrate():
     with current_app.app_context():
         DATABASE_URL = os.environ['DATABASE_URL']
+        DATABASE_URL= DATABASE_URL[:8]+'ql' + DATABASE_URL[8:]
         engine = create_engine(DATABASE_URL)
         metadata = MetaData()
 
