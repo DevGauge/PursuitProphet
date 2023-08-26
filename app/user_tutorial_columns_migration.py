@@ -1,4 +1,4 @@
-from app.app import db, User
+from app import db, User
 
 def migrate():
     # Query all existing rows
