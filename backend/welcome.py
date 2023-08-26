@@ -10,7 +10,7 @@ import app.app
 from app.app import Goal, Task, User
 from app.app import DreamForm, TaskForm
 from app.app import db, app_instance
-from app.user_tutorial_columns_migration import reset
+from app.user_tutorial_columns_migration import migrate
 from flask_socketio import SocketIO, send, emit
 from flask_security import roles_required, login_required, login_user, user_registered, current_user
 from flask_security.confirmable import confirm_user, confirm_email_token_status
@@ -72,7 +72,7 @@ def handle_500(error):
 
 @app.route('/manual_migrate', methods=['GET'])
 def manual_migrate():
-    reset()
+    migrate()
     return redirect(url_for('dashboard'))
 
 @app.route('/demo', methods=['GET', 'POST'])

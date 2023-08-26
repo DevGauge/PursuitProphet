@@ -2,6 +2,7 @@ from app.app import db, User
 
 def migrate():
     # Query all existing rows
+    print('Migrating user tutorial columns...')
     rows_to_update = User.query.all()
 
     columns = [
@@ -21,6 +22,8 @@ def migrate():
                 setattr(row, column, True)
         if getattr(row, 'is_demo_finished') is None:
             setattr(row, 'is_demo_finished', False)
+
+    print('Committing changes...')
 
     # Commit the changes
     db.session.commit()
