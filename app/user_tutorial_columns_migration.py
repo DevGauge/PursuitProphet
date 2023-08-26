@@ -9,7 +9,7 @@ from sqlalchemy import text
 def migrate():
     with current_app.app_context():
         DATABASE_URL = os.environ['DATABASE_URL']
-        DATABASE_URL= DATABASE_URL[:8]+'ql' + DATABASE_URL[8:]
+        DATABASE_URL = DATABASE_URL[:8]+'ql' + DATABASE_URL[8:]
         engine = create_engine(DATABASE_URL)
         metadata = MetaData()
 
@@ -18,7 +18,7 @@ def migrate():
 
         with engine.begin() as connection:
             for column in ["is_first_login", "is_first_detail_view", "is_first_new_goal", "is_first_new_task", "is_first_new_subtask", "is_first_demo_task_gen", "is_first_demo_subtask_gen", "is_demo_finished"]:
-                connection.execute(text(f"ALTER TABLE {table_name} ADD COLUMN IF NOT EXISTS {column} boolean DEFAULT false"))    
+                connection.execute(text(f'ALTER TABLE "{table_name}" ADD COLUMN IF NOT EXISTS {column} boolean DEFAULT false'))
 
             # Query all existing rows
             print('Migrating user tutorial columns...')
