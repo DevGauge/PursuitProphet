@@ -1,6 +1,5 @@
+from app.app import app as current_app
 from app.app import db, User
-from flask import current_app
-
 
 def migrate():
     with current_app.app_context():
