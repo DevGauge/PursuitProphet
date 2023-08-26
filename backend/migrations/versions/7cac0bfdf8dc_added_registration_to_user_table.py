@@ -55,4 +55,3 @@ def downgrade():
               batch_op.drop_column('email')
 
        # ### end Alembic commands ###
-`
