@@ -15,41 +15,54 @@ def migrate():
 
         table_name = 'user'
 
-        with engine.begin() as connection:
-            print('adding columns...')
-            for column in ["is_first_login", "is_first_detail_view", "is_first_new_goal", "is_first_new_task", "is_first_new_subtask", "is_first_demo_task_gen", "is_first_demo_subtask_gen", "is_demo_finished"]:
-                connection.execute(text(f'ALTER TABLE "{table_name}" ADD COLUMN IF NOT EXISTS {column} boolean DEFAULT false'))
+       def migrate():
+    print('Initializing application context...')
+    with current_app.app_context():
+        DATABASE_URL = os.environ['DATABASE_URL']
+        DATABASE_URL = DATABASE_URL[:8]+'ql' + DATABASE_URL[8:]
+        engine = create_engine(DATABASE_URL)
+        metadata = MetaData()
 
-            # Query all existing rows
-            print('Migrating user tutorial columns...')
-            rows_to_update = User.query.all()
-            print('queried users')
+        table_name = 'user'
+        user_table = Table(table_name, metadata, autoload_with=engine)
+        print('Application context initialized')
 
-            columns = [
-                'is_first_login',
-                'is_first_detail_view',
-                'is_first_new_goal',
-                'is_first_new_task',
-                'is_first_new_subtask',
-                'is_first_demo_task_gen',
-                'is_first_demo_subtask_gen'
-            ]
+        # Adding columns to table
+        connection = engine.connect()
+        print('DB connection established, adding columns...')
+        for column in ["is_first_login", "is_first_detail_view", "is_first_new_goal", "is_first_new_task", "is_first_new_subtask", "is_first_demo_task_gen", "is_first_demo_subtask_gen", "is_demo_finished"]:
+            connection.execute(text(f'ALTER TABLE "{table_name}" ADD COLUMN IF NOT EXISTS {column} boolean DEFAULT false'))
+        connection.close()
+        print('Columns added')
 
-            # Update each row with the default values
-            print('Updating rows...')
-            for row in rows_to_update:
-                print(f'Updating row {row.id}...')
-                for column in columns:
-                    if getattr(row, column) is None:
-                        setattr(row, column, True)
-                if getattr(row, 'is_demo_finished') is None:
-                    setattr(row, 'is_demo_finished', False)
+        # Query all existing rows
+        print('Migrating user tutorial columns...')
+        rows_to_update = User.query.all()
+        print('User rows queried')
 
-            print('Committing changes...')
+        columns = [
+            'is_first_login',
+            'is_first_detail_view',
+            'is_first_new_goal',
+            'is_first_new_task',
+            'is_first_new_subtask',
+            'is_first_demo_task_gen',
+            'is_first_demo_subtask_gen'
+        ]
 
-            # Commit the changes
+        # Update each row with the default values
+        print('Updating rows...')
+        for row in rows_to_update:
+            print(f'Updating row {row.id}...')
+            for column in columns:
+                if getattr(row, column) is None:
+                    setattr(row, column, True)
+            if getattr(row, 'is_demo_finished') is None:
+                setattr(row, 'is_demo_finished', False)
             db.session.commit()
-            print('Migration successful')
+            print(f'Row {row.id} updated')  
+
+        print('Migration successful')
 
 def reset():
     print('Resetting user tutorial columns...')
