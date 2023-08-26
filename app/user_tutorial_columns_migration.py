@@ -1,6 +1,7 @@
 from app.app import app as current_app
 from app.app import db, User
 from sqlalchemy import create_engine, MetaData, Table
+from sqlalchemy.orm import sessionmaker
 import os
 
 
@@ -26,6 +27,9 @@ def migrate():
         connection.close()
         print('Columns added')
 
+    sessionmaker(bind=engine)().commit()  # This will make sure that the columns are present when we query the users table
+
+    with current_app.app_context():
         # Query all existing rows
         print('Migrating user tutorial columns...')
         rows_to_update = User.query.all()
@@ -54,6 +58,7 @@ def migrate():
             print(f'Row {row.id} updated')  
 
         print('Migration successful')
+
 
 def reset():
     print('Resetting user tutorial columns...')
