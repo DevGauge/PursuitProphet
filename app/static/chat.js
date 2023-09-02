@@ -35,8 +35,13 @@ function send_message() {
         if (this.status == 200) {
             loading.style.display = 'none';
             // Display the chatbot's response on the page
-            var chatbotResponse = JSON.parse(this.responseText).response;  // TODO: Model after response from langchain
-            chatbotResponse = chatbotResponse.replace(/\n/g, '<br>');
+            try {
+                var chatbotResponse = JSON.parse(this.responseText).response;  // TODO: Model after response from langchain
+                chatbotResponse = chatbotResponse.replace(/\n/g, '<br>');
+            } catch (e) {
+                console.error(e);
+                console.log(this.responseText);
+            }           
             
             var imgElement = document.createElement('img');
             imgElement.src = '/static/favicon-32x32.png';
