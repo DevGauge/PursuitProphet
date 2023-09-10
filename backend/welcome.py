@@ -62,7 +62,7 @@ def handle_db_exceptions(error):
 def error_page(error_message):
     print(f'error message: {error_message}')
     # traceback.print_exc()
-    return render_template('error.html', error_message=error_message)
+    return render_template('error.html', error_message=error_message, pageTitle='Error')
 
 @app.errorhandler(500)
 def handle_500(error):
@@ -74,10 +74,10 @@ def role_selection():
     if request.method == 'POST':
         role = request.form.get('role')
         goal_id = bot.set_assistant_primary_goal(role)
-        return redirect(url_for('demo_goal_generation', num_goals=10, title=role, goal_id=goal_id))
+        return redirect(url_for('demo_goal_generation', num_goals=10, title=role, page_title=role, goal_id=goal_id))
     else:
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
-        return render_template('role_selection.html', roles=roles)
+        return render_template('role_selection.html', roles=roles, pageTitle="Pursuit Prophet Dream Demo")
 
 @app.route('/admin')
 @login_required
@@ -311,7 +311,7 @@ def view_tasks():
     goal = Goal.query.filter_by(id=goal_id).first()
     tasks = Task.query.filter_by(goal_id=goal_id).all()
     tasks = [task for task in tasks if task.parent_id is None]
-    return render_template('view-tasks.html', goals=tasks, goal=goal, title=goal.goal, subtitle=None)
+    return render_template('view-tasks.html', goals=tasks, goal=goal, title=goal.goal, subtitle=None, pageTitle=goal.goal)
 
 @app.route('/view_subtasks', methods=['GET'])
 def view_subtasks():
@@ -343,7 +343,7 @@ def demo_goal_generation(num_goals, title, goal_id):
         print(f'tasks: {tasks}')
         print(f'goal: {goal.goal}')
         print(f'title: {title}')
-        return render_template('generate_goals.html', goals=tasks, title=title, goal=goal)
+        return render_template('generate_goals.html', goals=tasks, title=title, goal=goal, pageTitle=title)
     except Exception as e:
         print('exception when rendering template')
         print(e)        
@@ -359,7 +359,7 @@ def goal_generation(num_goals):
     try:
         num_goals = int(num_goals)
         bot.generate_goals(goal, num_goals)
-        return redirect(url_for('view_tasks', goal_id=goal_id, title=title))
+        return redirect(url_for('view_tasks', goal_id=goal_id, title=title, pageTitle=title))
     except Exception as e:
         print('exception when generating goals')
         print(e)
