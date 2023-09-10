@@ -47,6 +47,9 @@ class ConversationSummarizer:
 class ModelFactory:
     """Creates models with preset parameters for various tasks"""
 
+    # region Fine Tuned Models
+    _gpt_3_5_turbo_fine_tuned = "ft:gpt-3.5-turbo-0613:personal:task-gen-000-00-01:7x3DsWok:"
+
     # region Expensive Models
     _gpt_3_5_turbo = "gpt-3.5-turbo"
     _gpt_3_5_turbo_16k = "gpt-3.5-turbo-16k"
@@ -66,6 +69,10 @@ class ModelFactory:
         return ChatOpenAI(model_name=self._gpt_3_5_turbo, temperature=0.2)
 
     # endregion
+
+    def task_and_subtask_generator(self):
+        """Returns a fine-tuned model for generating tasks and subtasks. Is more expensive than `cheap_task_and_subtask_generator()`, should be more accurate."""
+        return ChatOpenAI(model_name=self._gpt_3_5_turbo_fine_tuned, temperature=0.8)
 
     def summarizer(self):
         """Returns a creative model for high-value summarization. May be more expensive than `cheap_summarizer()`, should be more accurate."""
