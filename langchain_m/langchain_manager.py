@@ -7,6 +7,8 @@ from langchain.chains import ConversationChain
 from langchain.chains.conversation.memory import ConversationSummaryBufferMemory
 from langchain.callbacks import get_openai_callback
 
+import openai
+
 parameters_list = ["query", "answer"]
 
 class TokenHandler:
@@ -23,6 +25,30 @@ class TokenHandler:
                 print("chat result: ", result)
                 print(f"Spent a total of {cb.total_tokens} tokens")
                 return result
+        except Exception as e:
+            raise e
+    
+    def stream(self):
+        for resp in openai.Completion.create(model='code-davinci-002', prompt='def hello():', max_tokens=512, stream=True):
+            token = resp.choices[0].text
+            print(token)
+        
+    def model_response(self, model, query):
+        try:
+            with get_openai_callback() as cb:                
+                print(model)
+                print(query)
+                prompt={"role": "user", "content": query}
+                result = openai.ChatCompletion.create(
+                    model=model.model_name,
+                    messages=[prompt],
+                    max_tokens=512,
+                    temperature=0.8,
+                    stop=["\n\n", "Human:", "AI:"]
+                )
+                print(result)
+                print(f"Spent a total of {cb.total_tokens} tokens")
+                return result.choices[0]["message"]["content"]
         except Exception as e:
             raise e
 
@@ -48,12 +74,14 @@ class ModelFactory:
     """Creates models with preset parameters for various tasks"""
 
     # region Fine Tuned Models
-    _gpt_3_5_turbo_fine_tuned = "ft:gpt-3.5-turbo-0613:personal:task-gen-000-00-01:7x3DsWok:"
+    _gpt_3_5_turbo_fine_tuned = "ft:gpt-3.5-turbo-0613:personal:task-gen-000-00-01:7x3DsWok"
+    # endregion
 
     # region Expensive Models
     _gpt_3_5_turbo = "gpt-3.5-turbo"
     _gpt_3_5_turbo_16k = "gpt-3.5-turbo-16k"
     _gpt_4 = "gpt-4"
+    # endregion
 
     # region private methods
     def _creative_gpt3(self):
