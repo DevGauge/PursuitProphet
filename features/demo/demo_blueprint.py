@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, jsonify
 from app.models import Task, Goal, ChatBot
-from shared.blueprints.blueprints import task_bp
+from shared.blueprints.blueprints import demo_bp
 from bot import IOManager, GoalGeneratorBot, GoalManager
 
 io_manager = IOManager()
@@ -8,19 +8,19 @@ goal_manager = GoalManager(io_manager)
 goal_gen_bot = GoalGeneratorBot('', num_goals=10)
 gen_bot = ChatBot(goal_manager, goal_gen_bot)
 
-@task_bp.route('/demo', methods=['GET', 'POST'])
+@demo_bp.route('/demo', methods=['GET', 'POST'])
 def role_selection():
     if request.method == 'POST':
         role = request.form.get('role')
         print(f'setting role to: {role}')
         goal_id = gen_bot.set_assistant_primary_goal(role)
         print(f'goal_id for primary role: {goal_id}')
-        return redirect(url_for('task_bp.demo_goal_generation', num_goals=10, title=role, page_title=role, goal_id=goal_id))
+        return redirect(url_for('demo_bp.demo_goal_generation', num_goals=10, title=role, page_title=role, goal_id=goal_id))
     else:
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
         return render_template('role_selection.html', roles=roles, pageTitle="Pursuit Prophet Dream Demo")
 
-@task_bp.route('/demo/generate_goals/<int:num_goals>/<string:title>/<string:goal_id>', methods=['GET', 'POST'])
+@demo_bp.route('/demo/generate_goals/<int:num_goals>/<string:title>/<string:goal_id>', methods=['GET', 'POST'])
 def demo_goal_generation(num_goals, title, goal_id):
     print(f'num_goals: {num_goals}')
     print(f'title: {title}')
@@ -47,7 +47,7 @@ def demo_goal_generation(num_goals, title, goal_id):
         print(e)        
         return redirect(url_for('error_page', error_message=str(e)))
 
-@task_bp.route('/demo/display_subtasks/<string:task_id>', methods=['GET'])
+@demo_bp.route('/demo/display_subtasks/<string:task_id>', methods=['GET'])
 def display_subtasks(task_id):    
     task = Task.query.filter_by(id=task_id).first()
     goal = Goal.query.filter_by(id=task.goal_id).first()
@@ -57,7 +57,7 @@ def display_subtasks(task_id):
         return json    
     return render_template('generate_tasks.html', task=task, title=goal.goal, subtitle=task.task, goals=task.subtasks, goal=goal)
 
-@task_bp.route('/demo/generate_subtasks/<int:num_subtasks>', methods=['POST'])
+@demo_bp.route('/demo/generate_subtasks/<int:num_subtasks>', methods=['POST'])
 def demo_generate_subtasks(num_subtasks):
     data = request.get_json()
     task_id = data['task_id']

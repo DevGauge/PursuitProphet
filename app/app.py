@@ -22,7 +22,7 @@ from flask_security.forms import LoginForm, ConfirmRegisterForm
 from wtforms.validators import DataRequired, Length, Regexp, Email, Optional
 
 from .models import User, Role
-from shared.blueprints.blueprints import task_bp
+from shared.blueprints.blueprints import demo_bp
 
 load_dotenv()
 
