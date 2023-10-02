@@ -1,106 +1,8 @@
-from langchain_m.langchain_manager import ConversationSummarizer, ExampleFactory, FewShotPromptHandler, FewShotPromptTemplate, PromptLengthLimiter, PromptTemplate
+from langchain_m.langchain_manager import ConversationSummarizer, ExampleFactory, FewShotPromptHandler, FewShotPromptTemplate, PromptLengthLimiter, PromptTemplate, ModelFactory
 import halo
-from app.app import Task, Goal
+from app.models import Task, Goal
 from typing import List
-
-class GoalPromptHandler(FewShotPromptHandler):
-    """Prompt Factory for Goals"""
-
-    def __init__(
-        self,
-        example_template: PromptTemplate,
-        examples: list[str],
-        prefix: str,
-        suffix: str,
-        example_prompt: PromptTemplate = None,
-        limiter: PromptLengthLimiter = None,
-    ):
-        super().__init__(example_template, examples, prefix, suffix, limiter)
-        self.example_factory = GoalExampleFactory()
-        self.example_prompt = (
-            example_prompt
-            if example_prompt is not None
-            else self.example_factory.example_prompt
-        )
-
-    def _example_prompt(self, variables_list: list[str]) -> PromptTemplate:
-        return PromptTemplate(
-            input_variables=variables_list, template=self.example_template
-        )
-
-    def few_shot_prompt_template(
-        self,
-        input_variables=None,
-        example_separator="\n",
-        limiter: PromptLengthLimiter = None,
-    ) -> PromptTemplate:
-        if input_variables is None:
-            input_variables = ["query"]
-        self.prompt_template = FewShotPromptTemplate(
-            examples=self.examples,
-            example_prompt=limiter.length_based_selector()
-            if limiter is not None
-            else self.example_prompt,
-            prefix=self.prefix,
-            suffix=self.suffix,
-            input_variables=input_variables,
-            example_separator=example_separator,
-        )
-        return self.prompt_template
-
-class GoalExampleFactory(ExampleFactory):
-    """Factory for goal prompt examples"""
-    example_template = """
-    User: {query}
-    AI: {answer}
-    """
-
-    example_prompt = PromptTemplate(
-        input_variables=["query", "answer"], template=example_template
-    )
-
-    def examples(self) -> list[dict[str, str]]:
-        return [
-            {
-                "query": f"{ self.goal_instructions('learn how to code', 3)}",
-                "answer": 
-"""
-Develop a solid understanding of programming languages, syntax, and concepts.
-Gain practical experience in writing code and solving programming problems.
-Acquire the ability to design and develop software applications independently.
-"""
-            },
-            {
-                "query": f"{ self.goal_instructions('clean my house', 10)}",
-                "answer": 
-"""
-Declutter and organize rooms.
-Dust and clean surfaces.
-Vacuum and mop floors.
-Clean and sanitize kitchen and bathrooms.
-Wash, fold, and put away laundry.
-Clean windows, mirrors, and glass.
-Tidy outdoor areas.
-Organize closets, drawers, and cabinets.
-Empty and clean trash bins.
-Wipe down frequently touched surfaces.
-"""
-            },
-            {
-                "query": f"{ self.goal_instructions('wash my dog', 5)}",
-                "answer": 
-"""
-Prepare bathing area and supplies.
-Wet dog's fur with warm water.
-Apply and lather dog shampoo.
-Thoroughly rinse off shampoo.
-Dry dog's fur with a towel.
-"""
-            }
-        ]
-
-    def goal_instructions(self, primary_goal: str, num_goals: int):
-        return f"""Define up to {num_goals} goals that fulfill the primary goal of '{primary_goal}'"""
+from langchain_m.langchain_manager import TokenHandler
 
 class TaskPromptHandler(FewShotPromptHandler):
     """Prompt Factory for Goals"""
@@ -577,36 +479,24 @@ As a prophet of dreams, I will only help you with dreams and tasks that fit with
 
 class GoalGeneratorBot:
     def __init__(self, goal: str, num_goals: int = 10):
+        print(f'goal gen bot received goal: {goal}. This should be a string')
         self.goal = goal
         self.num_goals = num_goals
 
-    factory = GoalExampleFactory()
-
-    def create_prompt_template(self):
-        # remove all newlines from prefix
-        prefix=f"""Imagine three different experts are answering this question. All experts will write down 1 step of 
-        their thinking, then share it with the group. Then all experts will go on to the next step until the user's problem is solved. If any expert 
-        realises they're wrong at any point then they leave. The question is... You are a goal generator. 
-        Act as a problem solving assistant and logical thinker. Your primary objective is to guide and support 
-        users by tackling various challenges and breaking down complex problems into smaller, more manageable 
-        tasks. Generate up to {self.num_goals} goals for the user's goal of {self.goal}. Goals should be concise 
-        and actionable. Goals should be ordered first by priority, but always respect dependency order. For instance, 
-        if a user's goal is to bake a cake, it's very important to mix the batter, but first you must have the 
-        necessary ingredients!
-        """.replace('\n', ' ')
-        return GoalPromptHandler(
-        example_template=self.factory.example_template,
-        examples=self.factory.examples(),
-        prefix=prefix,
-        suffix="""
-        User: {query}
-        AI: """,
-    )
+    def goal_gen_prompt(self):
+        return f"Generate up to {self.num_goals} tasks for {self.goal}"
 
     def generate_goals(self):
-        query = self.factory.goal_instructions(f"{self.goal}", self.num_goals)
-        summarizer = ConversationSummarizer()
-        return summarizer.summarize(self.create_prompt_template().few_shot_prompt_template().format(query=query))
+        spinner = halo.Halo(text=f"Generating Tasks for {self.goal}", spinner='dots')
+        spinner.start()
+        model = ModelFactory().task_and_subtask_generator()
+        prompt = self.goal_gen_prompt()
+        try:
+            return TokenHandler(None).model_response(model, prompt)
+        except Exception as e:
+            raise e
+        finally:
+            spinner.stop()        
     
 class FilenameExampleFactory(ExampleFactory):
     """Factory for filename prompt examples"""
