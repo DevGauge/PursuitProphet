@@ -77,11 +77,10 @@ import openai
 # Local imports
 sys.path.insert(0, './langchain')
 from langchain_m.langchain_module import TaskGeneratorBot, GoalGeneratorBot, FilenameGeneratorBot
-from app.app import Goal, Task, User, db, app as flask_app
+from app.models import Goal, Task, User, db
 from app.app import app_instance
 from sqlalchemy.exc import SQLAlchemyError
 from flask import session
-from werkzeug.security import generate_password_hash
 
 load_dotenv()
 class SingletonMeta(type):
