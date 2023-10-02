@@ -7,11 +7,11 @@
         {%- if 'task' not in request.path -%}
         <h1>{{ goal.goal }}</h1>
           <a href="{{ url_for('view_tasks', goal_id=goal.id) }}">
-          <input class="standard-button" type="button" value="View Tasks ({{goal.tasks|length}})"> 
+          <input class="standard-button" type="button" value="View/Add Tasks ({{goal.tasks|length}})"> 
         {%- elif 'task' in request.path and 'new_subtask' not in request.path-%}
           <h1>{{ goal.task }}</h1>          
           <a href="{{ url_for('view_subtasks', title=goal.task, task_id=goal.id) }}">
-          <input class="standard-button" type="button" value="View Subtasks ({{goal.subtasks|length}})">
+          <input class="standard-button" type="button" value="View/Add Subtasks ({{goal.subtasks|length}})">
         {% endif %}
         {%- endif %}
         </input></a>        
