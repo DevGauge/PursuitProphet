@@ -4,10 +4,10 @@ from flask import Flask, jsonify, render_template, request, redirect, url_for, f
 from flask_restx import Api, Resource, fields
 sys.path.insert(0, '../')
 sys.path.insert(0, '/app')
-from bot import ChatBot
+# from app.models import ChatBot
 from langchain_m.langchain_module import TaskChatBot, GoalChatBot
 import app.app
-from app.app import Goal, Task, User
+from app.models import Goal, Task, User
 from app.app import DreamForm, TaskForm
 from app.app import db, app_instance
 from flask_socketio import SocketIO, send, emit
@@ -17,12 +17,12 @@ from LangChainAgentFactory import AgentFactory
 from langchain.tools import StructuredTool
 import traceback
 from urllib.parse import quote
-
+import features.demo.demo_blueprint
+from shared.blueprints.blueprints import register_blueprints
 app = app_instance.app
 app.debug_mode = True
 socketio = SocketIO(app)
-
-bot = ChatBot()
+register_blueprints(app)
 
 @user_registered.connect_via(app)
 def user_registered_sighandler(sender, user, confirm_token, confirmation_token, form_data):
@@ -68,16 +68,6 @@ def error_page(error_message):
 def handle_500(error):
     error_message = "Internal Server Error"
     return redirect(url_for('error_page', error_message=error_message))
-
-@app.route('/demo', methods=['GET', 'POST'])
-def role_selection():
-    if request.method == 'POST':
-        role = request.form.get('role')
-        goal_id = bot.set_assistant_primary_goal(role)
-        return redirect(url_for('demo_goal_generation', num_goals=10, title=role, page_title=role, goal_id=goal_id))
-    else:
-        roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
-        return render_template('role_selection.html', roles=roles, pageTitle="Pursuit Prophet Dream Demo")
 
 @app.route('/admin')
 @login_required
@@ -322,33 +312,6 @@ def view_subtasks():
     subtasks = Task.query.filter_by(parent_id=task_id).all()
     return render_template('view-subtasks.html', goal=goal, task=task, goals=subtasks, title=goal.goal, subtitle=task.task)
 
-@app.route('/demo/generate_goals/<int:num_goals>/<string:title>/<string:goal_id>', methods=['GET', 'POST'])
-def demo_goal_generation(num_goals, title, goal_id):
-    print(f'num_goals: {num_goals}')
-    print(f'title: {title}')
-    print(f'goal_id: {goal_id}')
-    goal = Goal.query.filter_by(id=goal_id).first()
-    if title is None:
-        title = goal.goal
-    print(f'received goal: {goal.goal}')
-    try:
-        num_goals = int(num_goals)
-        bot.generate_goals(goal, num_goals)        
-    except Exception as e:
-        print('exception when generating goals')
-        print(e)
-        return redirect(url_for('error_page', error_message=str(e)))
-    try:
-        tasks = Task.query.filter_by(goal_id=goal_id).all()
-        print(f'tasks: {tasks}')
-        print(f'goal: {goal.goal}')
-        print(f'title: {title}')
-        return render_template('generate_goals.html', goals=tasks, title=title, goal=goal, pageTitle=title)
-    except Exception as e:
-        print('exception when rendering template')
-        print(e)        
-        return redirect(url_for('error_page', error_message=str(e)))
-    
 @app.route('/generate_goals/<int:num_goals>', methods=['GET', 'POST'])
 def goal_generation(num_goals):
     title = request.args.get('title')
@@ -358,7 +321,7 @@ def goal_generation(num_goals):
         title = goal.goal
     try:
         num_goals = int(num_goals)
-        bot.generate_goals(goal, num_goals)
+        # bot.generate_goals(goal, num_goals)
         return redirect(url_for('view_tasks', goal_id=goal_id, title=title, pageTitle=title))
     except Exception as e:
         print('exception when generating goals')
@@ -399,74 +362,10 @@ def complete_task(task_id):
     task.completed = not task.completed
     db.session.commit()
     return redirect(url_for('view_tasks', goal_id=task.goal_id))
-
-
-@app.route('/demo/display_subtasks/<string:task_id>', methods=['GET'])
-def display_subtasks(task_id):    
-    task = Task.query.filter_by(id=task_id).first()
-    goal = Goal.query.filter_by(id=task.goal_id).first()
-    if not task.subtasks:
-        json = jsonify(error=f'No subtasks for task # {task_id}'), 404
-        print(json)
-        return json
-    else:
-        return render_template('generate_tasks.html', task=task, title=goal.goal, subtitle=task.task, goals=task.subtasks, goal=goal)
     
 @app.route('/generate_subtasks/<int:num_subtasks>', methods=['GET', 'POST'])
 def generate_subtasks(num_subtasks):
     task_id = request.args.get('task_id')
     task = Task.query.filter_by(id=task_id).first()
-    bot.generate_subtasks(task, num_subtasks)
+    # bot.generate_subtasks(task, num_subtasks)
     return redirect(url_for('view_subtasks', task_id=task.id))
-
-@app.route('/demo/generate_subtasks/<int:num_subtasks>', methods=['POST'])
-def demo_generate_subtasks(num_subtasks):
-    data = request.get_json()
-    task_id = data['task_id']
-    task = Task.query.filter_by(id=task_id).first()
-    bot.generate_subtasks(task, num_subtasks)
-    # get subtasks
-    subtasks = Task.query.filter_by(parent_id=task_id).all()
-    # convert subtasks to json
-    subtasks_json = [subtask.to_dict() for subtask in subtasks]
-
-    return jsonify(subtasks=subtasks_json)
-
-#region API    
-api = Api(app, version='1.0', doc='/api/api-docs', title='Pursuit Prophet API', description='Pursuit Prophet backend')
-
-role_model = api.model('Role', {
-    'role': fields.String(required=True, description="The user's primary goal"),
-})
-
-ns = api.namespace('api', description='Bot API')
-@ns.route('/role')
-class BotRole(Resource):
-    @ns.expect(role_model, validate=True) 
-    @ns.response(200, 'Role set successfully')
-    @ns.response(400, 'Validation Error')
-    def post(self):
-        '''Set a new role for the bot'''
-        role = request.json.get('role')
-        bot.set_assistant_primary_goal(role)
-
-        return {'role': f'{role}'}, 200
-    
-@ns.route('/goals')
-class BotGoals(Resource):
-    @ns.response(200, 'Goals generated successfully')
-    def get(self):
-        '''Generate goals for the bot'''
-        if bot.io_manager.primary_goal is None:
-            return {'error': 'Role not set, use /role first'}, 400
-        
-        goals = bot.generate_goals()
-        return {'goals': f'{goals}'}, 200
-#endregion API
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    if port is None:
-        port = 5000
-    app.debug = True
-    socketio.run(app, host='0.0.0.0', port=port)
-    
