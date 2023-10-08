@@ -221,30 +221,6 @@ def new_subtask(task_id: str):
         return redirect(url_for('view_tasks', goal_id=goal_id, title=goal.goal))
     return render_template('goal-detail.html', form=form, goal=goal)
 
-    
-@app.route('/task/<task_id>', methods=['GET', 'POST'])
-def task_detail(task_id):
-    task = Task.query.get(task_id)
-    form = TaskForm(obj=task)
-    form.submit.label.text = 'Update Task'
-    if form.validate_on_submit():
-        task.task = form.goal.data
-        task.target_date = form.target_date.data
-        task.target_time = form.target_time.data
-        db.session.commit()
-        flash('Your task has been updated.', 'success')
-        return render_template('goal-detail.html', form=form, goal=task)
-        
-    else:
-        if task is None:
-            flash('Task not found.', 'error')
-            return redirect(url_for('dashboard'))
-        else:
-            print(task.task)
-            form = TaskForm(obj=task)
-            form.submit.label.text = 'Update Task'
-            return render_template('goal-detail.html', form=form, goal=task)
-
 @app.route('/view_tasks', methods=['GET'])
 def view_tasks():
     goal_id = request.args.get('goal_id')
