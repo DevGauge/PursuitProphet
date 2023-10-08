@@ -299,13 +299,6 @@ def task_chat_api(task_id):
     goal = Goal.query.filter_by(id=task.goal_id).first()
     chat_bot = TaskChatBot(task, goal, [task.get_task() for task in task.subtasks])
 
-@app.route('/goal/complete/<goal_id>', methods=['GET', 'POST'])
-def complete_goal(goal_id):
-    goal = Goal.query.filter_by(id=goal_id).first()
-    goal.completed = not goal.completed
-    db.session.commit()
-    return redirect(url_for('dashboard'))
-
 @app.route('/task/complete/<task_id>', methods=['GET', 'POST'])
 def complete_task(task_id):
     task = Task.query.filter_by(id=task_id).first()

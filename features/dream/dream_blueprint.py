@@ -47,3 +47,10 @@ def view_dream(goal_id: str):
         flash('Your dream has been updated.', 'success')
         return render_template('dream-detail.html', form=form, goal=goal)
     return render_template('dream-detail.html', form=form, goal=goal)
+
+@dream_bp.route('/dream/complete/<goal_id>', methods=['GET', 'POST'])
+def complete_dream(goal_id):
+    goal = Goal.query.filter_by(id=goal_id).first()
+    goal.completed = not goal.completed
+    db.session.commit()
+    return redirect(url_for('dashboard'))

@@ -36,7 +36,7 @@ window.onload = function () {
             const goalId = clickedCard.getAttribute('data-task-id');
             const goalTitle = clickedCard.querySelector('.goal-text').innerText;
             if (!isTaskPage && !isSubTaskPage) { // is goal
-                window.location.href = `/goal/complete/${goalId}`;
+                window.location.href = `/dream/complete/${goalId}`;
             } else {
                 window.location.href = `/task/complete/${goalId}`;
             }

@@ -1,7 +1,15 @@
 from flask import Blueprint
-demo_bp = Blueprint('demo_bp', __name__, template_folder='../../features/demo/templates')
-dream_bp = Blueprint('dream_bp', __name__, template_folder='../../features/dream/templates')
-task_bp = Blueprint('task_bp', __name__, template_folder='../../features/task/templates')
+
+def construct_blueprint(name: str, template_folder: str = None):
+    """Constructs a blueprint with the given name and template_folder, which defaults to the name"""
+    if template_folder is None:
+        template_folder = name
+    return Blueprint(name + '_bp', __name__, template_folder='../../features/' + template_folder + '/templates')
+
+demo_bp = construct_blueprint('demo')
+dream_bp = construct_blueprint('dream')
+task_bp = construct_blueprint('task')
+subtask_bp = construct_blueprint('subtask')
 
 def register_blueprints(flask_app):
     blueprints = [demo_bp, dream_bp, task_bp]

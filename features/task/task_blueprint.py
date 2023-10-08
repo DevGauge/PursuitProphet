@@ -18,7 +18,7 @@ class TaskForm(FlaskForm):
         if obj:
             self.goal.data = obj.task
 
-@task_bp.route('/new_task/<goal_id>', methods=['GET', 'POST'])
+@task_bp.route('/task/new_task/<goal_id>', methods=['GET', 'POST'])
 def new_task(goal_id: str):
     form = TaskForm()
     form.submit.label.text = 'Add Task'
