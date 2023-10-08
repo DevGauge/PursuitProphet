@@ -7,7 +7,6 @@ mimetypes.add_type('text/css', '.css')
 from flask import Flask
 from flask_migrate import Migrate
 from flask_mail import Mail
-from shared.blueprints.blueprints import register_blueprints
 from dotenv import load_dotenv
 
 from sqlalchemy import create_engine, DateTime
@@ -22,30 +21,8 @@ from flask_security.forms import LoginForm, ConfirmRegisterForm
 from wtforms.validators import DataRequired, Length, Regexp, Email, Optional
 
 from .models import User, Role
-from shared.blueprints.blueprints import demo_bp
 
 load_dotenv()
-
-class DreamForm(FlaskForm):
-    goal = StringField('Dream Name', validators=[DataRequired()], render_kw={"placeholder": "What are you dreaming of?"})
-    description = TextAreaField('Dream Description', validators=[Optional()], render_kw={"placeholder": "Describe your dream"})
-    target_date = DateField('Target Date', format='%Y-%m-%d', validators=[Optional()])
-    target_time = TimeField('Target Time', format='%H:%M', validators=[Optional()])
-    submit = SubmitField()
-
-    def __init__(self, obj=None, **kwargs):
-        super().__init__(obj=obj, **kwargs)
-
-class TaskForm(FlaskForm):
-    goal = StringField('Task Name', validators=[DataRequired()], render_kw={"placeholder": "What do you need to do?"})
-    target_date = DateField('Target Date', format='%Y-%m-%d', validators=[Optional()])
-    target_time = TimeField('Target Time', format='%H:%M', validators=[Optional()])
-    submit = SubmitField()
-
-    def __init__(self, obj=None, **kwargs):
-        super().__init__(obj=obj, **kwargs)
-        if obj:
-            self.goal.data = obj.task
 
 class RegistrationForm(ConfirmRegisterForm):
     aka = StringField('Nickname (Optional)', [

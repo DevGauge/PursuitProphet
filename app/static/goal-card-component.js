@@ -50,7 +50,7 @@ window.onload = function () {
             if (isTaskPage) {
                 window.location.href = `/task/${goalId}`
             } else {
-                window.location.href = `/goal/${goalId}`;
+                window.location.href = `/dream/${goalId}`;
             }
         });
     });

@@ -2,7 +2,7 @@
 {% block extended_content %}
 <div class="dialogue" id="dialogue">
     <h2>Add a Task to {{ goal.goal }}</h2>
-    <form method="POST" action="{{ url_for('new_task') }}">
+    <form method="POST" action="{{ url_for('task_bp.new_task') }}">
         <input type="text" name="dream" placeholder="Task Name" required>
         <div class="button-container">
             <button type="submit" class="standard-button">Submit</button>

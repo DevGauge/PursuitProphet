@@ -1,5 +1,5 @@
-from app.app import app as current_app
-from app.app import db, User
+from app.app import app as current_app, User
+from .pp_logging.db_logger import db
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
 import os

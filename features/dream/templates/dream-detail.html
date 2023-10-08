@@ -1,0 +1,15 @@
+{% extends "goal-detail-base.html" %}
+
+{% block header %}
+<h1>{{ goal.goal }}</h1>
+<a href="{{ url_for('view_tasks', goal_id=goal.id) }}">
+<input class="standard-button" type="button" value="View Tasks ({{goal.tasks|length}})">
+</a>
+{% endblock %}
+
+{% block form_content %}
+{{ form.goal.label }} {{ form.goal() }}
+{{ form.description.label }} {{ form.description() }}
+{{ form.target_date.label }} {{ form.target_date() }}
+{{ form.target_time.label }} {{ form.target_time() }}
+{% endblock %}

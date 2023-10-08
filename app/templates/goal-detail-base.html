@@ -1,0 +1,23 @@
+{% extends "dashboard.html" %}
+
+{% block main %}
+<div class="loading dark-spinner">Loading...</div>
+<div class="goal-detail-container">
+    <form class="goal-detail-form" method="POST">
+        {{ form.hidden_tag() }}
+        {% block header %}{% endblock %}
+        {% block form_content %}{% endblock %}
+        {{ form.submit(class="standard-button") }}
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  var loading = document.querySelector('.loading');
+  // other common script content
+</script>
+<script src="{{ url_for('static', filename='show_alert.js') }}"></script>
+<script src="{{ url_for('static', filename='feature_value_request.js') }}"></script>
+{% block extra_scripts %}{% endblock %}
+{% endblock %}

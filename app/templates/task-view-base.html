@@ -5,7 +5,7 @@
     {% if subtitle == None %}
     <h1>
         {% if 'demo' not in request.url %}
-        <a href="{{ url_for('goal_detail', goal_id=goal.id) }}">
+        <a href="{{ url_for('dream_bp.view_dream', goal_id=goal.id) }}">
             <span class='highlight-text'>{{ title }}</span>
         </a>
         {% else %}

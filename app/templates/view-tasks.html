@@ -1,7 +1,7 @@
 {% include 'task-view-base.html' %}
 {% block title %}{{ pageTitle }}{% endblock %}
 {% block content %}
-<a href="{{ url_for('new_task', goal_id=goal.id) }}">
+<a href="{{ url_for('task_bp.new_task', goal_id=goal.id) }}">
     <button class="plus-button">+</button>
 </a>
 <button class="generate-button"></button>

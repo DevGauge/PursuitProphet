@@ -8,8 +8,10 @@ sys.path.insert(0, '/app')
 from langchain_m.langchain_module import TaskChatBot, GoalChatBot
 import app.app
 from app.models import Goal, Task, User
-from app.app import DreamForm, TaskForm
-from app.app import db, app_instance
+#TODO: remove this import once the blueprint is working for all routes requiring TaskForm
+from features.task.task_blueprint import TaskForm
+from app.app import app_instance
+from app.pp_logging.db_logger import db
 from flask_socketio import SocketIO, send, emit
 from flask_security import roles_required, login_required, login_user, user_registered, current_user
 from flask_security.confirmable import confirm_user, confirm_email_token_status
@@ -18,11 +20,14 @@ from langchain.tools import StructuredTool
 import traceback
 from urllib.parse import quote
 import features.demo.demo_blueprint
+import features.dream.dream_blueprint
+import features.task.task_blueprint
 from shared.blueprints.blueprints import register_blueprints
 app = app_instance.app
 app.debug_mode = True
 socketio = SocketIO(app)
 register_blueprints(app)
+print(app.url_map)
 
 @user_registered.connect_via(app)
 def user_registered_sighandler(sender, user, confirm_token, confirmation_token, form_data):
@@ -128,7 +133,7 @@ def update_feature_value(feature_key):
 
 @login_required
 @app.route('/')
-def dashboard():    
+def dashboard():
     try:        
         if current_user.is_authenticated:
             user_id = current_user.id
@@ -139,6 +144,7 @@ def dashboard():
         else:
             raise ValueError("User not found")
     except Exception as e:
+        print('login exception', e)
         return redirect(url_for('security.login'))
     
     return redirect(url_for('security.login'))
@@ -196,38 +202,6 @@ def delete_subtask(subtask_id):
         print(f'goal with id {task.goal_id} not found')
         return redirect(url_for('dashboard'))
 
-@app.route('/add_dream', methods=['GET', 'POST'])
-def add_dream():
-    form = DreamForm()
-    form.submit.label.text = 'Add Dream'
-    if form.validate_on_submit():
-        new_goal = Goal(form.goal.data, 
-                        user_id=current_user.id, 
-                        description=form.description.data,
-                        target_date=form.target_date.data, 
-                        target_time=form.target_time.data)
-        db.session.add(new_goal)
-        db.session.commit()
-        flash('Your dream has been added.', 'success')
-        return redirect(url_for('dashboard'))
-    return render_template('goal-detail.html', form=form, goal=None)
-
-@app.route('/new_task/<goal_id>', methods=['GET', 'POST'])
-def new_task(goal_id: str):
-    form = TaskForm()
-    form.submit.label.text = 'Add Task'
-    goal = Goal.query.filter_by(id=goal_id).first()
-    if form.validate_on_submit():
-        new_task = Task(form.goal.data,
-                        goal_id=goal_id,
-                        target_date=form.target_date.data,
-                        target_time=form.target_time.data)
-        db.session.add(new_task)
-        db.session.commit()
-        flash('Your task has been added.', 'success')
-        return redirect(url_for('view_tasks', goal_id=goal_id, title=goal.goal))
-    return render_template('goal-detail.html', form=form, goal=goal)
-
 @app.route('/new_subtask/<task_id>', methods=['GET', 'POST'])
 def new_subtask(task_id: str):
     form = TaskForm()
@@ -247,30 +221,6 @@ def new_subtask(task_id: str):
         return redirect(url_for('view_tasks', goal_id=goal_id, title=goal.goal))
     return render_template('goal-detail.html', form=form, goal=goal)
 
-@app.route('/goal/<goal_id>', methods=['GET', 'POST'])
-def goal_detail(goal_id):
-    goal = Goal.query.get(goal_id)
-    form = DreamForm(obj=goal)
-    form.submit.label.text = 'Update Dream'
-    if form.validate_on_submit():
-        goal.goal = form.goal.data
-        goal.description = form.description.data
-        goal.target_date = form.target_date.data
-        goal.target_time = form.target_time.data
-        db.session.commit()
-        flash('Your dream has been updated.', 'success')
-        return render_template('goal-detail.html', form=form, goal=goal)
-        
-    else:
-        goal = Goal.query.get(goal_id)
-        if goal is None:
-            flash('Goal not found.', 'error')
-            return redirect(url_for('dashboard'))
-        else:
-            print(goal.goal)
-        form = DreamForm(obj=goal)
-        form.submit.label.text = 'Update Dream'
-        return render_template('goal-detail.html', form=form, goal=goal)
     
 @app.route('/task/<task_id>', methods=['GET', 'POST'])
 def task_detail(task_id):
