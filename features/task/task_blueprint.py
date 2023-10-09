@@ -78,7 +78,7 @@ def view_subtasks():
     subtasks = Task.query.filter_by(parent_id=task_id).all()
     return render_template('view-subtasks.html', goal=goal, task=task, goals=subtasks, title=goal.goal, subtitle=task.task)
 
-@task_bp.route('/delete_task/<task_id>', methods=['GET', 'POST'])
+@task_bp.route('/task/delete/<task_id>', methods=['GET', 'POST'])
 def delete_task(task_id):
     task=Task.query.filter_by(id=task_id).first()
     print(f'task parent id: {task.goal_id}')

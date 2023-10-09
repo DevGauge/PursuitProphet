@@ -25,7 +25,7 @@ window.onload = function () {
             if (!isTaskPage && !isSubTaskPage) {
                 showAlert('warning', `Are you sure you want to delete the goal "${goalTitle}"? All tasks and subtasks will be deleted!`, `/dream/delete/${goalId}`, 'Delete');
             } else if (isTaskPage && !isSubTaskPage) {
-                showAlert('warning', `Are you sure you want to delete the task "${goalTitle}"? All subtasks will be deleted!`, `/delete_task/${goalId}`, 'Delete');
+                showAlert('warning', `Are you sure you want to delete the task "${goalTitle}"? All subtasks will be deleted!`, `/task/delete/${goalId}`, 'Delete');
             } else {
                 showAlert('warning', `Are you sure you want to delete the subtask "${goalTitle}"?`, `/delete_subtask/${goalId}`, 'Delete');
             }            
