@@ -148,18 +148,6 @@ def dashboard():
         return redirect(url_for('security.login'))
     
     return redirect(url_for('security.login'))
-
-@app.route('/delete_goal/<goal_id>', methods=['GET', 'POST'])
-def delete_goal(goal_id):
-    goal=Goal.query.filter_by(id=goal_id).first()
-    if goal is None:
-        flash('Goal not found.', 'error')
-        return redirect(url_for('dashboard'))
-    else:
-        db.session.delete(goal)
-        db.session.commit()
-        flash('Your dream has been deleted.', 'success')
-        return redirect(url_for('dashboard'))
     
 @app.route('/delete_task/<task_id>', methods=['GET', 'POST'])
 def delete_task(task_id):

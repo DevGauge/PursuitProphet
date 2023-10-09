@@ -63,3 +63,15 @@ def view_tasks():
     tasks = Task.query.filter_by(goal_id=goal_id).all()
     tasks = [task for task in tasks if task.parent_id is None]
     return render_template('view-tasks.html', goals=tasks, goal=goal, title=goal.goal, subtitle=None, pageTitle=goal.goal)
+
+@dream_bp.route('/dream/delete/<goal_id>', methods=['GET', 'POST'])
+def delete_dream(goal_id):
+    goal=Goal.query.filter_by(id=goal_id).first()
+    if goal is None:
+        flash('Goal not found.', 'error')
+        return redirect(url_for('dashboard'))
+    else:
+        db.session.delete(goal)
+        db.session.commit()
+        flash('Your dream has been deleted.', 'success')
+        return redirect(url_for('dashboard'))

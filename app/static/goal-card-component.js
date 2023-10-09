@@ -23,7 +23,7 @@ window.onload = function () {
             const goalId = clickedCard.getAttribute('data-task-id');
             const goalTitle = clickedCard.querySelector('.goal-text').innerText;            
             if (!isTaskPage && !isSubTaskPage) {
-                showAlert('warning', `Are you sure you want to delete the goal "${goalTitle}"? All tasks and subtasks will be deleted!`, `/delete_goal/${goalId}`, 'Delete');
+                showAlert('warning', `Are you sure you want to delete the goal "${goalTitle}"? All tasks and subtasks will be deleted!`, `/dream/delete/${goalId}`, 'Delete');
             } else if (isTaskPage && !isSubTaskPage) {
                 showAlert('warning', `Are you sure you want to delete the task "${goalTitle}"? All subtasks will be deleted!`, `/delete_task/${goalId}`, 'Delete');
             } else {
