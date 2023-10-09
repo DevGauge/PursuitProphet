@@ -84,6 +84,11 @@ class Task(db.Model):
         """Return the task."""
         return self.task
     
+    def get_goal(self) -> str:
+        """Return the goal."""
+        parent = Goal.query.filter_by(id=self.goal_id).first()
+        return parent.goal
+
     def _is_child(self):
         """Return True if the task has a parent task, False otherwise."""
         return self.parent_id is not None
