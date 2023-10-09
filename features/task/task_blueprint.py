@@ -77,3 +77,24 @@ def view_subtasks():
     goal = Goal.query.filter_by(id=task.goal_id).first()
     subtasks = Task.query.filter_by(parent_id=task_id).all()
     return render_template('view-subtasks.html', goal=goal, task=task, goals=subtasks, title=goal.goal, subtitle=task.task)
+
+@task_bp.route('/delete_task/<task_id>', methods=['GET', 'POST'])
+def delete_task(task_id):
+    task=Task.query.filter_by(id=task_id).first()
+    print(f'task parent id: {task.goal_id}')
+    goal = Goal.query.filter_by(id=task.goal_id).first()
+    if task is None:
+        flash('Task not found.', 'error')
+        print("task not found")
+        return redirect(url_for('dashboard'))
+    else:
+        db.session.delete(task)
+        db.session.commit()
+        flash('Your task has been deleted.', 'success')    
+    if goal is not None:
+        print(f"goal and task found: {goal.goal}\n{task.task}")
+        return redirect(url_for('dream_bp.view_tasks', goal_id=goal.id, title=goal.goal, subtitle=None))
+    else:
+        print(f'goal with id {task.goal_id} not found')
+        return redirect(url_for('dashboard'))
+    
