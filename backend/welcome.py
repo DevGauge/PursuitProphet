@@ -224,6 +224,7 @@ def new_subtask(task_id: str):
 @app.route('/view_tasks', methods=['GET'])
 def view_tasks():
     goal_id = request.args.get('goal_id')
+    print(f'goal id: {goal_id}')
     goal = Goal.query.filter_by(id=goal_id).first()
     tasks = Task.query.filter_by(goal_id=goal_id).all()
     tasks = [task for task in tasks if task.parent_id is None]
@@ -274,17 +275,3 @@ def task_chat_api(task_id):
     task = Task.query.filter_by(id=task_id).first()
     goal = Goal.query.filter_by(id=task.goal_id).first()
     chat_bot = TaskChatBot(task, goal, [task.get_task() for task in task.subtasks])
-
-@app.route('/task/complete/<task_id>', methods=['GET', 'POST'])
-def complete_task(task_id):
-    task = Task.query.filter_by(id=task_id).first()
-    task.completed = not task.completed
-    db.session.commit()
-    return redirect(url_for('view_tasks', goal_id=task.goal_id))
-    
-@app.route('/generate_subtasks/<int:num_subtasks>', methods=['GET', 'POST'])
-def generate_subtasks(num_subtasks):
-    task_id = request.args.get('task_id')
-    task = Task.query.filter_by(id=task_id).first()
-    # bot.generate_subtasks(task, num_subtasks)
-    return redirect(url_for('view_subtasks', task_id=task.id))
