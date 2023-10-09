@@ -4,7 +4,7 @@
 {% if task is not none %}
 <h1>{{ task.task }}</h1>
 <h3>{{ task.get_goal() }}</h1>
-<a href="{{ url_for('view_subtasks', task_id=task.id) }}">
+<a href="{{ url_for('task_bp.view_subtasks', task_id=task.id) }}">
 <input class="standard-button" type="button" value="View Subtasks ({{task.subtasks|length}})">
 </a>
 {% elif goal is not none %}

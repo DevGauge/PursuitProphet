@@ -197,7 +197,7 @@ def delete_subtask(subtask_id):
         flash('Your task has been deleted.', 'success')
     if task is not None:
         print(f"task and subtask found: {task.task}\n{subtask.task}")
-        return redirect(url_for('view_subtasks', task_id=task.id, title=goal.goal))
+        return redirect(url_for('task_bp.view_subtasks', task_id=task.id, title=goal.goal))
     else:
         print(f'goal with id {task.goal_id} not found')
         return redirect(url_for('dashboard'))
@@ -229,15 +229,6 @@ def view_tasks():
     tasks = Task.query.filter_by(goal_id=goal_id).all()
     tasks = [task for task in tasks if task.parent_id is None]
     return render_template('view-tasks.html', goals=tasks, goal=goal, title=goal.goal, subtitle=None, pageTitle=goal.goal)
-
-@app.route('/view_subtasks', methods=['GET'])
-def view_subtasks():
-    task_id = request.args.get('task_id')
-    print(f'task id: {task_id}')
-    task = Task.query.filter_by(id=task_id).first()
-    goal = Goal.query.filter_by(id=task.goal_id).first()
-    subtasks = Task.query.filter_by(parent_id=task_id).all()
-    return render_template('view-subtasks.html', goal=goal, task=task, goals=subtasks, title=goal.goal, subtitle=task.task)
 
 @app.route('/generate_goals/<int:num_goals>', methods=['GET', 'POST'])
 def goal_generation(num_goals):
