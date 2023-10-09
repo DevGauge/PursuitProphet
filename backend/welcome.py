@@ -176,7 +176,7 @@ def delete_task(task_id):
         flash('Your task has been deleted.', 'success')    
     if goal is not None:
         print(f"goal and task found: {goal.goal}\n{task.task}")
-        return redirect(url_for('view_tasks', goal_id=goal.id, title=goal.goal, subtitle=None))
+        return redirect(url_for('dream_bp.view_tasks', goal_id=goal.id, title=goal.goal, subtitle=None))
     else:
         print(f'goal with id {task.goal_id} not found')
         return redirect(url_for('dashboard'))
@@ -218,17 +218,8 @@ def new_subtask(task_id: str):
         db.session.add(submitted_subtask)
         db.session.commit()
         flash('Your task has been added.', 'success')        
-        return redirect(url_for('view_tasks', goal_id=goal_id, title=goal.goal))
+        return redirect(url_for('dream_bp.view_tasks', goal_id=goal_id, title=goal.goal))
     return render_template('goal-detail.html', form=form, goal=goal)
-
-@app.route('/view_tasks', methods=['GET'])
-def view_tasks():
-    goal_id = request.args.get('goal_id')
-    print(f'goal id: {goal_id}')
-    goal = Goal.query.filter_by(id=goal_id).first()
-    tasks = Task.query.filter_by(goal_id=goal_id).all()
-    tasks = [task for task in tasks if task.parent_id is None]
-    return render_template('view-tasks.html', goals=tasks, goal=goal, title=goal.goal, subtitle=None, pageTitle=goal.goal)
 
 @app.route('/generate_goals/<int:num_goals>', methods=['GET', 'POST'])
 def goal_generation(num_goals):
@@ -240,7 +231,7 @@ def goal_generation(num_goals):
     try:
         num_goals = int(num_goals)
         # bot.generate_goals(goal, num_goals)
-        return redirect(url_for('view_tasks', goal_id=goal_id, title=title, pageTitle=title))
+        return redirect(url_for('dream_bp.view_tasks', goal_id=goal_id, title=title, pageTitle=title))
     except Exception as e:
         print('exception when generating goals')
         print(e)

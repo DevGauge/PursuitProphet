@@ -1,6 +1,6 @@
-from app.models import Goal
+from app.models import Goal, Task
 from app.pp_logging.db_logger import db
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, DateField, TimeField
@@ -54,3 +54,12 @@ def complete_dream(goal_id):
     goal.completed = not goal.completed
     db.session.commit()
     return redirect(url_for('dashboard'))
+
+@dream_bp.route('/view_tasks', methods=['GET'])
+def view_tasks():
+    goal_id = request.args.get('goal_id')
+    print(f'goal id: {goal_id}')
+    goal = Goal.query.filter_by(id=goal_id).first()
+    tasks = Task.query.filter_by(goal_id=goal_id).all()
+    tasks = [task for task in tasks if task.parent_id is None]
+    return render_template('view-tasks.html', goals=tasks, goal=goal, title=goal.goal, subtitle=None, pageTitle=goal.goal)

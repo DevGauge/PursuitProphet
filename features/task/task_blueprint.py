@@ -36,7 +36,7 @@ def new_task(goal_id: str):
         db.session.add(new_task)
         db.session.commit()
         flash('Your task has been added.', 'success')
-        return redirect(url_for('view_tasks', goal_id=goal_id, title=goal.goal))
+        return redirect(url_for('dream_bp.view_tasks', goal_id=goal_id, title=goal.goal))
     return render_template('task-detail.html', form=form, task=None, goal=goal)
 
 @task_bp.route('/task/<task_id>', methods=['GET', 'POST'])
