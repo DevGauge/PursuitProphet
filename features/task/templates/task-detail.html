@@ -1,10 +1,15 @@
 {% extends "goal-detail-base.html" %}
 
 {% block header %}
-<h1>{{ goal.task }}</h1>
-<a href="{{ url_for('view_tasks', goal_id=goal.id) }}">
-<input class="standard-button" type="button" value="View Subtasks ({{goal.tasks|length}})">
+{% if task is not none %}
+<h1>{{ task.task }}</h1>
+<h3>{{ task.get_goal() }}</h1>
+<a href="{{ url_for('view_subtasks', task_id=task.id) }}">
+<input class="standard-button" type="button" value="View Subtasks ({{task.subtasks|length}})">
 </a>
+{% elif goal is not none %}
+<h1>New Task for <span class='highlight-text'>{{ goal.goal }}</span></h1>
+{% endif %}
 {% endblock %}
 
 {% block form_content %}
