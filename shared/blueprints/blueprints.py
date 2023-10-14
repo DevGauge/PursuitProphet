@@ -12,7 +12,7 @@ task_bp = construct_blueprint('task')
 subtask_bp = construct_blueprint('subtask')
 
 def register_blueprints(flask_app):
-    blueprints = [demo_bp, dream_bp, task_bp]
+    blueprints = [demo_bp, dream_bp, task_bp, subtask_bp]
     for blueprint in blueprints:
         flask_app.register_blueprint(blueprint)
         print(f'registered blueprint: {blueprint.name} with url_prefix: {blueprint.url_prefix}')
