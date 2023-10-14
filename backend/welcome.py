@@ -1,23 +1,18 @@
 import os
 import sys
 from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session, after_this_request
-from flask_restx import Api, Resource, fields
 sys.path.insert(0, '../')
 sys.path.insert(0, '/app')
 # from app.models import ChatBot
 from langchain_m.langchain_module import TaskChatBot, GoalChatBot
 import app.app
 from app.models import Goal, Task, User
-#TODO: remove this import once the blueprint is working for all routes requiring TaskForm
-from features.task.task_blueprint import TaskForm
 from app.app import app_instance
 from app.pp_logging.db_logger import db
 from flask_socketio import SocketIO, send, emit
 from flask_security import roles_required, login_required, login_user, user_registered, current_user
 from flask_security.confirmable import confirm_user, confirm_email_token_status
 from LangChainAgentFactory import AgentFactory
-from langchain.tools import StructuredTool
-import traceback
 from urllib.parse import quote
 # import feature blueprints
 import features.demo.demo_blueprint
