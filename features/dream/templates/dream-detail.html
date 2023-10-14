@@ -1,10 +1,12 @@
 {% extends "goal-detail-base.html" %}
 
 {% block header %}
+{% if goal is not none %}
 <h1>{{ goal.goal }}</h1>
 <a href="{{ url_for('dream_bp.view_tasks', goal_id=goal.id) }}">
 <input class="standard-button" type="button" value="View Tasks ({{goal.tasks | selectattr('parent_id', 'none') | list | length}})">
 </a>
+{% endif %}
 {% endblock %}
 
 {% block form_content %}
