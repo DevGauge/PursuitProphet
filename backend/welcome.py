@@ -23,6 +23,7 @@ from urllib.parse import quote
 import features.demo.demo_blueprint
 import features.dream.dream_blueprint
 import features.task.task_blueprint
+import features.subtask.subtask_blueprint
 
 from shared.blueprints.blueprints import register_blueprints
 app = app_instance.app

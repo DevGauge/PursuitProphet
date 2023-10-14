@@ -1,0 +1,17 @@
+{% extends "goal-detail-base.html" %}
+
+{% block header %}
+{% if task is not none %}
+<h1>{{ task.task }}</h1>
+<h3>{{ goal.get_goal() }}</h1>
+
+{% elif task is not none %}
+<h1>New Subtask for <span class='highlight-text'>{{ task.task }}</span></h1>
+{% endif %}
+{% endblock %}
+
+{% block form_content %}
+Subtask Name {{ form.goal() }}
+{{ form.target_date.label }} {{ form.target_date() }}
+{{ form.target_time.label }} {{ form.target_time() }}
+{% endblock %}
