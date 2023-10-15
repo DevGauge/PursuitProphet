@@ -1,10 +1,12 @@
 {% extends "goal-detail-base.html" %}
 
 {% block header %}
-{% if ( (subtask is not none) and (subtask is defined) and (task is not none) and (task is defined) ) %}
+{% if ( (subtask is not none) and (subtask is defined) ) %}
 <h1>
     <span class='highlight-text'>{{ subtask.task }}</span>
 </h1>
+{% endif %}
+{% if ( (task is not none) and (task is defined)) %}
 <h2>
     <b>Task</b>: <a href="url_for('task_bp.task_detail', task_id=task.id)"><span class='highlight-text'>{{ task.task }}</span></a>
 </h2>
@@ -16,14 +18,14 @@
 </h3>
 {% endif %}
 
-{% if subtask is not defined %}
-<h3>
+{% if ( (subtask is not defined) and (task is not none) and (task is defined) ) %}
+<h1>
     New Subtask for <a href="url_for('task_bp.task_detail', task_id=task.id)"><span class='highlight-text'>{{ task.task }}</a></span>
-</h3>
+</h1>
 {% endif %}
 {% endblock %}
-
 {% block form_content %}
+<hr style="width:100%">
 Subtask Name {{ form.goal() }}
 {{ form.target_date.label }} {{ form.target_date() }}
 {{ form.target_time.label }} {{ form.target_time() }}
