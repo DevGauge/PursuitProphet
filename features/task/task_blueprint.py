@@ -42,6 +42,7 @@ def new_task(goal_id: str):
 @task_bp.route('/task/<task_id>', methods=['GET', 'POST'])
 def task_detail(task_id):
     task = Task.query.get(task_id)
+    goal = Goal.query.filter_by(id=task.goal_id).first()
     form = TaskForm(obj=task)
     form.submit.label.text = 'Update Task'
     if form.validate_on_submit():
@@ -50,7 +51,7 @@ def task_detail(task_id):
         task.target_time = form.target_time.data
         db.session.commit()
         flash('Your task has been updated.', 'success')
-        return render_template('task-detail.html', form=form, task=task)
+        return render_template('task-detail.html', form=form, task=task, goal=goal)
         
     else:
         if task is None:
@@ -60,7 +61,7 @@ def task_detail(task_id):
             print(task.task)
             form = TaskForm(obj=task)
             form.submit.label.text = 'Update Task'
-            return render_template('task-detail.html', form=form, task=task)
+            return render_template('task-detail.html', form=form, task=task, goal=goal)
 
 @task_bp.route('/task/generate_subtasks/<int:num_subtasks>', methods=['GET', 'POST'])
 def generate_subtasks(num_subtasks):
