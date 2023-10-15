@@ -2,10 +2,14 @@
 
 {% block header %}
 {% if task is not none %}
-<h1>{{ task.task }}</h1>
-<h3>{{ task.get_goal() }}</h1>
+<h1><span class='highlight-text'>{{ task.task }}</span></h1>
+{% endif %}
+{% if goal is not none %}
+<h3><a href="{{ url_for('dream_bp.view_dream', goal_id=goal.id) }}">{{ task.get_goal() }}</a></h3>
+{% endif %}
+{% if task is not none %}
 <a href="{{ url_for('task_bp.view_subtasks', task_id=task.id) }}">
-<input class="standard-button" type="button" value="View Subtasks ({{task.subtasks|length}})">
+<input class="standard-button" type="button" value="View/Add Subtasks ({{task.subtasks|length}})">
 </a>
 {% elif goal is not none %}
 <h1>New Task for <span class='highlight-text'>{{ goal.goal }}</span></h1>

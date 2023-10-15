@@ -3,9 +3,11 @@
 {% block header %}
 {% if task is not none %}
 <h1>{{ task.task }}</h1>
+{% endif %}
+{% if goal is not none %}
 <h3>{{ goal.get_goal() }}</h1>
-
-{% elif task is not none %}
+{% endif %}
+{% if task.parent_id is none %}
 <h1>New Subtask for <span class='highlight-text'>{{ task.task }}</span></h1>
 {% endif %}
 {% endblock %}
