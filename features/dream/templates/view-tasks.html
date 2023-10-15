@@ -13,7 +13,8 @@
     Scrollbar.init(document.querySelector('#subtasks'));
 </script>
 <script src="{{ url_for('static', filename='show_alert.js') }}"></script>
-<script src="{{ url_for('static', filename='goal-card-component.js') }}"></script>
+<script src="{{ url_for('static', filename='goal-card-component-base.js') }}"></script>
+<script src="{{ url_for('task_bp.static', filename='task-card-component.js') }}"></script>
 <script>
 var generateButton = document.querySelector('.generate-button');
 generateButton.addEventListener('click', function() {

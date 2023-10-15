@@ -1,10 +1,14 @@
+import os
 from flask import Blueprint
 
-def construct_blueprint(name: str, template_folder: str = None):
+def construct_blueprint(name: str):
     """Constructs a blueprint with the given name and template_folder, which defaults to the name"""
-    if template_folder is None:
-        template_folder = name
-    return Blueprint(name + '_bp', __name__, template_folder='../../features/' + template_folder + '/templates')
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    root_path = os.path.abspath(os.path.join(current_dir, '../../features'))
+    template_path = os.path.join(root_path, name, 'templates')
+    static_path = os.path.join(root_path, name, 'static')
+    
+    return Blueprint(name + '_bp', __name__, template_folder=template_path, static_folder=static_path, static_url_path=f'/{name}_static')
 
 demo_bp = construct_blueprint('demo')
 dream_bp = construct_blueprint('dream')
@@ -15,4 +19,4 @@ def register_blueprints(flask_app):
     blueprints = [demo_bp, dream_bp, task_bp, subtask_bp]
     for blueprint in blueprints:
         flask_app.register_blueprint(blueprint)
-        print(f'registered blueprint: {blueprint.name} with url_prefix: {blueprint.url_prefix}')
+        print(f'registered blueprint: {blueprint.name} with url_prefix: {blueprint.url_prefix}, template_folder: {blueprint.template_folder}, static_folder: {blueprint.static_folder}')
