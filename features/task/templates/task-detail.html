@@ -5,7 +5,7 @@
 <h1><span class='highlight-text'>{{ task.task }}</span></h1>
 {% endif %}
 {% if goal is not none %}
-<h3><a href="{{ url_for('dream_bp.view_dream', goal_id=goal.id) }}">{{ task.get_goal() }}</a></h3>
+<h3><b>Goal</b>: <a href="{{ url_for('dream_bp.view_dream', goal_id=goal.id) }}">{{ task.get_goal() }}</a></h3>
 {% endif %}
 {% if task is not none %}
 <a href="{{ url_for('task_bp.view_subtasks', task_id=task.id) }}">
