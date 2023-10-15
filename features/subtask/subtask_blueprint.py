@@ -4,6 +4,28 @@ from app.models import Task, Goal
 from app.pp_logging.db_logger import db
 from features.task.task_blueprint import TaskForm
 
+@subtask_bp.route('/subtask/<subtask_id>', methods=['GET', 'POST'])
+def subtask_detail(subtask_id):
+    subtask = Task.query.get(subtask_id)
+    task = Task.query.filter_by(id=subtask.parent_id).first()
+
+    goal = Goal.query.filter_by(id=task.goal_id).first()
+    form = TaskForm(obj=subtask)
+    form.submit.label.text = 'Update Subtask'
+    if form.validate_on_submit():
+        subtask.task = form.goal.data
+        subtask.target_date = form.target_date.data
+        subtask.target_time = form.target_time.data
+        db.session.commit()
+        flash('Your subtask has been updated.', 'success')
+        return render_template('subtask-detail.html', form=form, task=task, subtask=subtask, goal=goal)
+    else:
+        if subtask is None:
+            flash('Subtask not found.', 'error')
+            return redirect(url_for('dashboard'))
+        else:
+            return render_template('subtask-detail.html', form=form, task=task, subtask=subtask, goal=goal)
+
 @subtask_bp.route('/delete_subtask/<subtask_id>', methods=['GET', 'POST'])
 def delete_subtask(subtask_id):
     subtask=Task.query.filter_by(id=subtask_id).first()
