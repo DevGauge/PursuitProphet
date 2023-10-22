@@ -15,9 +15,15 @@
 {% block scripts %}
 <script>
   var loading = document.querySelector('.loading');
-  // other common script content
 </script>
 <script src="{{ url_for('static', filename='show_alert.js') }}"></script>
 <script src="{{ url_for('static', filename='feature_value_request.js') }}"></script>
+<script>
+  // set input active and move cursor to end of text
+  var goal_input = document.getElementById("goal")
+  goal_input.focus();
+  var len = goal_input.value.length;
+  goal_input.setSelectionRange(len, len);
+</script>
 {% block extra_scripts %}{% endblock %}
 {% endblock %}

@@ -30,3 +30,10 @@ Subtask Name {{ form.goal() }}
 {{ form.target_date.label }} {{ form.target_date() }}
 {{ form.target_time.label }} {{ form.target_time() }}
 {% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.getElementById("goal").focus();
+</script>
+{% endblock %}

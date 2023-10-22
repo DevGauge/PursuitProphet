@@ -79,8 +79,6 @@
         for (var i = 0; i < cards.length; i++) {
             cards[i].addEventListener('click', function (e) {
                 var activeCard = document.getElementsByClassName('active')[0];
-                var textInput = document.getElementsByClassName('input')[0];                
-                textInput.focus();
                 if (activeCard) activeCard.classList.remove('active');
                 this.classList.add('active');
                 // Set the value of the input box to the role name
@@ -99,6 +97,9 @@
         form.addEventListener('submit', function() {
             loading.style.display = 'block';
         });
+        // make dream input active
+        var inputBox = document.getElementsByClassName('input')[0];
+        inputBox.focus();
     });
 
     function submitFormOnEnterPress(e) {
