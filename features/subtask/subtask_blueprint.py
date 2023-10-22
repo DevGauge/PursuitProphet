@@ -26,7 +26,7 @@ def subtask_detail(subtask_id):
         else:
             return render_template('subtask-detail.html', form=form, task=task, subtask=subtask, goal=goal)
 
-@subtask_bp.route('/delete_subtask/<subtask_id>', methods=['GET', 'POST'])
+@subtask_bp.route('/subtask/delete/<subtask_id>', methods=['GET', 'POST'])
 def delete_subtask(subtask_id):
     subtask=Task.query.filter_by(id=subtask_id).first()
     print(f'subtask parent id: {subtask.parent_id}')

@@ -14,7 +14,7 @@ function navigateToChat(card) {
 }
 
 function showAlertDelete(goalTitle, message, url) {
-    showAlert('warning', `Are you sure you want to delete the ${goalTitle}? ${message}`, url, 'Delete');
+    showAlert('warning', `Are you sure you want to delete ${goalTitle}? <br><br><b>${message}<b>`, url, 'Delete');
 }
 
 function completeGoalOrTask(card, url) {

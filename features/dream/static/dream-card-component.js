@@ -8,7 +8,7 @@ window.onload = function () {
         
         card.querySelector('.delete-button').addEventListener('click', () => {
             const goalTitle = card.querySelector('.goal-text').innerText;
-            showAlertDelete("goal", `All tasks and subtasks will be deleted!`, `/dream/delete/${card.getAttribute('data-task-id')}`);
+            showAlertDelete(`"${goalTitle}"`, `This is permanent. All tasks and subtasks will be deleted!`, `/dream/delete/${card.getAttribute('data-task-id')}`);
         });
 
         card.querySelector('.checkbox-container').addEventListener('click', () => completeGoalOrTask(card, `/dream/complete/`));
