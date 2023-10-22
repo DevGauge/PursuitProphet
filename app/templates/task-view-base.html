@@ -1,8 +1,9 @@
 {% extends "dashboard.html" %}
+
 {% block main %}
 <div class="loading dark-spinner">Loading...</div>
 <div class="goal-container">
-    {% block titleContent %}{% endblock %}    
+    {% block titleContent %}{% endblock %}
     <div class="subtasks" , id="subtasks">        
         {% for goal in goals|sort(attribute='completed') %}
             {% with task_name=goal.get_task() %}
@@ -12,4 +13,3 @@
     </div>
 </div>
 {% endblock %}
-```

@@ -1,9 +1,9 @@
-{% include 'task-view-base.html' %}
+{% extends "task-view-base.html" %}
 {% block titleContent %}
-<h1><span class='highlight-text'>{{ title }}</span></h1>
-<h3><span class='highlight-text'>{{ subtitle }}</span></h3>
+<h1>Task: <a href="{{ url_for('task_bp.task_detail', task_id=task.id) }}"><span class='highlight-text'>{{ subtitle }}</span></a></h1>
+<h3>Dream: <a href="{{ url_for('dream_bp.view_dream', goal_id=goal.id) }}"><span class='highlight-text'>{{ title }}</span></a></h3>
 {% endblock %}
-{% block content %}
+{% block extended_content %}
 <a id="new_subtask" href="#">
     <button class="plus-button">+</button>
 </a>
