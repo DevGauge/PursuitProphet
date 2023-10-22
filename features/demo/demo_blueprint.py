@@ -21,7 +21,7 @@ def role_selection():
         roles = ['Write a blog post about cats', 'Organize my house', 'Learn about quantum physics']
         return render_template('role_selection.html', roles=roles, pageTitle="Pursuit Prophet Dream Demo")
 
-@demo_bp.route('/demo/generate_goals/<int:num_goals>/<string:title>/<string:goal_id>', methods=['GET', 'POST'])
+@demo_bp.route('/demo/generate_tasks/<int:num_goals>/<string:title>/<string:goal_id>', methods=['GET', 'POST'])
 def demo_goal_generation(num_goals, title, goal_id):
     print(f'num_goals: {num_goals}')
     print(f'title: {title}')
@@ -56,7 +56,7 @@ def display_subtasks(task_id):
         json = jsonify(error=f'No subtasks for task # {task_id}'), 404
         print(json)
         return json    
-    return render_template('generate_tasks.html', task=task, title=goal.goal, subtitle=task.task, goals=task.subtasks, goal=goal)
+    return render_template('subtask-view.html', task=task, title=goal.goal, subtitle=task.task, goals=task.subtasks, goal=goal)
 
 @demo_bp.route('/demo/generate_subtasks/<int:num_subtasks>', methods=['POST'])
 def demo_generate_subtasks(num_subtasks):
