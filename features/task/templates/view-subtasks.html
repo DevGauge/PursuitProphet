@@ -1,4 +1,8 @@
 {% include 'task-view-base.html' %}
+{% block titleContent %}
+<h1><span class='highlight-text'>{{ title }}</span></h1>
+<h3><span class='highlight-text'>{{ subtitle }}</span></h3>
+{% endblock %}
 {% block content %}
 <a id="new_subtask" href="#">
     <button class="plus-button">+</button>
@@ -37,7 +41,7 @@
             }
             var loading = document.querySelector('.loading');
             loading.style.display = 'block';
-            var newUrl = "/generate_subtasks/" + numTasks + "?task_id=" + taskId;
+            var newUrl = "/task/generate_subtasks/" + numTasks + "?task_id=" + taskId;
             window.location.assign(newUrl);
         }
     });    

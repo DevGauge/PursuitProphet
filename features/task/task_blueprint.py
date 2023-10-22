@@ -7,10 +7,11 @@ from wtforms import StringField, SubmitField, TextAreaField, DateField, TimeFiel
 from wtforms.validators import DataRequired, Optional
 from shared.blueprints.blueprints import task_bp 
 from app.models import ChatBot
-from bot import GoalManager, IOManager
+from bot import GoalManager, IOManager, GoalGeneratorBot
 
-goal_generator_bot = GoalManager(io_manager = IOManager())
-bot = ChatBot(goal_generator_bot, None)
+manager = GoalManager(io_manager = IOManager())
+goal_gen_bot = GoalGeneratorBot('', num_goals=10)
+bot = ChatBot(manager, goal_gen_bot, None)
 
 class TaskForm(FlaskForm):
     goal = StringField('Task Name', validators=[DataRequired()], render_kw={"placeholder": "What do you need to do?"})
@@ -62,13 +63,27 @@ def task_detail(task_id):
             form = TaskForm(obj=task)
             form.submit.label.text = 'Update Task'
             return render_template('task-detail.html', form=form, task=task, goal=goal)
+        
+@task_bp.route('/task/generate_tasks/<int:num_tasks>', methods=['GET', 'POST'])
+def generate_tasks(num_tasks):
+    goal_id = request.args.get('goal_id')
+    goal = Goal.query.filter_by(id=goal_id).first()
+    try:
+        bot.set_assistant_primary_goal(goal.goal)
+        bot.generate_goals(goal, num_tasks)
+        return redirect(url_for('dream_bp.view_tasks', goal_id=goal.id, title=goal.goal, subtitle=None))
+    except Exception as e:
+        print('exception when generating goals')
+        print(e)
+        return redirect(url_for('error_page', error_message=str(e)))
 
 @task_bp.route('/task/generate_subtasks/<int:num_subtasks>', methods=['GET', 'POST'])
 def generate_subtasks(num_subtasks):
     task_id = request.args.get('task_id')
     task = Task.query.filter_by(id=task_id).first()
+    bot.set_assistant_primary_goal(task.task)
     bot.generate_subtasks(task, num_subtasks)
-    return redirect(url_for('view_subtasks', task_id=task.id))
+    return redirect(url_for('task_bp.view_subtasks', task_id=task.id))
 
 @task_bp.route('/view_subtasks', methods=['GET'])
 def view_subtasks():

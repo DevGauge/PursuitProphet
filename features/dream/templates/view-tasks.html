@@ -33,7 +33,7 @@ generateButton.addEventListener('click', function() {
         }
         var loading = document.querySelector('.loading');
         loading.style.display = 'block';
-        var newUrl = "/generate_goals/" + numGoals + "?goal_id=" + goalId;
+        var newUrl = "/task/generate_tasks/" + numGoals + "?goal_id=" + goalId;
         window.location.assign(newUrl);
     }
 });

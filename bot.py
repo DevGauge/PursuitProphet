@@ -82,6 +82,7 @@ from app.app import app_instance
 from sqlalchemy.exc import SQLAlchemyError
 from flask import session
 
+
 load_dotenv()
 class SingletonMeta(type):
     """Singleton metaclass. If instance already exists, it will be returned. Otherwise, a new instance will be created."""
@@ -108,6 +109,7 @@ class ChatBot:
         print()
         self.display_welcome_message()
         self.set_assistant_primary_goal()
+        print(dir(self.goal_gen_bot))
         self.goal_gen_bot.goal = self.io_manager.primary_goal.get_goal()
         suggested_goals = self.goal_gen_bot.generate_goals()        
         self.goal_manager.goals = self.goal_manager.strip_goals_and_save(suggested_goals)

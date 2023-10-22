@@ -492,6 +492,7 @@ class GoalGeneratorBot:
         model = ModelFactory().task_and_subtask_generator()
         prompt = self.goal_gen_prompt()
         try:
+            print('returning generated tasks')
             return TokenHandler(None).model_response(model, prompt)
         except Exception as e:
             raise e

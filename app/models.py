@@ -249,6 +249,7 @@ class ChatBot:
     def set_primary_goal(self, user_input, user = None):
         if user:
             primary_goal = Goal(user_input, user)
+            print('set primary goal: ', primary_goal.goal, 'for user: ', user)
         else:
             print('creating temp user')
             temp_user = User(email=str(uuid.uuid4()) + "@temp.com",  # Use a dummy email for the temporary user
@@ -285,9 +286,9 @@ class ChatBot:
     
     def generate_goals(self, primary_goal, num_goals=10):
         """Generate goals using the OpenAI API"""
-        
         print(f'generating goals for {primary_goal.get_goal()}')
-        self.goal_gen_bot.goal = primary_goal.get_goal()        
+        self.goal_gen_bot.goal = primary_goal.get_goal()
+        self.goal_gen_bot.num_goals = num_goals
         #strip and save
         try:
             self.goal_manager.strip_tasks_and_save(self.goal_gen_bot.generate_goals(), primary_goal.id)

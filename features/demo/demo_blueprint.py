@@ -8,6 +8,7 @@ goal_manager = GoalManager(io_manager)
 goal_gen_bot = GoalGeneratorBot('', num_goals=10)
 gen_bot = ChatBot(goal_manager, goal_gen_bot)
 
+
 @demo_bp.route('/demo', methods=['GET', 'POST'])
 def role_selection():
     if request.method == 'POST':
@@ -31,7 +32,7 @@ def demo_goal_generation(num_goals, title, goal_id):
     print(f'received goal: {goal.goal}')
     try:
         num_goals = int(num_goals)
-        gen_bot.generate_goals(goal, num_goals)        
+        gen_bot.generate_goals(goal, num_goals)
     except Exception as e:
         print('exception when generating goals')
         print(e)
@@ -41,7 +42,7 @@ def demo_goal_generation(num_goals, title, goal_id):
         print(f'tasks: {tasks}')
         print(f'goal: {goal.goal}')
         print(f'title: {title}')
-        return render_template('generate_goals.html', goals=tasks, title=title, goal=goal, pageTitle=title)
+        return render_template('task-view.html', goals=tasks, title=title, goal=goal, pageTitle=title)
     except Exception as e:
         print('exception when rendering template')
         print(e)        
