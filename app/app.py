@@ -54,6 +54,7 @@ class App:
         flask_app = Flask(__name__)
         mail_password=os.getenv('MAIL_PASSWORD')
         flask_app.debug = True
+        flask_app.config['DEBUG'] = True
         # flask-security-too
         flask_app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
         print('secret key is None: ', os.getenv('SECRET_KEY') is None)
