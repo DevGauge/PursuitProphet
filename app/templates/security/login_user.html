@@ -9,6 +9,21 @@
 <div class="login-form-container">
   <form class="login-form" method="POST" action="{{ url_for_security('login') }}">
     {{ login_user_form.hidden_tag() }}
+    <!-- Google Sign In -->
+    <div id="g_id_onload"
+        data-client_id="427431941341-6m1oc9imoc7r74n98gavfoi0ikc5vnhs.apps.googleusercontent.com"
+        data-login_uri="http://localhost:5000/google_login/callback"
+        data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+        data-type="standard"
+        data-size="large"
+        data-theme="outline"
+        data-text="sign_in_with"
+        data-shape="rectangular"
+        data-logo_alignment="left">
+    </div>
+    <hr style="width:100%;">
 
     {{ login_user_form.email.label }}<br>
     {{ login_user_form.email(size=32, placeholder="name@example.com", id="email-input") }}
@@ -38,4 +53,5 @@
       e.preventDefault();
   });
 </script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 {% endblock %}
