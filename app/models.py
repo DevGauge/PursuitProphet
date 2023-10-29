@@ -159,25 +159,25 @@ class User(UserMixin, db.Model):
     id = db.Column(db.String(255),
                    primary_key=True,
                    default=lambda: str(uuid.uuid4()))
-    fs_uniquifier = db.Column(db.String(255), 
-                              unique=True, 
+    fs_uniquifier = db.Column(db.String(255),
+                              unique=True,
                               nullable=False)
-    email = db.Column(db.String(254), 
-                      nullable=False, 
-                      unique=True)
-    aka = db.Column(db.String(20), 
-                    nullable=True)
-    password = db.Column(db.String(128), 
-                         nullable=False)
-    roles = db.relationship('Role', 
-                            secondary=roles_users, 
+    email = db.Column(db.String(254),
+                       nullable=False,
+                       unique=True)
+    aka = db.Column(db.String(20),
+                      nullable=True)
+    password = db.Column(db.String(128),
+                      nullable=False)
+    roles = db.relationship('Role',
+                            secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
-    aka = db.Column(db.String(20), 
-                    nullable=True)
+    aka = db.Column(db.String(20),
+                      nullable=True)
     confirmed_at = db.Column(DateTime)
     goals = db.relationship('Goal',
-                            backref='user',
-                            lazy=True)
+                             backref='user',
+                             lazy=True)
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
     # region tutorial
@@ -186,26 +186,33 @@ class User(UserMixin, db.Model):
     is_first_new_goal = db.Column(db.Boolean(), default=True)
     is_first_new_task = db.Column(db.Boolean(), default=True)
     is_first_new_subtask = db.Column(db.Boolean(), default=True)
-    
+
     # region demo
-    is_temporary = False # true for demo user, used as holding for goal
+    is_temporary = False  # true for demo user, used as holding for goal
     is_first_demo_task_gen = db.Column(db.Boolean(), default=True)
     is_first_demo_subtask_gen = db.Column(db.Boolean(), default=True)
     is_demo_finished = db.Column(db.Boolean(), default=False)
     # endregion demo
     # endregion tutorial
+    # region google
+    google_id = db.Column(db.String(255), nullable=True)
+
+    def is_authenticated_with_google(self):
+        return self.google_id is not None
+
+    # endregion google
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         self.fs_uniquifier = str(uuid.uuid4())
-    
+
     def set_role(self, role):
-        self.roles.append(role)        
-    
+        self.roles.append(role)
+
     def add_goal(self, goal: Goal):
         """Add a goal to the user."""
         self.goals.append(goal)
-    
+
     def does_user_have_goal(self):
         return len(self.goals) > 0
 
@@ -216,7 +223,7 @@ class User(UserMixin, db.Model):
     def get_goals(self) -> list:
         """Return a list of goals."""
         return self.goals
-    
+
     def get_username(self) -> str:
         """Return the username."""
         return self.aka
