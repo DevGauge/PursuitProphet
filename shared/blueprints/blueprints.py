@@ -1,3 +1,4 @@
+import json
 import os
 from flask import Blueprint
 from flask_dance.contrib.google import google, make_google_blueprint
@@ -6,7 +7,7 @@ from app.models import User
 from app.pp_logging.db_logger import db
 from flask import flash, request
 from flask_login import login_user
-from flask import redirect, url_for, session
+from flask import redirect, url_for, session, Response
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -47,14 +48,24 @@ def get_user_info():
     GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
     resp = google.get("https://people.googleapis.com/v1/people/me?key=" + GOOGLE_API_KEY + "&personFields=names,emailAddresses")
     if not google.authorized:
+        print('Google not authorized')
         return redirect(url_for("google.login"))
-    return resp
+    print(resp)
+    if resp.status_code == 200:
+        print('GoOGLE StaTUS CODE 200')
+        return resp.json()
+    else:
+        raise Exception(f"Failed to fetch user info from Google: {resp.status_code}")
 
 def login_user_with_google():
     """Logs the user in using their Google account."""
-
     user_info = get_user_info()
-    email = user_info["email"]
+    # if user_info is redirect, there was an auth error
+    if isinstance(user_info, Response):
+        return user_info
+    
+    email_addresses = user_info.get('emailAddresses', [])
+    email = email_addresses[0].get('value') if email_addresses else None
 
     user = User.query.filter_by(email=email).first()
     if user is not None:
@@ -72,6 +83,7 @@ def login_user_with_google():
 
 @google_bp.route("/login", endpoint='google_bp_login')
 def login():
+    print('google_bp_login')
     GOOGLE_CALLBACK_URI = os.getenv('GOOGLE_CALLBACK_URI')
     # Redirect the user to the Google OAuth login page.
     return google.authorize(callback_uri=GOOGLE_CALLBACK_URI)
