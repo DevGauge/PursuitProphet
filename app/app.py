@@ -54,7 +54,7 @@ class App:
         flask_app = Flask(__name__)
         mail_password=os.getenv('MAIL_PASSWORD')
         flask_app.debug = True
-        flask_app.config['DEBUG'] = True
+        
         # flask-security-too
         flask_app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
         print('secret key is None: ', os.getenv('SECRET_KEY') is None)
@@ -97,7 +97,6 @@ class App:
             flask_app.logger.addHandler(db_logger)
             security = Security(datastore=self.user_datastore,  confirm_register_form=RegistrationForm, login_form=CustomLoginForm)
             security.init_app(flask_app)
-            # register_blueprints(flask_app)
 
         return flask_app
 
