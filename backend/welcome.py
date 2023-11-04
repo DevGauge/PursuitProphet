@@ -27,6 +27,13 @@ socketio = SocketIO(app)
 register_blueprints(app)
 print(app.url_map)
 
+@app.context_processor
+def inject_environment_variables():
+    """Injects environment variables into the template context."""
+    return {
+        "google_client_id": os.getenv("GOOGLE_CLIENT_ID")
+    }
+
 @user_registered.connect_via(app)
 def user_registered_sighandler(sender, user, confirm_token, confirmation_token, form_data):
     @after_this_request
@@ -139,13 +146,12 @@ def dashboard():
             if user is not None:
                 goals = Goal.query.filter_by(user_id=user_id).all()
                 return render_template('dream-home.html', goals=goals)
-        else:
             raise ValueError("User not found")
     except Exception as e:
         print('login exception', e)
         return redirect(url_for('security.login'))
     
-    return redirect(url_for('security.login'))  
+    return redirect(url_for('security.login'))
  
 @app.route('/chat')
 def chat():
