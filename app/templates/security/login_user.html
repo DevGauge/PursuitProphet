@@ -10,6 +10,10 @@
   <form class="login-form" method="POST" action="{{ url_for_security('login') }}">
     {{ login_user_form.hidden_tag() }}
 
+    <a href="{{ url_for('login_google') }}">
+      <img src="https://developers.google.com/identity/images/btn_google_signin_dark_normal_web.png" alt="Sign in with Google"/>
+    </a>
+
     {{ login_user_form.email.label }}<br>
     {{ login_user_form.email(size=32, placeholder="name@example.com", id="email-input") }}
     {% for error in login_user_form.email.errors %}
