@@ -113,4 +113,15 @@ def delete_task(task_id):
     else:
         print(f'goal with id {task.goal_id} not found')
         return redirect(url_for('dashboard'))
+
+@task_bp.route('/task/complete/<task_id>', methods=['GET', 'POST'])
+def complete_dream(task_id):
+    task = Task.query.filter_by(id=task_id).first()
+    task.completed = not task.completed
+    db.session.commit()
     
+    goal = Goal.query.filter_by(id=task.goal_id).first()
+    if goal is not None:
+        return redirect(url_for('dream_bp.view_tasks', goal_id=goal.id, title=goal.goal, subtitle=None))
+    
+    return redirect(url_for('dashboard'))
