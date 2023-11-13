@@ -1,6 +1,5 @@
 import os
 from flask import Blueprint
-from app.app import app
 
 def construct_blueprint(name: str):
     """Constructs a blueprint with the given name and template_folder, which defaults to the name"""
