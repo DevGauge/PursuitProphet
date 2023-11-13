@@ -141,7 +141,7 @@ def dashboard():
                 goals = Goal.query.filter_by(user_id=user_id).all()
                 return render_template('dream-home.html', goals=goals)
         else:
-            raise ValueError("User not found")
+            return redirect(url_for('security.login'))
     except Exception as e:
         print('login exception', e)
         return redirect(url_for('security.login'))
