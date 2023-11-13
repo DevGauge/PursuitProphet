@@ -881,6 +881,26 @@ button.submit-button {
   padding: 20px;
 }
 
+.experiment-parent-element {
+  position: relative;
+}
+.experiment-parent-element .experiment-badge {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: rgba(255, 0, 0, 0.5);
+  color: white;
+  text-align: center;
+  padding: 5px 0;
+  font-size: 1.5em;
+  font-weight: bold;
+  z-index: 10;
+  pointer-events: none;
+}
+
 /* Styles for mobile devices */
 @media (max-width: 767px) {
   .introduction-text {
