@@ -1,37 +1,54 @@
-import os
 from shared.blueprints.blueprints import google_bp
-from authlib.integrations.flask_client import OAuth
-from dotenv import load_dotenv
-from flask import url_for
-from app.app import app
-load_dotenv()
+from flask import url_for, redirect
+from app.app import oauth
 
-oauth = OAuth(app)
-google = oauth.register(
-    name='google',
-    client_id=os.getenv('GOOGLE_CLIENT_ID'),
-    client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    access_token_params=None,
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-    authorize_params=None,
-    api_base_url='https://www.googleapis.com/oauth2/v1/',
-    client_kwargs={'scope': 'email profile'},
-)
+from flask_security.confirmable import confirm_user
+from flask_security.utils import hash_password, login_user
+
+from app.models import User
+from app.pp_logging.db_logger import db
+
+google_client = oauth.create_client('google')
 
 @google_bp.route('/google/login')
 def login():
-    redirect_uri = url_for('google_bp.authorize', _external=True)
-    print(f"redirecting to {redirect_uri}")
-    return google.authorize_redirect(redirect_uri)
+    redirect_uri = url_for('google_bp.authorize', _external=True) 
+    return google_client.authorize_redirect(redirect_uri)
 
 @google_bp.route('/google/authorize')
 def authorize():
-    token = google.authorize_access_token()
-    resp = google.get('userinfo')
-    if resp.ok:
-        user_info = resp.json()
-        print(user_info)
-        email = user_info['email']
-        return f'You are {email} on Google'
-    return 'Bad Resp'
+    token = google_client.authorize_access_token()
+    resp = google_client.get('userinfo')
+
+    if not resp.ok:
+        return 'Bad Response from Google'
+
+    user_info = resp.json()
+    email = user_info['email']
+    confirmed = user_info['verified_email']
+    google_id = user_info['id']
+
+    user = User.query.filter_by(email=email).first()
+
+    # Create a new user if one doesn't exist
+    if user is None:
+        user = User(email=email, password=hash_password('password123!'), active=True, google_id=google_id)
+        db.session.add(user)
+        db.session.commit()
+
+    # Confirm user if their Google account is verified and they are not confirmed yet
+    if confirmed and not user.confirmed_at:
+        confirm_user(user)
+        db.session.commit()
+
+    # Activate user if not active
+    if not user.active:
+        user.active = True
+        db.session.commit()
+
+    if not user.google_id:
+        return redirect(url_for('error_page', error_message='Google account not linked to email account. Please login with email and password, then visit your profile and link your google account.'))
+
+    # Log in the user
+    login_user(user)
+    return redirect(url_for('dashboard'))
