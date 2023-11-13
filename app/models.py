@@ -195,9 +195,16 @@ class User(UserMixin, db.Model):
     # endregion demo
     # endregion tutorial
 
+    # region google_oauth
+    google_id = db.Column(db.String(255), nullable=True)
+    # endregion google_oauth
+
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         self.fs_uniquifier = str(uuid.uuid4())
+
+    def is_google_user(self):
+        return self.google_id is not None
     
     def set_role(self, role):
         self.roles.append(role)        
