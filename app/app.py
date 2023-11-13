@@ -19,6 +19,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, DateField, TimeField
 from flask_security.forms import LoginForm, ConfirmRegisterForm
 from wtforms.validators import DataRequired, Length, Regexp, Email, Optional
+from authlib.integrations.flask_client import OAuth
 
 from .models import User, Role
 
@@ -49,6 +50,8 @@ class CustomLoginForm(LoginForm):
 class App:
     def __init__(self):
         self.app = self.create_app()
+        self.oauth = OAuth(self.app)
+        self.configure_google_oauth()
 
     def create_app(self):
         flask_app = Flask(__name__)
@@ -85,7 +88,7 @@ class App:
         flask_app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
         flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(flask_app)
-        _ = Migrate(flask_app, db)     
+        _ = Migrate(flask_app, db)
 
         with flask_app.app_context():
             self.user_datastore = SQLAlchemyUserDatastore(db, User, Role)
@@ -99,6 +102,20 @@ class App:
             # register_blueprints(flask_app)
 
         return flask_app
+    
+    def configure_google_oauth(self):
+        self.oauth.register(
+            name='google',
+            client_id=os.getenv('GOOGLE_CLIENT_ID'),
+            client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
+            access_token_url='https://accounts.google.com/o/oauth2/token',
+            access_token_params=None,
+            authorize_url='https://accounts.google.com/o/oauth2/auth',
+            authorize_params=None,
+            api_base_url='https://www.googleapis.com/oauth2/v1/',
+            client_kwargs={'scope': 'email profile'},
+        )
 
 app_instance = App()
+oauth = app_instance.oauth
 app = app_instance.app
