@@ -1,3 +1,4 @@
+Authlib
 bcrypt
 colorama
 python-dotenv
