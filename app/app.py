@@ -88,7 +88,8 @@ class App:
         flask_app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
         flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(flask_app)
-        _ = Migrate(flask_app, db)
+        MIGRATE_PATH = os.getenv("MIGRATIONS_DIR")
+        _ = Migrate(flask_app, db, directory=MIGRATE_PATH)
 
         with flask_app.app_context():
             self.user_datastore = SQLAlchemyUserDatastore(db, User, Role)
