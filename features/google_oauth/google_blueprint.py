@@ -48,6 +48,9 @@ def authorize():
 
     if not user.google_id:
         return redirect(url_for('error_page', error_message='Google account not linked to email account. Please login with email and password, then visit your profile and link your google account.'))
+    
+    if not confirmed:
+        return redirect(url_for('error_page', error_message='Google account not verified. Please verify your google account and try again.'))
 
     # Log in the user
     login_user(user)
