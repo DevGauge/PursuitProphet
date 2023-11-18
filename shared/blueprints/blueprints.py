@@ -15,9 +15,10 @@ dream_bp = construct_blueprint('dream')
 task_bp = construct_blueprint('task')
 subtask_bp = construct_blueprint('subtask')
 google_bp = construct_blueprint('google')
+profile_bp = construct_blueprint('profile')
 
 def register_blueprints(flask_app):
-    blueprints = [demo_bp, dream_bp, task_bp, subtask_bp, google_bp]
+    blueprints = [demo_bp, dream_bp, task_bp, subtask_bp, google_bp, profile_bp]
     for blueprint in blueprints:
         flask_app.register_blueprint(blueprint)
         print(f'registered blueprint: {blueprint.name} with url_prefix: {blueprint.url_prefix}, template_folder: {blueprint.template_folder}, static_folder: {blueprint.static_folder}')

@@ -20,6 +20,7 @@ import features.dream.dream_blueprint
 import features.task.task_blueprint
 import features.subtask.subtask_blueprint
 import features.google_oauth.google_blueprint
+import features.profile.profile_blueprint
 
 from shared.blueprints.blueprints import register_blueprints
 app = app_instance.app
