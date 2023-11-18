@@ -93,7 +93,7 @@ class App:
 
         with flask_app.app_context():
             self.user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-            db.drop_all()
+            # db.drop_all()
             db.create_all()
             db_logger = DBLogger(db)
             self.logger = EventLogger(db_logger)
