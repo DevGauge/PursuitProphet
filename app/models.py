@@ -198,7 +198,7 @@ class User(UserMixin, db.Model):
     # region google_oauth
     google_id = db.Column(db.String(255), nullable=True)
     google_api_key = db.Column(db.String(255), nullable=True)
-    primary_google_email = db.Column(db.String(255), unique=True, nullable=True)
+    primary_google_email = db.Column(db.String(255), unique=False, nullable=True)
     # endregion google_oauth
 
     def __init__(self, **kwargs):

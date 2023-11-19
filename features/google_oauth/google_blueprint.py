@@ -51,13 +51,11 @@ def authorize():
         db.session.add(user)
         db.session.commit()
 
-    # Confirm user if their Google account is verified and they are not confirmed yet
     if confirmed and not user.confirmed_at:
         print('Confirming user')
         confirm_user(user)
         db.session.commit()
 
-    # Activate user if not active
     if not user.active:
         print('Activating user')
         user.active = True
@@ -69,9 +67,9 @@ def authorize():
     if not confirmed:
         return redirect(url_for('error_page', error_message='Google account not verified. Please verify your google account and try again.'))
 
-    # Log in the user
     print('Logging in user')
-    login_user(user)
+    login_user(user)    
+    linkUserPrimaryGoogleEmail(email)
     return redirect(url_for('dashboard'))
 
 @login_required
@@ -99,5 +97,14 @@ def linkUser():
     except Exception as e:
         print(f'Error linking user: {e}')
         return redirect(url_for('error_page', error_message='Unknown error. Please try again.'))
-    
+    linkUserPrimaryGoogleEmail(user_info['email'])
     return redirect(url_for('profile_bp.profile'))
+
+def linkUserPrimaryGoogleEmail(email: str):
+    try:
+        curr_user = current_user._get_current_object()
+        curr_user.primary_google_email = email
+        db.session.commit()
+    except Exception as e:
+        print(f'Error linking user: {e}')
+        return redirect(url_for('error_page', error_message='Unknown error. Please try again.'))
