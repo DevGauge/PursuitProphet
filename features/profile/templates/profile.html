@@ -3,7 +3,7 @@
 {% block main %}
 <h1>Profile</h1>
 <div class="profile-container">    
-    <form class="profile-detail-form">
+    <div class="profile-detail-form">
         <div class="col-md-12">
             <hr>
             <div class="row">
@@ -14,15 +14,17 @@
                         {% include 'google_button.html' %}
                     {% endwith %}
                     {% else %}
-                    <h3>Google Account is linked</h3>
+                    <h3>Google Account <span class='highlight-text'>{{ current_user.primary_google_email }}</span> is linked</h3>
                     {% endif %}
                 </div>
             </div>
             <hr>
-            <label for="aka">Preferred Name</label><br>
-            <input type="text" name="aka" id="aka" value="{{ current_user.aka }}" required><br>
-            <button class="btn btn-primary" type="submit">Submit</button>
+            <form method="post" class="profile-detail-form">
+                <label for="aka">Preferred Name</label><br>
+                <input type="text" name="aka" id="aka" value="{{ current_user.aka }}" required><br>
+                <button class="cancel-button" type="submit">Change Preferred Name</button>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 {% endblock %}    
