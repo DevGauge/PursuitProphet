@@ -17,32 +17,43 @@ def login():
 
 @google_bp.route('/google/authorize')
 def authorize():
+    print('redirected to authorize')
     token = google_client.authorize_access_token()
+    print(f'token: {token}')
     resp = google_client.get('userinfo')
+    print(f'resp: {resp.json()}')
 
     if not resp.ok:
-        return 'Bad Response from Google'
+        return redirect(url_for('error_page', error_message='Bad Response from Google'))
 
     user_info = resp.json()
     email = user_info['email']
     confirmed = user_info['verified_email']
     google_id = user_info['id']
 
-    user = User.query.filter_by(email=email).first()
+    try:
+        user = User.query.filter_by(email=email).first()
+        print(f'user: {user}')
+    except Exception as e:
+        print(f'Error finding user: {e}')
+        return redirect(url_for('error_page', error_message='Error finding user'))
 
     # Create a new user if one doesn't exist
     if user is None:
+        print('Creating new user')
         user = User(email=email, password=hash_password('password123!'), active=True, google_id=google_id)
         db.session.add(user)
         db.session.commit()
 
     # Confirm user if their Google account is verified and they are not confirmed yet
     if confirmed and not user.confirmed_at:
+        print('Confirming user')
         confirm_user(user)
         db.session.commit()
 
     # Activate user if not active
     if not user.active:
+        print('Activating user')
         user.active = True
         db.session.commit()
 
@@ -53,5 +64,6 @@ def authorize():
         return redirect(url_for('error_page', error_message='Google account not verified. Please verify your google account and try again.'))
 
     # Log in the user
+    print('Logging in user')
     login_user(user)
     return redirect(url_for('dashboard'))
