@@ -8,10 +8,8 @@
 {% block main %}
 <div class="login-form-container">
   <form class="login-form" method="POST" action="{{ url_for_security('login') }}">
-    <a href="{{ url_for('google_bp.login') }}" class="experiment-parent-element">
-      <img src="https://developers.google.com/identity/images/btn_google_signin_dark_normal_web.png" alt="Sign in with Google"/>
-      <div class="experiment-badge">Experimental: Google Login</div>
-    </a>
+    <!-- include google button from google_bp blueprint template directory -->
+    {% include 'google_button.html' %}
     {{ login_user_form.hidden_tag() }}
     {{ login_user_form.email.label }}<br>
     {{ login_user_form.email(size=32, placeholder="name@example.com", id="email-input") }}
