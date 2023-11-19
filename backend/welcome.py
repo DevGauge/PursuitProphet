@@ -23,8 +23,7 @@ import features.google_oauth.google_blueprint
 
 from shared.blueprints.blueprints import register_blueprints
 app = app_instance.app
-app.debug_mode = True
-socketio = SocketIO(app)
+socketio = SocketIO(app, debug=True)
 register_blueprints(app)
 print(app.url_map)
 
@@ -133,21 +132,17 @@ def update_feature_value(feature_key):
 @login_required
 @app.route('/')
 def dashboard():
-    try:        
-        if current_user.is_authenticated:
+    if isinstance(current_user, User): # current_user can be anonymous and need to login
+        try:
             user_id = current_user.id
             user = app_instance.user_datastore.find_user(id=user_id)
-            if user is not None:
+            if user:
                 goals = Goal.query.filter_by(user_id=user_id).all()
                 return render_template('dream-home.html', goals=goals)
-        else:
-            return redirect(url_for('security.login'))
-    except Exception as e:
-        print('login exception', e)
-        return redirect(url_for('security.login'))
-    
-    return redirect(url_for('security.login'))  
- 
+        except Exception as e:
+            app.logger.error(f'Dashboard loading error: {e}')
+            return redirect(url_for('error_page', error_message='Error logging you in.'))
+    return redirect(url_for('security.login'))
 @app.route('/chat')
 def chat():
     return render_template('chat.html')
