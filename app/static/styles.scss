@@ -383,12 +383,14 @@ body {
 
 .register-form-container,
 .login-form-container,
-.goal-detail-container {
+.goal-detail-container,
+.profile-container {
     @include form-container;
 
     .register-form,
     .login-form,
     .goal-detail-form,
+    .profile-detail-form,
     .alert {
         @include form-inner-element;
     }
@@ -927,7 +929,7 @@ button.submit-button {
     color: white;
     text-align: center;
     padding: 5px 0;
-    font-size: 1.5em;
+    font-size: 1.25em;
     font-weight: bold;
     z-index: 10;
     pointer-events: none; // Let clicks through to underlying elements

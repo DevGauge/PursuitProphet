@@ -285,7 +285,8 @@ body {
 
 .register-form-container,
 .login-form-container,
-.goal-detail-container {
+.goal-detail-container,
+.profile-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -297,15 +298,23 @@ body {
 .register-form-container .register-form,
 .register-form-container .login-form,
 .register-form-container .goal-detail-form,
+.register-form-container .profile-detail-form,
 .register-form-container .alert,
 .login-form-container .register-form,
 .login-form-container .login-form,
 .login-form-container .goal-detail-form,
+.login-form-container .profile-detail-form,
 .login-form-container .alert,
 .goal-detail-container .register-form,
 .goal-detail-container .login-form,
 .goal-detail-container .goal-detail-form,
-.goal-detail-container .alert {
+.goal-detail-container .profile-detail-form,
+.goal-detail-container .alert,
+.profile-container .register-form,
+.profile-container .login-form,
+.profile-container .goal-detail-form,
+.profile-container .profile-detail-form,
+.profile-container .alert {
   display: flex;
   flex-direction: column;
   background-color: #333;
@@ -318,15 +327,23 @@ body {
 .register-form-container .register-form label,
 .register-form-container .login-form label,
 .register-form-container .goal-detail-form label,
+.register-form-container .profile-detail-form label,
 .register-form-container .alert label,
 .login-form-container .register-form label,
 .login-form-container .login-form label,
 .login-form-container .goal-detail-form label,
+.login-form-container .profile-detail-form label,
 .login-form-container .alert label,
 .goal-detail-container .register-form label,
 .goal-detail-container .login-form label,
 .goal-detail-container .goal-detail-form label,
-.goal-detail-container .alert label {
+.goal-detail-container .profile-detail-form label,
+.goal-detail-container .alert label,
+.profile-container .register-form label,
+.profile-container .login-form label,
+.profile-container .goal-detail-form label,
+.profile-container .profile-detail-form label,
+.profile-container .alert label {
   font-weight: semibold;
   text-decoration: underline;
 }
@@ -336,6 +353,8 @@ body {
 .register-form-container .login-form textarea,
 .register-form-container .goal-detail-form input,
 .register-form-container .goal-detail-form textarea,
+.register-form-container .profile-detail-form input,
+.register-form-container .profile-detail-form textarea,
 .register-form-container .alert input,
 .register-form-container .alert textarea,
 .login-form-container .register-form input,
@@ -344,6 +363,8 @@ body {
 .login-form-container .login-form textarea,
 .login-form-container .goal-detail-form input,
 .login-form-container .goal-detail-form textarea,
+.login-form-container .profile-detail-form input,
+.login-form-container .profile-detail-form textarea,
 .login-form-container .alert input,
 .login-form-container .alert textarea,
 .goal-detail-container .register-form input,
@@ -352,22 +373,42 @@ body {
 .goal-detail-container .login-form textarea,
 .goal-detail-container .goal-detail-form input,
 .goal-detail-container .goal-detail-form textarea,
+.goal-detail-container .profile-detail-form input,
+.goal-detail-container .profile-detail-form textarea,
 .goal-detail-container .alert input,
-.goal-detail-container .alert textarea {
+.goal-detail-container .alert textarea,
+.profile-container .register-form input,
+.profile-container .register-form textarea,
+.profile-container .login-form input,
+.profile-container .login-form textarea,
+.profile-container .goal-detail-form input,
+.profile-container .goal-detail-form textarea,
+.profile-container .profile-detail-form input,
+.profile-container .profile-detail-form textarea,
+.profile-container .alert input,
+.profile-container .alert textarea {
   margin-bottom: 10px;
 }
 .register-form-container .register-form input[type=time]::-webkit-calendar-picker-indicator,
 .register-form-container .login-form input[type=time]::-webkit-calendar-picker-indicator,
 .register-form-container .goal-detail-form input[type=time]::-webkit-calendar-picker-indicator,
+.register-form-container .profile-detail-form input[type=time]::-webkit-calendar-picker-indicator,
 .register-form-container .alert input[type=time]::-webkit-calendar-picker-indicator,
 .login-form-container .register-form input[type=time]::-webkit-calendar-picker-indicator,
 .login-form-container .login-form input[type=time]::-webkit-calendar-picker-indicator,
 .login-form-container .goal-detail-form input[type=time]::-webkit-calendar-picker-indicator,
+.login-form-container .profile-detail-form input[type=time]::-webkit-calendar-picker-indicator,
 .login-form-container .alert input[type=time]::-webkit-calendar-picker-indicator,
 .goal-detail-container .register-form input[type=time]::-webkit-calendar-picker-indicator,
 .goal-detail-container .login-form input[type=time]::-webkit-calendar-picker-indicator,
 .goal-detail-container .goal-detail-form input[type=time]::-webkit-calendar-picker-indicator,
-.goal-detail-container .alert input[type=time]::-webkit-calendar-picker-indicator {
+.goal-detail-container .profile-detail-form input[type=time]::-webkit-calendar-picker-indicator,
+.goal-detail-container .alert input[type=time]::-webkit-calendar-picker-indicator,
+.profile-container .register-form input[type=time]::-webkit-calendar-picker-indicator,
+.profile-container .login-form input[type=time]::-webkit-calendar-picker-indicator,
+.profile-container .goal-detail-form input[type=time]::-webkit-calendar-picker-indicator,
+.profile-container .profile-detail-form input[type=time]::-webkit-calendar-picker-indicator,
+.profile-container .alert input[type=time]::-webkit-calendar-picker-indicator {
   filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(218deg) brightness(95%) contrast(80%);
   height: 20px;
   width: 20px;
@@ -375,15 +416,23 @@ body {
 .register-form-container .register-form input[type=date]::-webkit-calendar-picker-indicator,
 .register-form-container .login-form input[type=date]::-webkit-calendar-picker-indicator,
 .register-form-container .goal-detail-form input[type=date]::-webkit-calendar-picker-indicator,
+.register-form-container .profile-detail-form input[type=date]::-webkit-calendar-picker-indicator,
 .register-form-container .alert input[type=date]::-webkit-calendar-picker-indicator,
 .login-form-container .register-form input[type=date]::-webkit-calendar-picker-indicator,
 .login-form-container .login-form input[type=date]::-webkit-calendar-picker-indicator,
 .login-form-container .goal-detail-form input[type=date]::-webkit-calendar-picker-indicator,
+.login-form-container .profile-detail-form input[type=date]::-webkit-calendar-picker-indicator,
 .login-form-container .alert input[type=date]::-webkit-calendar-picker-indicator,
 .goal-detail-container .register-form input[type=date]::-webkit-calendar-picker-indicator,
 .goal-detail-container .login-form input[type=date]::-webkit-calendar-picker-indicator,
 .goal-detail-container .goal-detail-form input[type=date]::-webkit-calendar-picker-indicator,
-.goal-detail-container .alert input[type=date]::-webkit-calendar-picker-indicator {
+.goal-detail-container .profile-detail-form input[type=date]::-webkit-calendar-picker-indicator,
+.goal-detail-container .alert input[type=date]::-webkit-calendar-picker-indicator,
+.profile-container .register-form input[type=date]::-webkit-calendar-picker-indicator,
+.profile-container .login-form input[type=date]::-webkit-calendar-picker-indicator,
+.profile-container .goal-detail-form input[type=date]::-webkit-calendar-picker-indicator,
+.profile-container .profile-detail-form input[type=date]::-webkit-calendar-picker-indicator,
+.profile-container .alert input[type=date]::-webkit-calendar-picker-indicator {
   height: 20px;
   width: 20px;
   filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(218deg) brightness(95%) contrast(80%);
@@ -391,29 +440,45 @@ body {
 .register-form-container .register-form input[type=time]::-webkit-calendar-picker-indicator:hover,
 .register-form-container .login-form input[type=time]::-webkit-calendar-picker-indicator:hover,
 .register-form-container .goal-detail-form input[type=time]::-webkit-calendar-picker-indicator:hover,
+.register-form-container .profile-detail-form input[type=time]::-webkit-calendar-picker-indicator:hover,
 .register-form-container .alert input[type=time]::-webkit-calendar-picker-indicator:hover,
 .login-form-container .register-form input[type=time]::-webkit-calendar-picker-indicator:hover,
 .login-form-container .login-form input[type=time]::-webkit-calendar-picker-indicator:hover,
 .login-form-container .goal-detail-form input[type=time]::-webkit-calendar-picker-indicator:hover,
+.login-form-container .profile-detail-form input[type=time]::-webkit-calendar-picker-indicator:hover,
 .login-form-container .alert input[type=time]::-webkit-calendar-picker-indicator:hover,
 .goal-detail-container .register-form input[type=time]::-webkit-calendar-picker-indicator:hover,
 .goal-detail-container .login-form input[type=time]::-webkit-calendar-picker-indicator:hover,
 .goal-detail-container .goal-detail-form input[type=time]::-webkit-calendar-picker-indicator:hover,
-.goal-detail-container .alert input[type=time]::-webkit-calendar-picker-indicator:hover {
+.goal-detail-container .profile-detail-form input[type=time]::-webkit-calendar-picker-indicator:hover,
+.goal-detail-container .alert input[type=time]::-webkit-calendar-picker-indicator:hover,
+.profile-container .register-form input[type=time]::-webkit-calendar-picker-indicator:hover,
+.profile-container .login-form input[type=time]::-webkit-calendar-picker-indicator:hover,
+.profile-container .goal-detail-form input[type=time]::-webkit-calendar-picker-indicator:hover,
+.profile-container .profile-detail-form input[type=time]::-webkit-calendar-picker-indicator:hover,
+.profile-container .alert input[type=time]::-webkit-calendar-picker-indicator:hover {
   filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(291deg) brightness(95%) contrast(80%);
 }
 .register-form-container .register-form input[type=date]::-webkit-calendar-picker-indicator:hover,
 .register-form-container .login-form input[type=date]::-webkit-calendar-picker-indicator:hover,
 .register-form-container .goal-detail-form input[type=date]::-webkit-calendar-picker-indicator:hover,
+.register-form-container .profile-detail-form input[type=date]::-webkit-calendar-picker-indicator:hover,
 .register-form-container .alert input[type=date]::-webkit-calendar-picker-indicator:hover,
 .login-form-container .register-form input[type=date]::-webkit-calendar-picker-indicator:hover,
 .login-form-container .login-form input[type=date]::-webkit-calendar-picker-indicator:hover,
 .login-form-container .goal-detail-form input[type=date]::-webkit-calendar-picker-indicator:hover,
+.login-form-container .profile-detail-form input[type=date]::-webkit-calendar-picker-indicator:hover,
 .login-form-container .alert input[type=date]::-webkit-calendar-picker-indicator:hover,
 .goal-detail-container .register-form input[type=date]::-webkit-calendar-picker-indicator:hover,
 .goal-detail-container .login-form input[type=date]::-webkit-calendar-picker-indicator:hover,
 .goal-detail-container .goal-detail-form input[type=date]::-webkit-calendar-picker-indicator:hover,
-.goal-detail-container .alert input[type=date]::-webkit-calendar-picker-indicator:hover {
+.goal-detail-container .profile-detail-form input[type=date]::-webkit-calendar-picker-indicator:hover,
+.goal-detail-container .alert input[type=date]::-webkit-calendar-picker-indicator:hover,
+.profile-container .register-form input[type=date]::-webkit-calendar-picker-indicator:hover,
+.profile-container .login-form input[type=date]::-webkit-calendar-picker-indicator:hover,
+.profile-container .goal-detail-form input[type=date]::-webkit-calendar-picker-indicator:hover,
+.profile-container .profile-detail-form input[type=date]::-webkit-calendar-picker-indicator:hover,
+.profile-container .alert input[type=date]::-webkit-calendar-picker-indicator:hover {
   filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(291deg) brightness(95%) contrast(80%);
 }
 
@@ -895,7 +960,7 @@ button.submit-button {
   color: white;
   text-align: center;
   padding: 5px 0;
-  font-size: 1.5em;
+  font-size: 1.25em;
   font-weight: bold;
   z-index: 10;
   pointer-events: none;
