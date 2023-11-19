@@ -5,7 +5,7 @@ from flask_login import current_user, login_required
 from app.models import User
 from app.pp_logging.db_logger import db
 from shared.blueprints.blueprints import profile_bp
-
+from app.app import RegistrationForm, CustomLoginForm
 
 load_dotenv()
 
@@ -14,20 +14,23 @@ load_dotenv()
 def profile():
     if request.method == 'POST':
         # Update user info
-        user = User.query.filter_by(id=current_user.id).first()
-        user.email = request.form['email'] if request.form['email'] else user.email
-        user.first_name = request.form['first_name'] if request.form['first_name'] else user.first_name
-        user.last_name = request.form['last_name'] if request.form['last_name'] else user.last_name
-        user.phone_number = request.form['phone_number'] if request.form['phone_number'] else user.phone_number
-        user.address = request.form['address'] if request.form['address'] else user.address
-        user.city = request.form['city'] if request.form['city'] else user.city
-        user.state = request.form['state'] if request.form['state'] else user.state
-        user.zip_code = request.form['zip_code'] if request.form['zip_code'] else user.zip_code
-        user.country = request.form['country'] if request.form['country'] else user.country
+        try:
+            user = User.query.filter_by(id=current_user.id).first()
+        except Exception as e:
+            print(f'Error getting user: {e}')
+            return redirect(url_for('error_page', error_message='Unknown error. Please try again.'))
+        # TDDO: Fix these
+        aka = request.form.get('aka')   
+        user.aka = aka if aka else user.aka
         db.session.commit()
         flash('Profile updated successfully.', 'success')
         return redirect(url_for('profile_bp.profile'))
     else:
         # Get user info
-        user = User.query.filter_by(id=current_user.id).first()
-        return render_template('profile.html', user=user)
+        try:
+            user = User.query.filter_by(id=current_user.id).first()
+        except Exception as e:
+            print(f'Error getting user: {e}')
+            return redirect(url_for('error_page', error_message='Unknown error. Please try again.'))
+        return render_template('profile.html', user=user, aka_form=RegistrationForm(), email_form=CustomLoginForm())
+    
