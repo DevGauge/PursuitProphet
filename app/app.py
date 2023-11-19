@@ -56,13 +56,20 @@ class App:
     def create_app(self):
         flask_app = Flask(__name__)
         mail_password=os.getenv('MAIL_PASSWORD')
-        flask_app.debug = True
+        env = os.getenv('FLASK_ENV')
+
+        flask_debug = os.getenv('FLASK_DEBUG')
+        if flask_debug is None:
+            flask_debug = False
+        flask_app.debug = flask_debug
+        flask_app.config['DEBUG'] = flask_debug
+        flask_app.config['ENV'] = env
+
         # flask-security-too
         flask_app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-        print('secret key is None: ', os.getenv('SECRET_KEY') is None)
         flask_app.config['SECURITY_PASSWORD_SALT'] = os.getenv('SECURITY_PASSWORD_SALT')
-        print('salt is None: ', os.getenv('SECURITY_PASSWORD_SALT') is None)
         # flask-security-too registration settings
+        flask_app.config['SECURITY_SESSION_PROTECTION'] = 'strong'
         flask_app.config['SECURITY_REGISTERABLE'] = True
         flask_app.config['SECURITY_CONFIRMABLE'] = True
         flask_app.config['SECURITY_RECOVERABLE'] = True
