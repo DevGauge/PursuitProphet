@@ -1,6 +1,6 @@
 from shared.blueprints.blueprints import google_bp
 from flask import url_for, redirect, request
-from app.app import oauth
+from app.app import oauth, app_instance
 
 from flask_security.confirmable import confirm_user
 from flask_security.utils import hash_password, login_user
@@ -91,7 +91,7 @@ def linkUser():
         return redirect(url_for('error_page', error_message='Google account not verified. Please verify your google account with Google and try again.'))
 
     try:
-        curr_user = current_user._get_current_object()
+        curr_user = app_instance.user_datastore.find_user(id=current_user.id)
         curr_user.google_id = google_id
         db.session.commit()
     except Exception as e:
