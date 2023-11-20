@@ -89,7 +89,6 @@ def linkUser():
     # Confirm user if their Google account is verified and they are not confirmed yet
     if not confirmed:
         return redirect(url_for('error_page', error_message='Google account not verified. Please verify your google account with Google and try again.'))
-
     try:
         curr_user = app_instance.user_datastore.find_user(id=current_user.id)
         curr_user.google_id = google_id
