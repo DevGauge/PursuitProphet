@@ -9,7 +9,12 @@
 <div class="register-form-container">
   <form class="register-form" method="POST" action="{{ url_for_security('register') }}">
     {{ register_user_form.hidden_tag() }}
-
+    <h3>Register with Google</h3>
+    {% include 'google_button.html' %}    
+    <hr style="width:100%;">
+    <h3 style="margin:auto;">- or -</h3>
+    <hr style="width:100%;">
+    <h3>Register with Email</h3>
     {{ register_user_form.email.label }}<br>
     {{ register_user_form.email(size=32, placeholder="name@example.com") }}
     {% for error in register_user_form.email.errors %}
