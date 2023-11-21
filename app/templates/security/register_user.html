@@ -40,3 +40,10 @@
   </form>
 </div>
 {% endblock %}
+{% block scripts %}
+<script>
+    var inputBox = document.getElementById('email');
+    inputBox.focus();
+</script>
+<script src="{{ url_for('static', filename='chat.js') }}"></script>
+{% endblock %}

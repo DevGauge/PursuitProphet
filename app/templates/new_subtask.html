@@ -11,3 +11,10 @@
     </form>
 </div>
 {% endblock %}
+{% block scripts %}
+{{ super() }}
+<script>
+    var inputBox = document.getElementsByClassName('input')[0];
+    inputBox.focus();
+</script>
+{% endblock %}
