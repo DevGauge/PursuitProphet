@@ -17,6 +17,9 @@ function send_message() {
     var userMessage = userInput.value;
     userInput.value = '';
     var chatArea = document.querySelector('#chat-box .scroll-content');
+    if (chatArea == null || chatArea == undefined) {
+        chatArea = document.querySelector('#chat-box');
+    }
     
     var loading = document.querySelector('.loading');
     loading.style.display = 'block';
