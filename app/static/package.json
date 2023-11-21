@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "compile-scss": "\app\static\sass styles.scss:styles.css"
+    "compile-scss": "\\app\\static\\sass styles.scss:styles.css"
   },
   "devDependencies": {
     "sass": "1.62.1"
